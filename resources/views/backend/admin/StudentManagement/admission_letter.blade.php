@@ -1,4 +1,4 @@
-@extends('admin.admin_master')
+@extends('Admission_Officer.master')
 
 @section('mainContent')
 

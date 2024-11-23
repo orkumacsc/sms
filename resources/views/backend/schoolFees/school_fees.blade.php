@@ -10,7 +10,7 @@
 		  <div class="row"> 
 				<!-- School Fees Discount Modal -->
 				<div class="modal fade" id="feesDiscountForm" tabindex="-1" role="dialog" aria-labelledby="feesDiscountModel" aria-hidden="true">
-					<div class="modal-dialog" role="document">
+					<div class="modal-dialog modal-lg" role="document">
 						<div class="modal-content box">
 							<div class="modal-header bg-secondary">
 								<h5 class="modal-title" id="feesDiscountModal">School Fees Payment</h5>
@@ -237,7 +237,7 @@ $(document).ready(() => {
             success: function(response){
                 $('#student_id').empty();
                 response.forEach(Student => {						
-                    $('#student_id').append('<option value="'+Student.id+'">'+Student.surname+', '+Student.firstname+' '+Student.middlename+'</option>');
+                    $('#student_id').append('<option value="'+Student.students_id+'">'+Student.surname+', '+Student.firstname+' '+(Student.middlename ? Student.middlename : '')+'</option>');
 					
                 });
             },

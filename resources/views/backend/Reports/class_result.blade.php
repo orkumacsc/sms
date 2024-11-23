@@ -50,7 +50,7 @@
                                     <select name="arm_id" id="arm_id" required class="form-control p-10">
                                         <option value="">Select Arm</option>
                                         @foreach($ClassArms as $key => $Arm)
-                                        <option value="{{ $Arm->id }}">{{ $Arm->name }}</option>
+                                        <option value="{{ $Arm->id }}">{{ $Arm->arm_name }}</option>
                                         @endforeach                                        
                                     </select>
                                     </div>

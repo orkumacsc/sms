@@ -51,17 +51,27 @@ class CassScoresController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function InputScoreForm(Request $request)
-    {
+    {    
+        $data['SchoolClasses'] = SchoolClass::all();
+        $data['SchoolTerm'] = SchoolTerm::all();
+        $data['SchoolSessions'] = SchoolSessions::all();        
+        $data['SchoolSubjects'] = SchoolSubjects::all();
+        $data['ClassArms'] = SchoolArms::all();
         $data['current_session'] = SchoolSessions::find($request->s_id);
-        $data['SchoolClasses'] = SchoolClass::find($request->class_id);
+        $data['Current_Class'] = SchoolClass::find($request->class_id);
+        $data['Class_Arm'] = SchoolArms::find($request->arm_id);
         $data['current_term'] = SchoolTerm::find($request->term_id);
         $data['subject'] = SchoolSubjects::find($request->subject_id);             
-        $data['Students'] = Students::where('class','=',$request->class_id)->orderBy('students.surname', 'ASC')->get()->all();
+        $data['Students'] = Students::where('class','=',$request->class_id)
+            ->where('classarm_id', $request->arm_id)
+                ->where('session_admitted', $request->s_id)
+                    ->orderBy('students.surname', 'ASC')->get()->all();
+                    
         $data['Assessments'] = SchoolAssessments::where('class_id', '=', $request->class_id)->join('school_classes', 'school_classes.id', '=', 'school_assessments.class_id')
             ->orderBy('school_classes.id', 'ASC')->orderBy('school_assessments.id', 'ASC')
                 ->join('assessment__types', 'assessment__types.id', '=', 'school_assessments.ass_type_id')->get()->all();
 
-            return view('backend.Examination.input_scores_form', $data);
+            return view('backend.Examination.cass_entry_form', $data);
     }
 
     /**

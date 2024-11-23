@@ -18,6 +18,7 @@ use App\Models\SchoolSessions;
 use App\Models\Gender;
 use App\Models\ParentGuardian;
 use App\Models\User;
+use App\Models\StudentClass;
 use Auth;
 
 class StudentAdmissionController extends Controller
@@ -82,6 +83,7 @@ class StudentAdmissionController extends Controller
         $Student_User->email = strtolower($request->surname).$number.'@gospelschools.sch.ng';
         $Student_User->password = bcrypt($request->surname);
         $Student_User->save();
+        $login_id = $Student_User->id;
 
         // Parent/Guardian's table insert
         // $Parent = new ParentGuardian();
@@ -96,8 +98,10 @@ class StudentAdmissionController extends Controller
 
         //Students Tables Insert
         $Student = new Students();
+        $Student->login_id = $login_id;
         $Student->admission_no = $schoolCode.'/'.$classCode.'/'.$sessionCode.'/'.$number;
         $Student->session_admitted = $currentSeason->currentSession;
+        $Student->term_admitted = $currentSeason->currentTerem;
         $Student->class = $request->class_admitted;
         $Student->classarm_id = $request->class_arm;
         $Student->surname = strtoupper($request->surname);
@@ -119,8 +123,19 @@ class StudentAdmissionController extends Controller
         $Student->last_school = $request->school_name;
         $Student->last_class = $request->last_class;
         $Student->class = $request->class_admitted;
+
         $Student->passport = $PassportFolder;        
         $Student->save();
+
+
+        $StudentClasses = new StudentClass();
+        $StudentClasses->student_id = Students::max('id');
+        $StudentClasses->class_id = $request->class_admitted;
+        $StudentClasses->school_arm_id = $request->class_arm;
+        $StudentClasses->academic_session_id = $currentSeason->currentSession;
+        $StudentClasses->status = 1;
+        $StudentClasses->save();
+
 
         $notifications = array(
             'message' => 'Student Registration Successfully Completed!',
@@ -140,7 +155,7 @@ class StudentAdmissionController extends Controller
         ->join('school_classes', 'school_classes.id', '=', 'students.class')
         ->join('school_arms', 'school_arms.id','=','students.classarm_id')
             ->join('genders', 'genders.id', '=', 'students.gender')
-                ->select('students.id', 'students.date_of_birth', 'students.surname', 'students.firstname', 'students.middlename', 'students.admission_no', 'genders.gendername', 'school_classes.classname', 'school_arms.arm_name', 'school_houses.name')
+                ->select('students.students_id', 'students.date_of_birth', 'students.surname', 'students.firstname', 'students.middlename', 'students.admission_no', 'genders.gendername', 'school_classes.classname', 'school_arms.arm_name', 'school_houses.name')
                     ->get()->all();
         
 
@@ -169,7 +184,7 @@ class StudentAdmissionController extends Controller
         $Print = Students::join('school_houses', 'school_houses.id', '=', 'students.school_houses_id')->orderBy('students.surname', 'ASC')
         ->join('school_classes', 'school_classes.id', '=', 'students.class')
             ->join('genders', 'genders.id', '=', 'students.gender')
-                ->select('students.id', 'students.surname', 'students.firstname', 'students.middlename', 'students.admission_no', 
+                ->select('students.students_id', 'students.surname', 'students.firstname', 'students.middlename', 'students.admission_no', 
                             'genders.gendername', 'school_classes.classname', 'school_houses.name', 'students.date_of_birth', 'students.passport')
                     ->find($id);
         
@@ -186,7 +201,7 @@ class StudentAdmissionController extends Controller
             ->join('religions', 'religions.id', '=', 'students.religion')->join('tribes', 'tribes.id', '=', 'students.tribe')
             ->join('countries', 'countries.id', '=', 'students.nationality')->join('states', 'states.id', '=', 'students.state_of_origin')
             ->join('local_govts', 'local_govts.id', '=', 'students.lga_of_origin')
-                ->select('students.id', 'students.surname', 'students.firstname', 'students.middlename', 'students.admission_no', 
+                ->select('students.students_id', 'students.surname', 'students.firstname', 'students.middlename', 'students.admission_no', 
                             'genders.gendername', 'school_classes.classname', 'school_houses.name', 'students.date_of_birth', 'students.passport','school_sessions.name as session_admitted',
                             'religions.name as religion', 'tribes.name as tribe', 'countries.name as nationality', 'states.name as state', 'local_govts.name as lga',
                             'students.home_town', 'students.last_class', 'students.last_school', 'students.school_clubs',
@@ -264,7 +279,7 @@ class StudentAdmissionController extends Controller
 
     public function StudentTransfer(){
         $data['Classes'] = SchoolClass::all();
-        $data['Students'] = Students::select('students.id', 'students.surname', 'students.firstname', 'students.middlename')->orderBy('students.surname', 'ASC')->get();
+        $data['Students'] = Students::select('students.students_id', 'students.surname', 'students.firstname', 'students.middlename')->orderBy('students.surname', 'ASC')->get();
 
         return view('backend.admin.StudentManagement.student_transfer_form',$data);
     }

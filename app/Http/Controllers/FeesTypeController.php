@@ -148,14 +148,22 @@ class FeesTypeController extends Controller
      */
     public function destroy(FeesType $feesType, $id)
     {
-        $fee = FeesType::find($id);
-        $fee->delete();
+       try {
+            $fee = FeesType::find($id);
+            $fee->delete();
+            $notifications = array(
+                'message' => 'Fee Type Deleted Successfully',
+                'alert-type' => 'success'
+            );
 
-        $notifications = array(
-            'message' => 'Fee Type Deleted Successfully',
-            'alert-type' => 'success'
-        );
+            return redirect()->route('fees_type')->with($notifications);
+       }catch(\Exception $e) {
+            $notifications = [
+                'message' => 'System could not delete fees types',
+                'alert-type' => 'error'
+            ];
 
-        return redirect()->route('fees_type')->with($notifications);
+            return back()->with($notifications);
+       }
     }
 }

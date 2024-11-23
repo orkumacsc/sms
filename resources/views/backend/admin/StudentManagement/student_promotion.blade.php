@@ -8,7 +8,7 @@
 	  	<section class="content">
 		  <div class="box">
 			<div class="box-header with-border">
-			  <h4 class="box-title">Transfer Students</h4>			  
+			  <h4 class="box-title">Promote Students</h4>			  
 			</div>
 			<!-- /.box-header -->
 			<div class="box-body">
@@ -21,7 +21,7 @@
                   <div class="form-group">
                       <h5>Academic Session<span class="text-danger">*</span></h5>
                       <div class="controls">
-                      <select name="acad_session" id="acad_session" required class="form-control p-10">                                        
+                      <select name="academic_session" id="academic_session" required class="form-control p-10">                                        
                           @foreach($SchoolSessions as $key => $School_Session)
                           <option value="{{ $School_Session->id }}">{{ $School_Session->name }}</option> 
                           @endforeach                                       
@@ -44,10 +44,10 @@
               </div> 
               <div class="col-sm-3">
                   <div class="form-group">
-                      <h5>New Class Arm<span class="text-danger">*</span></h5>
+                      <h5>Current Class Arm<span class="text-danger">*</span></h5>
                       <div class="controls">
-                      <select name="class_arm" id="class_arm"  class="form-control p-10">
-                          <option value="">Select New Class Arm</option>
+                      <select name="current_class_arm" id="class_arm"  class="form-control p-10">
+                          <option value="">Select Current Class Arm</option>
                           @foreach($ClassArms as $key => $class_arm)
                           <option value="{{ $class_arm->id }}">{{ $class_arm->arm_name }}</option>
                           @endforeach                                        
@@ -58,7 +58,7 @@
               <div class="col-sm-3">
                 <div class="form-group">									
                   <div class="text-xs-right pt-25">
-                    <input type="submit" value="Transfer To New Class" class="btn  btn-info">
+                    <input type="submit" value="View Student In Class" class="btn  btn-info">
                   </div>
                 </div>
               </div>

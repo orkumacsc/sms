@@ -5,6 +5,7 @@ namespace App\Http\Controllers\backend;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Roles;
 
 class userController extends Controller
 {
@@ -22,19 +23,23 @@ class userController extends Controller
     }
 
     public function AddUser(){
-        
-        return view('backend.user.add_user');
+        $data['userRoles'] = Roles::all();
+        return view('backend.user.add_user', $data);
     }
 
     public function StoreUser(Request $request){
         $validatedData = $request->validate([
             'email' => 'required|unique:users',
-            'name' => 'required',
+            'full_name' => 'required',
+            // 'username' => 'required|unique:users',
+            // 'password' > 'required',
+            // 'usertype' => 'required',
         ]);
 
         $data  = new User();
         $data->usertype = $request->usertype;
-        $data->name = $request->name;
+        $data->name = $request->full_name;
+        $data->username = $request->username;
         $data->email = $request->email;
         $data->password = bcrypt($request->password);
         $data->save();

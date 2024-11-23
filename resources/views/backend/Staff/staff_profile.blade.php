@@ -7,26 +7,23 @@
         		
 		<!-- Main content -->
 		<section class="content">
-
-		  <div class="row">
-			  <div class="col-12 col-lg-5 col-xl-4">
-
-
-				  <!-- /.box -->
-				 <div class="box box-widget widget-user">
+			<div class="row">
+				<div class="col-12 col-md-5">
+					<!-- /.box -->
+					<div class="box box-widget widget-user">
 					<!-- Add the bg color to the header using any of the bg-* classes -->
 					<div class="widget-user-header bg-success" >
-					  
+						
 					</div>
 					<div class="widget-user-image">
-					  <img class="circle" src="{{ (!empty($Profile->staff_passport))? url('storage/'.$Profile->staff_passport) : url('storage/profile-photos/default.png') }}" alt="User Avatar">
+						<img class="circle" src="{{ (!empty($Profile->staff_passport))? url('storage/'.$Profile->staff_passport) : url('storage/profile-photos/default.png') }}" alt="User Avatar">
 					</div>
-	
+
 					<div class="box-footer pt-80">
 						<div class="description-header text-center">
 							<h4 description-content>{{ $Profile->surname.', '.$Profile->firstname.' '.$Profile->middlename }}</h3>
 						</div>
-					  <div class="row">
+						<div class="row">
 						<div class="col-sm-12 text-left">
 						<div class="row">
 								<div class="col-sm-6">									
@@ -61,13 +58,14 @@
 								</div>							  
 							</div>
 						</div>
-					  </div>
-					  <!-- /.row -->
+						</div>
+						<!-- /.row -->
 					</div>
-				  </div>
-
-			  </div>
-			  <div class="col-12 col-lg-7 col-xl-8">
+					</div>
+				</div>
+			</div>
+			<div class="row">			  
+			  <div class="col-12 col-md-5">
 				
 			  <div class="nav-tabs-custom box-profile">
 				<ul class="nav nav-tabs">
@@ -79,7 +77,7 @@
 
 					<!-- /.tab-pane -->
 					<div class="active tab-pane bg-transparent" id="profile">
-						<div class="box pt-30 pb-30 pl-50 pr-50 ">
+						<div class="box py-20 px-20 ">
 							<div class="row">						  
 						<div class="col-sm-12 text-left">
 							<h4>PERSONAL INFORMATION</h4>
@@ -206,7 +204,7 @@
 				  <!-- /.tab-pane -->
 
 				  <div class="tab-pane" id="emergency">				  		
-					<div class="box pt-30 pb-30 pl-50 pr-50 ">
+					<div class="box py-20 px-20 ">
 						<div class="row">						  
 							<div class="col-sm-12 text-left">
 								<h4>EMERGENCY CONTACT INFORMATION</h4>

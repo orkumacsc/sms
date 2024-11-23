@@ -18860,10 +18860,10 @@ input[type="color"] {
   box-shadow: none; }
 
 .form-control {
-  border-radius: 10px;
+  border-radius: 5px;
   box-shadow: none;
   border-color: #b3c5d9;
-  height: auto; }
+  height: 3.5rem; }
   .form-control:focus {
     box-shadow: none; }
   .form-control::-webkit-input-placeholder {

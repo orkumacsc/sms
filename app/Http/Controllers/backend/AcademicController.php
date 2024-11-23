@@ -24,6 +24,13 @@ class AcademicController extends Controller
     
     public function SchoolSubjects(){
         $data['allData'] = SchoolSubjects::all();
+        $data['ClassSubjects'] = ClassSubjects::join('staff', 'staff.id', 'class_subjects.teacher_id')->join('school_classes', 'school_classes.id', 'class_subjects.class_id')
+            ->join('school_subjects', 'school_subjects.id', 'class_subjects.subject_id')
+                ->select('school_subjects.subject_name as subjects', 'school_classes.classname as class', 'staff.surname as surname', 
+                'staff.firstname as firstname', 'staff.middlename as middlename', 'staff.id as staff_id', 'class_subjects.id as id')->get();
+        $data['SchoolClasses'] = SchoolClass::all();
+        $data['SchoolSubjects'] = SchoolSubjects::all();
+        $data['Staff'] = Staff::all();
 
         return view('backend.academics.school_subjects', $data);
     }
@@ -43,23 +50,6 @@ class AcademicController extends Controller
         );
 
         return redirect()->route('school_subjects')->with($notifications);
-    }
-
-    public function AssignSubject(){
-        if(Auth::user()->usertype != 'Super Admin'){
-            return redirect()->route('login');
-       } else {
-            $data['ClassSubjects'] = ClassSubjects::join('staff', 'staff.id', 'class_subjects.teacher_id')->join('school_classes', 'school_classes.id', 'class_subjects.class_id')
-                ->join('school_subjects', 'school_subjects.id', 'class_subjects.subject_id')
-                    ->select('school_subjects.name as subjects', 'school_classes.classname as class', 'staff.surname as surname', 
-                    'staff.firstname as firstname', 'staff.middlename as middlename', 'staff.id as staff_id', 'class_subjects.id as id')->get();
-            $data['SchoolClasses'] = SchoolClass::all();
-            $data['SchoolSubjects'] = SchoolSubjects::all();
-            $data['Staff'] = Staff::all();
-
-
-            return view('backend.academics.assign_subjects_form', $data);
-       }
     }
 
     public function StoreAssignedSubject(Request $request){
@@ -83,7 +73,7 @@ class AcademicController extends Controller
             'alert-type' => 'success'
         );
 
-        return redirect()->route('assign_subject')->with($notifications);
+        return redirect()->route('school_subjects')->with($notifications);
     }
 
 

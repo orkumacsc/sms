@@ -15,20 +15,7 @@
 			  <div class="row">
 				<div class="col">
 					<form method="get" action="{{ route('exam_attendance_view') }}">
-					<div class="row">
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <h5>Session<span class="text-danger">*</span></h5>
-                                    <div class="controls">
-                                    <select name="sid" id="sid" required class="form-control p-10">
-                                    <option value="">Select Session</option>                                        
-                                        @foreach($SchoolSessions as $key => $Session)
-                                        <option value="{{ $Session->id }}">{{ $Session->name }}</option> 
-                                        @endforeach                                       
-                                    </select>
-                                    </div>
-                                </div>
-                            </div>
+					<div class="row">                           
                             <div class="col-sm-3">
                                 <div class="form-group">
                                     <h5>Class<span class="text-danger">*</span></h5>
@@ -44,17 +31,17 @@
                             </div>
                             <div class="col-sm-3">
                                 <div class="form-group">
-                                    <h5>Term<span class="text-danger">*</span></h5>
+                                    <h5>Class Arm<span class="text-danger">*</span></h5>
                                     <div class="controls">
-                                    <select name="term_id" id="term" required class="form-control p-10">
-                                        <option value="">Select Term</option>
-                                        @foreach($SchoolTerm as $key => $Term)
-                                        <option value="{{ $Term->id }}">{{ $Term->name }}</option>
+                                    <select name="class_arm" id="class_arm" required class="form-control p-10">
+                                        <option value="">Select Class</option>
+                                        @foreach($SchoolArms as $key => $class_arm)
+                                        <option value="{{ $class_arm->id }}">{{ $class_arm->arm_name }}</option>
                                         @endforeach                                        
                                     </select>
                                     </div>
                                 </div>
-                            </div>
+                            </div>                            
 							<div class="col-sm-3">
 								<div class="form-group">									
 									<div class="text-xs-right pt-25">

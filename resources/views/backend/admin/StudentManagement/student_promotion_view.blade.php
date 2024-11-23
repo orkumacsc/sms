@@ -10,11 +10,11 @@
 
 		  <div class="row mt-0"> 
 
-			<div class="col-6">
+			<div class="col-xl-6">
 
 			  <div class="box">
 				<div class="box-header with-border">
-				  <h3 class="box-title">Students in Class</h3>               
+				  <h3 class="box-title">Students in Class <p class="students"></p></h3>               
            
 				</div>
 				<!-- /.box-header -->
@@ -37,8 +37,8 @@
 								<th>Admission No</th>
 								<th>Full Name</th>        
 								<th>
-                                    <input type="checkbox" name="" id="toggle_check" onClick="toggle(this)" />
-                                    <label for="toggle_check">Tick All</label>
+                                    <input type="checkbox" name="" id="selectAllCheckbox" onClick="toggle(this)" />
+                                    <label for="selectAllCheckbox">Tick All</label>
                                 </th>
 							</tr>
 						</thead>
@@ -51,8 +51,8 @@
                         <td>{{ $Student->admission_no }}</td>
                         <td>{{ $Student->surname.', '.$Student->firstname.' '.$Student->middlename }}</td>
                         <td>                            
-                            <input type="checkbox" id="{{ $Student->id }}" name="student_id[{{ $Student->id }}]">
-                            <label for="{{ $Student->id }}"></label>					        
+                            <input type="checkbox" id="{{ $Student->students_id }}" name="student_id[{{ $Student->students_id }}]" class="checkboxes">
+                            <label for="{{ $Student->students_id }}"></label>					        
                         </td>                           							
                     </tr>                            
                     @endforeach
@@ -73,7 +73,7 @@
                             <div class="form-group">
                                 <h5>New Class Arm<span class="text-danger">*</span></h5>
                                 <div class="controls">
-                                <select name="new_classarm" id="new_classarm" required class="form-control p-10">                                        
+                                <select name="new_class_arm" id="new_class_arm" required class="form-control p-10">                                        
                                     @foreach($ClassArms as $key => $class_arm)
                                     <option value="{{ $class_arm->id }}">{{ $class_arm->arm_name }}</option> 
                                     @endforeach                                       
@@ -105,12 +105,15 @@
   </div>
 
   <script>
-        function toggle(toggle_check) {
-  checkboxes = document.getElementsByName('student_id');
-  for(var i=0, n=checkboxes.length;i<n;i++) {
-    checkboxes[i].checked = toggle_check.checked;
-  }
-}
+    
+        document.getElementById('selectAllCheckbox')
+                  .addEventListener('change', function () {
+            let checkboxes = 
+                document.querySelectorAll('.checkboxes');
+            checkboxes.forEach(function (checkbox) {
+                checkbox.checked = this.checked;                
+            }, this);
+        }); 
   </script>
 
 @endsection

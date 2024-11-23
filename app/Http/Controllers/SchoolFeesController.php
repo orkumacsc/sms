@@ -30,12 +30,12 @@ class SchoolFeesController extends Controller
     {
         $Season_id = CurrentAcademicId();
         $data['Classes'] = SchoolClass::all();        
-        $data['SchoolFees'] = SchoolFees::join('students','students.id','school_fees.student_id')
+        $data['SchoolFees'] = SchoolFees::join('students','students.students_id','school_fees.student_id')
         ->join('school_sessions', 'school_sessions.id', 'school_fees.session_id')
             ->join('school_classes', 'school_classes.id', 'school_fees.class_id')
                 ->join('school_terms', 'school_terms.id', 'school_fees.term_id')
                     ->select('school_fees.id as id', 'surname', 'passport',
-                        'school_terms.name as term', 'school_sessions.name as session', 'classname', 'students.id as student_id',
+                        'school_terms.name as term', 'school_sessions.name as session', 'classname', 'students.students_id as student_id',
                                 'firstname', 'middlename', 'fee_discount', 'total_fee_amount', 'amount_paid', 
                                     'payment_ref', 'receipt_no', 'admission_no', 'school_fees.created_at as payment_date')
                                         ->get()->all(); 
@@ -98,8 +98,8 @@ class SchoolFeesController extends Controller
                 $discount = 0;
                 $amount_paid = 0;
 
-                $stu_name = Students::select('id', 'surname', 'firstname', 'middlename')
-                    ->where('students.id', $id)->get()->first();
+                $stu_name = Students::select('students_id', 'surname', 'firstname', 'middlename')
+                    ->where('students.students_id', $id)->get()->first();
                 $surname = $stu_name->surname;
                 $firstname = $stu_name->firstname;
                 $middlename = $stu_name->middlename;
@@ -151,7 +151,7 @@ class SchoolFeesController extends Controller
     public function showFeesReceipt(SchoolFees $schoolFees, $id)
     {
         // Receipt generation
-        $SchoolFees = SchoolFees::join('students','students.id','school_fees.student_id')
+        $SchoolFees = SchoolFees::join('students','students.students_id','school_fees.student_id')
         ->join('school_sessions', 'school_sessions.id', 'school_fees.session_id')
             ->join('school_classes', 'school_classes.id', 'school_fees.class_id')
                 ->join('school_terms', 'school_terms.id', 'school_fees.term_id')

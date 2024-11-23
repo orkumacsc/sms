@@ -8,4 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class CurrentAcademicSeason extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'session_id',
+        'term_id',
+        'term_start',
+        'term_end',
+        'next_term_start'
+    ];
 }

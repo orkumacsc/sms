@@ -10,8 +10,5 @@ class Students extends Model
     use HasFactory;
 
     protected $guarded = [];
-
-    public function SchoolClass(){
-        return $this->belongsTo(SchoolClass::class, 'class');
-    }
+    protected $primaryKey = 'students_id';    
 }

@@ -16,7 +16,7 @@ class FeesDiscountController extends Controller
 {
     public function feesDiscount(){
         $data['Classes'] = SchoolClass::all();
-        $data['feesDiscount'] = FeesDiscount::join('students','students.id','fees_discounts.student_id')
+        $data['feesDiscount'] = FeesDiscount::join('students','students.students_id','fees_discounts.student_id')
         ->join('school_sessions', 'school_sessions.id', 'fees_discounts.session_id')
             ->join('school_classes', 'school_classes.id', 'fees_discounts.class_id')
                 ->join('school_terms', 'school_terms.id', 'fees_discounts.term_id')
@@ -67,7 +67,7 @@ class FeesDiscountController extends Controller
 
             $discount = $request->discount_amount;
             $s_id = $request->student_id;
-            $stu_name = Students::select('id', 'surname', 'firstname', 'middlename')
+            $stu_name = Students::select('students_id', 'surname', 'firstname', 'middlename')
                 ->where('students.id', $s_id)->get();            
             $total_fee_amount = $request->total_fee_amount;
 

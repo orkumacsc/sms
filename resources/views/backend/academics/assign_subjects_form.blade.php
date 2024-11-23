@@ -37,7 +37,7 @@
                                     <select name="subject_id" id="class" required class="form-control p-10">
                                         <option value="">Select Subject</option>
                                         @foreach($SchoolSubjects as $key => $smSubject)
-                                        <option value="{{ $smSubject->id }}">{{ $smSubject->name }}</option>
+                                        <option value="{{ $smSubject->id }}">{{ $smSubject->subject_name }}</option>
                                         @endforeach                                        
                                     </select>
                                     </div>

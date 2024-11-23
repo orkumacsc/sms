@@ -4,11 +4,11 @@
 
 <div class="content-wrapper">
 	  <div class="container-full">
-
+        <!-- Score Entry Request Form -->
 	  	<section class="content">
 		  <div class="box">
 			<div class="box-header with-border">
-			  <h4 class="box-title">Scores Input Request Form</h4>			  
+			  <h4 class="box-title">CASS Scores Entry Request Form</h4>			  
 			</div>
 			<!-- /.box-header -->
 			<div class="box-body">
@@ -65,7 +65,7 @@
                                     <select name="arm_id" id="arm_id" required class="form-control p-10">
                                         <option value="">Select Arm</option>
                                         @foreach($ClassArms as $key => $Arm)
-                                        <option value="{{ $Arm->id }}">{{ $Arm->name }}</option>
+                                        <option value="{{ $Arm->id }}">{{ $Arm->arm_name }}</option>
                                         @endforeach                                        
                                     </select>
                                     </div>
@@ -85,7 +85,7 @@
 							<div class="col-sm-4">
 								<div class="form-group">									
 									<div class="text-xs-right pt-25">
-										<input type="submit" value="Input Scores" class="btn  btn-info">
+										<input type="submit" value="Get CASS Entry Form" class="btn  btn-info">
 									</div>
 								</div>
 							</div>
@@ -102,49 +102,10 @@
 			<!-- /.box-body -->
 		  </div>
 		</section>
+        <!-- /Score Entry Request Form -->
 	  </div>
   </div>
 
-  <script>
-	
-	$(document).ready(() => {
-		$('#clas_id').change(() => {
-			let $class_id = clas_id.value;
-			let url = '/GetClass/' +$class_id;
-			$.ajax({
-				url: url,
-				method: 'GET',
-				data: {},
-				dataType: 'JSON',
-				contentType: false,
-				cache: false,
-				processData: false,
-				success: function(response){
-                    
-					$('#subject_id').empty();					
-					
-					if(response.length > 0) {                        
-                        response.forEach(Subject => {                            
-                            $('#subject_id').append('<option value="'+Subject.subject_id+'">'+Subject.name+'</option>');
-                        });						
-						
-					} else {
-						$('#subject_id').append('<option value"">Subject not assigned to class</option>');
-						
-						
-					}
-
-										
-				},
-				error: function(response){
-
-				}
-
-			});
-		});
-	});
-
-	
-</script>
+  <script src="{{ asset('backend/js/forms/CASS_entry.js') }}"></script>  
 
 @endsection

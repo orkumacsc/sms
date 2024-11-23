@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AdmissionsOfficer\AdmissionsController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\SchoolSetupController;
 use App\Models\SchoolSetup;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +26,9 @@ use App\Http\Controllers\FeesDiscountController;
 use App\Http\Controllers\admin\Examination\CassViewController;
 use App\Http\Controllers\admin\Reports\ReportController;
 use App\Http\Controllers\StudentPromteController;
+use App\Http\Controllers\StudentsClassController;
+use App\Http\Controllers\backend\Setup\AcademicSessionController;
+use App\Http\Controllers\backend\Setup\SchoolArmsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,21 +43,48 @@ use App\Http\Controllers\StudentPromteController;
 
 Route::get('/', function () {
     return view('auth/login');
-});
+})->name('main_login');
 
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
-    'verified'
+    'verified',
+    'super_admin'
 ])->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.admin_dashboard');
     })->name('dashboard');
 });
 
+// Admission Officer Routes
+Route::middleware(['admission_officer'])->group(function(){
+    Route::get('/admissions_dashboard', function () {
+        return view('Admission_Officer.dashboard');
+    })->name('admissions_dashboard');
+
+    Route::prefix('/Admissions')->group(function(){
+        Route::get('StudentEntrollment', [AdmissionsController::class, 'admission'])->name('admissions');
+        Route::post('StudentEntrollment', [AdmissionsController::class, 'store_student_enrolment'])->name('store_student_enrolment');
+        Route::get('', [AdmissionsController::class, 'admission_index'])->name('admissions_view');
+        Route::get('Enroled', [AdmissionsController::class, 'admission_list'])->name('admissions_list');
+        Route::get('AdmissionLetter/{student_id}', [AdmissionsController::class, 'admission_letter'])->name('student_admission_letter');
+    });
+});
+
+//Teachers Routes
+Route::middleware(['teachers'])->group(function(){
+    Route::get('/Staff_Dashboard', function () {
+        return view('Teachers.dashboard');
+    })->name('Staff_Dashboard');
+
+});
+
+//Login Routes
+Route::get('/login', [LoginController::class, 'login'])->name('login');
 Route::get('/admin/logout', [AdminController::class, 'Logout'])->name('admin.logout');
 
 
+//Users Routes
 Route::prefix('users')->group(function(){
     Route::get('view', [userController::class, 'UserView'])->name('user.view');
     Route::get('add', [userController::class, 'AddUser'])->name('user.add');
@@ -67,26 +99,36 @@ Route::prefix('users')->group(function(){
 // User Profile and Change password
 Route::prefix('Profile')->group(function(){
     Route::get('view', [ProfileController::class, 'ProfileView'])->name('user.view-profile');
-    
-
 });
 
 Route::prefix('Setup')->group(function(){
 
     // School Classes routes
-    Route::get('school-classes', [SchoolClassController::class, 'SchoolClass'])->name('school-classes');
-    Route::post('school.class.store', [SchoolClassController::class, 'StoreSchoolClass'])->name('school-class.store');
+    Route::get('SchoolClass', [SchoolClassController::class, 'SchoolClass'])->name('school_class');
+    Route::post('SchoolClass', [SchoolClassController::class, 'StoreSchoolClass'])->name('save_school_class');
+    Route::get('ClassProfile', [SchoolClassController::class, 'ClassProfile'])->name('class_profile');
+    Route::get('ClassConfiguration', [SchoolClassController::class, 'ClassConfiguration'])->name('class_configuration');
 
-    // School Terms routes
-    Route::get('school-terms', [SchoolTermController::class, 'SchoolTerm'])->name('school-terms');
-    Route::post('school.term.store', [SchoolTermController::class, 'StoreSchoolTerm'])->name('school-term.store');
+    // School Class Arms Routes
+    Route::get('SchoolArm', [SchoolArmsController::class, 'SchoolArm'])->name('school_arm');
+    Route::post('store_school_arm', [SchoolArmsController::class, 'StoreSchoolArm'])->name('store_school_arm');
+    Route::post('store_class_arm', [SchoolArmsController::class, 'StoreClassArm'])->name('store_class_arm');
+
+    // School Academic Session routes
+    Route::get('AcademicSessionConfigurations', [AcademicSessionController::class, 'AcademicSession'])->name('academic_session');
+    Route::post('store_academic_session', [AcademicSessionController::class, 'StoreAcademicSession'])->name('store_academic_session');
+    Route::post('store_school_term', [SchoolTermController::class, 'StoreSchoolTerm'])->name('store_school_term');
+    Route::put('TermConfigurations', [SchoolTermController::class, 'Update'])->name('update_term');
+    Route::post('store_term_configurations', [AcademicSessionController::class, 'store_term_configurations'])->name('store_term_configurations');
+    Route::get('term_configurations/{academic_id}', [AcademicSessionController::class, 'set_current_term'])->name('set_current_term');
+    Route::get('session_configurations/{session_id}', [AcademicSessionController::class, 'set_current_session'])->name('set_current_session');
 
     Route::get('/', [SchoolSetupController::class, 'index'])->name('schoolsetup');
     Route::post('/', [SchoolSetupController::class, 'store'])->name('schoolsetup');
     Route::put('/', [SchoolSetupController::class, 'edit'])->name('schoolsetup');    
 });
 
-Route::prefix('Students')->group(function(){
+Route::prefix('Students')->middleware(['super_admin'])->group(function(){
     Route::get('StudentRegistation', [StudentAdmissionController::class, 'StudentAdmission'])->name('student-admission');
     Route::post('student.admission.store', [StudentAdmissionController::class, 'StoreStudentAdmission'])->name('student-admission.store');
     Route::get('student_list', [StudentAdmissionController::class, 'StudentAdmissionView'])->name('student_view');
@@ -95,19 +137,22 @@ Route::prefix('Students')->group(function(){
     Route::get('StudentProfile/{id}', [StudentAdmissionController::class, 'ViewStudentProfile'])->name('view_student_profile');
     Route::get('edit_student_record/{id}', [StudentAdmissionController::class, 'EditStudentRecord'])->name('edit_student_record');
     Route::post('update_student_record/{id}', [StudentAdmissionController::class, 'UpdateStudentRecord'])->name('update_student_record');
-    Route::get('delete_student_record/{id}', [StudentAdmissionController::class, 'DeleteStudentRecord'])->name('delete_student_record');
-    Route::get('student_transfer', [StudentAdmissionController::class, 'StudentTransfer'])->name('student_transfer');
-    Route::post('transfer_student', [StudentAdmissionController::class, 'TransferStudent'])->name('transfer_student');
+    Route::get('delete_student_record/{id}', [StudentAdmissionController::class, 'DeleteStudentRecord'])->name('delete_student_record');   
     Route::get('StudentsHouses', [StudentAdmissionController::class, 'StudentHousesView'])->name('student_houses');
     Route::get('StudentPromotion', [StudentPromteController::class, 'Index'])->name('student_promotion_index');
     Route::get('StudentPromotionView', [StudentPromteController::class, 'ViewCurrentStudents'])->name('student_promotion_view');
     Route::post('StudentPromotion', [StudentPromteController::class, 'Promote'])->name('student_promotion');
+    Route::get('GenerateRollNumber', [StudentsClassController::class, 'index'])->name('generate_reg_no');
+    Route::post('GenerateRollNumber', [StudentsClassController::class, 'store_reg_no'])->name('store_reg_no');
+    Route::patch('Suspend/{student_id}', [StudentsClassController::class, 'suspend_student'])->name('suspend_student');
+    Route::get('ReEnrol', [StudentPromteController::class, 'ReEnrol'])->name('re_enrol_student');
+    Route::get('UpdateReEnrol', [StudentPromteController::class, 'CreateReEnrol'])->name('create_re_enrol');
+    Route::post('UpdateReEnrol', [StudentPromteController::class, 'UpdateReEnrol'])->name('update_re_enrol');
 });
 
 Route::prefix('Academics')->group(function(){
-    Route::get('school_subjects', [AcademicController::class, 'SchoolSubjects'])->name('school_subjects');
-    Route::post('school.subjects.store', [AcademicController::class, 'StoreSchoolSubjects'])->name('school.subjects.store');
-    Route::get('AssignSubject', [AcademicController::class, 'AssignSubject'])->name('assign_subject');
+    Route::get('Subjects', [AcademicController::class, 'SchoolSubjects'])->name('school_subjects');
+    Route::post('school.subjects.store', [AcademicController::class, 'StoreSchoolSubjects'])->name('school.subjects.store');    
     Route::post('StoreAssingSubject', [AcademicController::class, 'StoreAssignedSubject'])->name('store_assigned_subject');
     Route::get('MarksGrade', [MarksGradeController::class, 'MarksGrades'])->name('marks_grades');
     Route::post('StoreMarksGrades', [MarksGradeController::class, 'StoreMarksGrades'])->name('store_marks_grades');
@@ -139,22 +184,19 @@ Route::prefix('/')->group(function(){
     Route::get('ViewCassScores', [CassViewController::class, 'viewCass'])->name('view_cass_scores');
 
     Route::get('ResultSeummary', [CassViewController::class, 'resultSummary'])->name('result_summary');
-    Route::get('ViewResultSeummary', [CassViewController::class, 'viewResultSummary'])->name('view_result_summary');
-    
+    Route::get('ViewResultSeummary', [CassViewController::class, 'viewResultSummary'])->name('view_result_summary');    
         
 });
 
 
 Route::prefix('Staff')->group(function(){
-    Route::get('StaffEnrollment', [StaffController::class, 'StaffEnrollment'])->name('enrol_staff');
+    Route::get('/', [StaffController::class, 'Staff'])->name('staff');
     Route::post('store_staff_enrollment', [StaffController::class, 'StoreStudentAdmission'])->name('store_staff_enrollment');
-    Route::get('StaffList', [StaffController::class, 'StaffView'])->name('staff_view');    
-    Route::get('EmploymentLetter/{id}', [StaffController::class, 'PrintAdmissionLetter'])->name('admission_letter');
+    Route::get('EmploymentLetter/{id}', [StaffController::class, 'employmentLetter'])->name('employment_letter');
     Route::get('StaffProfile/{id}', [StaffController::class, 'StaffProfile'])->name('staff_profile');
     Route::get('EditStaffRecord/{id}', [StaffController::class, 'EditStaffRecord'])->name('edit_staff_record');
     Route::post('update_staff_record/{id}', [StaffController::class, 'UpdateStudentRecord'])->name('update_staff_record');
-    Route::get('delete_staff_record/{id}', [StaffController::class, 'DeleteStudentRecord'])->name('delete_staff_record');
-    
+    Route::get('delete_staff_record/{id}', [StaffController::class, 'DeleteStudentRecord'])->name('delete_staff_record');    
 });
 
 
@@ -183,7 +225,6 @@ Route::prefix('SchoolFees')->group(function(){
     Route::post('UpdateClassFees/{id}', [AssignClassFeeController::class, 'update'])->name('update_class_fees');
     Route::get('DeleteClassFees/{id}', [AssignClassFeeController::class, 'destroy'])->name('delete_class_fees');
 
-
     //Fees Discount Routes
     Route::get('FeesDiscount', [FeesDiscountController::class, 'feesDiscount'])->name('feesdiscount');
     Route::post('StoreFeesDiscount', [FeesDiscountController::class, 'storeFeesDiscount'])->name('storefeesdiscount');
@@ -192,18 +233,11 @@ Route::prefix('SchoolFees')->group(function(){
     Route::post('UpdateClassFees/{id}', [FeesDiscountController::class, 'update'])->name('update_class_fees');
     Route::get('DeleteClassFees/{id}', [FeesDiscountController::class, 'destroy'])->name('delete_class_fees');
 
-
-
-
     //Pay Fees Routes    
     Route::get('PayFees', [SchoolFeesController::class, 'PayFees'])->name('payfees');
     Route::post('StoreFeesPay', [SchoolFeesController::class, 'storeFeesPay'])->name('storefeespay');
     Route::get('SchoolFeesReceipts/{id}', [SchoolFeesController::class, 'showFeesReceipt'])->name('show_fees_receipt');
 
-
-
-
-        
 });
 
 
@@ -215,10 +249,11 @@ Route::prefix('Reports')->group(function(){
 
 });
 
-
-
     Route::get('FeesResponse/{id}', [GeneralController::class, 'SchoolFees'])->name('fees_response');
     Route::get('GetStudent/{id}', [GeneralController::class, 'StudentByClass'])->name('students');
     Route::get('FeesDue/{id}', [GeneralController::class, 'FeesDue'])->name('students');
     Route::get('GetClass/{id}', [GeneralController::class, 'getSubject'])->name('get_class');
     Route::get('GetLGA/{id}', [GeneralController::class, 'GetLGA'])->name('get_lgas');
+
+    //Get number of students admitted in a class
+    Route::get('AdmittedStudents/{class_info}', [GeneralController::class, 'AdmittedStudents'])->name('number_of_admitted');

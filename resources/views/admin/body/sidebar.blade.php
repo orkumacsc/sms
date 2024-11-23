@@ -16,7 +16,7 @@ $route = Route::current()->getName();
               <!-- logo for regular state and mobile devices -->
               <div class="d-flex align-items-center justify-content-center">					 	
                   <img src="{{ asset('backend/images/logo-dark.png') }}" alt="">
-                  <h3>{{ @Auth::user()->name }} | {{ @Auth::user()->usertype }}</h3>
+                  <h3>{{ @Auth::user()->name }} | Super Admin</h3>
               </div>
             </a>
           </div>
@@ -57,26 +57,23 @@ $route = Route::current()->getName();
           </a>
           <ul class="treeview-menu">
             <li><a href="{{ route('student-admission') }}"><i class="ti-more"></i>Enrol Student</a></li>
-            <li><a href="{{ route('student_view') }}"><i class="ti-more"></i>Student List</a></li>
-            <li><a href="{{ route('student_transfer') }}"><i class="ti-more"></i>Transfer Students</a></li>
+            <li><a href="{{ route('re_enrol_student') }}"><i class="ti-more"></i>Re-Enrol Student</a></li>
+            <li><a href="{{ route('generate_reg_no') }}"><i class="ti-more"></i>Generate Roll No</a></li>
+            <li><a href="{{ route('student_view') }}"><i class="ti-more"></i>List of Student</a></li>            
             <li><a href="{{ route('student_houses') }}"><i class="ti-more"></i>Students Houses</a></li>
             <li><a href="{{ route('student_promotion_index') }}"><i class="ti-more"></i>Promote Students</a></li>
           </ul>
         </li> 
 
         
-        <li class="treeview {{ ($prefix == '/staff')? 'active' : ''}}">
-          <a href="javascript:void(0)">
+        <li class="{{ ($prefix == '/staff')? 'active' : ''}}">
+          <a href="{{ route('staff') }}">
             <i data-feather="users"></i>
-            <span>Staff Management</span>
+            <span>Staff</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-right pull-right"></i>
             </span>
-          </a>
-          <ul class="treeview-menu">
-            <li><a href="{{ route('enrol_staff') }}"><i class="ti-more"></i>Enrol Staff</a></li>            
-            <li><a href="{{ route('staff_view') }}"><i class="ti-more"></i>Staff List</a></li>            
-          </ul>
+          </a>          
         </li> 
         
 
@@ -90,8 +87,7 @@ $route = Route::current()->getName();
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="{{ route('school_subjects') }}"><i class="ti-more"></i>Subjects</a></li>            
-            <li><a href="{{ route('assign_subject') }}"><i class="ti-more"></i>Assign Subjects</a></li>
+            <li><a href="{{ route('school_subjects') }}"><i class="ti-more"></i>Subjects Management</a></li> 
             <li><a href="{{ route('marks_grades') }}"><i class="ti-more"></i>Marks Grade</a></li>
           </ul>
         </li> 
@@ -154,15 +150,16 @@ $route = Route::current()->getName();
         <li class="treeview {{ ($prefix == '/setup')? 'active' : ''}}">
           <a href="javascript:void(0)">
             <i data-feather="settings"></i>
-            <span>Setup Management</span>
+            <span>School Configurations</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-right pull-right"></i>
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="{{ route('schoolsetup') }}"><i class="ti-more"></i>School Setup</a></li>
-            <li><a href="{{ route('school-classes') }}"><i class="ti-more"></i>Class</a></li>
-            <li><a href="{{ route('school-terms') }}"><i class="ti-more"></i>Term</a></li>
+            <li><a href="{{ route('schoolsetup') }}"><i class="ti-more"></i>School Information</a></li>
+            <li><a href="{{ route('school_class') }}"><i class="ti-more"></i>Class</a></li>
+            <li><a href="{{ route('school_arm') }}"><i class="ti-more"></i>Arm</a></li>
+            <li><a href="{{ route('academic_session') }}"><i class="ti-more"></i>Sessions & Terms</a></li>            
           </ul>
         </li>
         

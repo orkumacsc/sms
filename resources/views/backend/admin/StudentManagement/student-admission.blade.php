@@ -9,7 +9,9 @@
 		<!-- Main content -->
 		<section class="content">
 
-		 <!-- Basic Forms -->
+		 <div class="row">
+            <div class="col-xl-8">
+                <!-- Basic Forms -->
 		  <div class="box">
 			<div class="box-header with-border">
 			  <h4 class="box-title">Student Admission Form</h4>			  
@@ -17,7 +19,7 @@
 			<!-- /.box-header -->
 			<div class="box-body">
 			  <div class="row">
-				<div class="col">
+				<div class="col px-xl-80">
 					<form method="post" action="{{ route('student-admission.store') }}" enctype="multipart/form-data">
                         @csrf
 
@@ -355,6 +357,8 @@
 			<!-- /.box-body -->
 		  </div>
 		  <!-- /.box -->
+            </div>
+         </div>
 
 		</section>
 		<!-- /.content -->

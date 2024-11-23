@@ -23,7 +23,7 @@
                                     <select name="sid" id="sid" required class="form-control p-10">
                                     <option value="">Select Session</option>                                        
                                         @foreach($SchoolSessions as $key => $Session)
-                                        <option value="{{ $Session->id }}">{{ $Session->name }}</option> 
+                                        <option value="{{ $Session->id }}" {{ session('academic_session') == $Session->id ? 'selected' : ''}}>{{ $Session->name }}</option> 
                                         @endforeach                                       
                                     </select>
                                     </div>
@@ -36,7 +36,7 @@
                                     <select name="class" id="class" required class="form-control p-10">
                                         <option value="">Select Class</option>
                                         @foreach($SchoolClasses as $key => $Class)
-                                        <option value="{{ $Class->id }}">{{ $Class->classname }}</option>
+                                        <option value="{{ $Class->id }}" {{ session('class_id') == $Class->id ? 'selected' : ''}}>{{ $Class->classname }}</option>
                                         @endforeach                                        
                                     </select>
                                     </div>
@@ -49,7 +49,7 @@
                                     <select name="class_arm" id="class_arm" required class="form-control p-10">
                                         <option value="">Select Class Arm</option>
                                         @foreach($SchoolArms as $key => $S_Arm)
-                                        <option value="{{ $S_Arm->id }}">{{ $S_Arm->arm_name }}</option>
+                                        <option value="{{ $S_Arm->id }}" {{ session('class_arm') == $S_Arm->id ? 'selected' : ''}}>{{ $S_Arm->arm_name }}</option>
                                         @endforeach                                        
                                     </select>
                                     </div>
@@ -62,7 +62,7 @@
                                     <select name="term_id" id="term" required class="form-control p-10">
                                         <option value="">Select Term</option>
                                         @foreach($SchoolTerm as $key => $Term)
-                                        <option value="{{ $Term->id }}">{{ $Term->name }}</option>
+                                        <option value="{{ $Term->id }}" {{ session('term_id') == $Term->id ? 'selected' : ''}}>{{ $Term->name }}</option>
                                         @endforeach                                        
                                     </select>
                                     </div>

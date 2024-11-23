@@ -10,52 +10,34 @@
 		 <!-- Basic Forms -->
 		  <div class="box">
 			<div class="box-header with-border">
-			  <h4 class="box-title">Student Admission Form</h4>			  
+			  <h4 class="box-title">STUDENT INFORMATION UPDATE</h4>			  
 			</div>
 			<!-- /.box-header -->
 			<div class="box-body">
 			  <div class="row">
 				<div class="col">
-					<form method="post" action="{{ route('update_student_record', $Students->id) }}" enctype="multipart/form-data">
+					<form method="post" action="{{ route('update_student_record', $Students->students_id) }}" enctype="multipart/form-data">
                         @csrf
 
-                    <div class="row">
-                        <div class="col-sm-4">
+                        
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="box border p-20">
                                 <div class="form-group">
-                                    <h5>Class<span class="text-danger">*</span></h5>
-                                    <div class="controls">
-                                        <select name="class_admitted" id="class_admitted" required class="form-control" disabled>
-                                            <option value="">Select Class Admitted</option>
-                                            @foreach($SchoolClasses as $key => $school_classes)
-                                            <option value="{{ $school_classes->id }}" {{ ($school_classes->id == $Students->class)? 'selected' : '' }}>{{ $school_classes->classname }}</option>
-                                            @endforeach
-                                        </select>
+                                    <h5>Student Passport<span class="text-danger">*</span></h5>
+                                    <div class="controls text-center">
+                                        <label for="file">
+                                            <img src="{{ (!empty($Students->passport)) ? 
+                                                url('storage/'.$Students->passport) :
+                                                url(`storage/profile-photos/default.png`) }}" alt="Student Passport" id="OuputStudentPassport" class="pb-20">
+                                            <input type="file" name="StudentPassport" class="form-control" id="StudentPassport"> 
+                                        </label>
+                                        
                                     </div>
                                 </div>
-                        </div>
-
-                        <div class="col-sm-4">
-                                <div class="form-group">
-                                    <h5>Class Arm<span class="text-danger">*</span></h5>
-                                    <div class="controls">
-                                    <select name="class_arm" id="class_arm" required class="form-control" disabled>                                        
-                                        @foreach($SchoolArms as $key => $class_arm)
-                                        <option value="{{ $class_arm->id }}" {{ ($class_arm->id == $Students->classarm_id)? 'selected' : '' }}>{{ $class_arm->arm_name }}</option>
-                                        @endforeach                                        
-                                    </select>
-                                    </div>
                                 </div>
-                        </div>
-
-                        <div class="col-sm-4">
-                        <div class="form-group">
-								<h5>Passport<span class="text-danger">*</span></h5>
-								<div class="controls">
-									<input type="file" name="imgPassport" id="Passport" class="form-control" > </div>
-							</div>
-                        </div>
-
-                        </div>    
+                            </div>
+                        </div> 
 
                         <div class="row">
                             <div class="col-sm-4">
@@ -360,4 +342,12 @@
 		<!-- /.content -->
 	  </div>
   </div>
+
+  <script>  
+    
+    StudentPassport.onchange = event => {
+        let StudentPassport = document.getElementById('StudentPassport');    
+        OuputStudentPassport.src = URL.createObjectURL(event.target.files[0]);
+    };
+</script>
 @endsection

@@ -47,7 +47,7 @@
 								<div class="col-sm-10 text-center m-0 p-0">
 									<h5>GOSPEL INTERNATIONAL COLLEGE, ZAKI-BIAM</h5>
 									<h6>ZAKI-BIAM, UKUM LGA, BENUE STATE, NIGERIA</h6>
-									<h5>{{ $Current_term->name }} {{ $Current_sessions->name }} ACADEMIC SESSION</h5>
+									<h5> {{ Active_Term()->term_name }} - {{ Active_Session()->name }}  ACADEMIC SESSION</h5>
 								</div>
 							</div>
 							<div class="row m-0">								
@@ -62,7 +62,7 @@
 											<tr class="text-center" style="padding:2%">
 												<th colspan="2">{{ $student->surname.', '.$student->firstname.' '.$student->middlename }}</th>
 												<td rowspan="5" style="width:30%">
-												<img src="{{ url('storage/'.$student->passport) }}" >
+												<img src="{{ $student->passport ? url('storage/'.$student->passport) : asset('backend/images/passport.png') }}" alt="Students' Passport">
 												</td>												
 											</tr>
 											<tr>
@@ -72,7 +72,7 @@
 											</tr>
 											<tr>
 												<th>CLASS</th>
-												<td>{{ $student->classname }}</td>
+												<td>{{ $student->classname }} {{ $student->arm_name }}</td>
 																								
 											</tr>
 											<tr>
@@ -81,7 +81,7 @@
 											</tr>
 											<tr>
 												<th>SERIAL NO</th>
-												<td>{{ $key + 1 }}</td>
+												<td>{{ $student->roll_number }}</td>
 											</tr>											
 										</tbody>
 									</table>

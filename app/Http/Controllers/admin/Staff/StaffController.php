@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\admin\Staff;
 
 use App\Http\Controllers\Controller;
+use App\Models\SchoolSessions;
+use DB;
 use Illuminate\Http\Request;
 use App\Models\Departments;
 use App\Models\Designations;
@@ -29,7 +31,7 @@ class StaffController extends Controller
 
     }
 
-    public function StaffEnrollment(){
+    public function Staff(){
         $data['Departments'] = Departments::all();
         $data['Designations'] = Designations::all();
         $data['MaritalStatus'] = MaritalStatus::all();
@@ -42,96 +44,6 @@ class StaffController extends Controller
         $data['Religions'] = Religions::all();
         $data['Tribes'] = Tribes::all();
         $data['Qualifications'] = Qualifications::all();
-
-        return view('backend.Staff.staff_enrollment',$data);
-    }
-
-    public function StoreStudentAdmission(Request $request){
-        $validated = $request->validate([
-
-        ]);
-
-        $lastID = Staff::max('id');       
-
-        $schoolCode = 'GIC';        
-        $sessionCode = '22';
-        $number = $lastID + 1;
-
-
-        
-        try{
-            $Staff_User = new User();
-            $Staff_User->usertype = 3;        
-            $Staff_User->name = $request->surname.', '.$request->firstname.' '.$request->middlename;
-            $Staff_User->username = $schoolCode.'/'.'STAFF'.'/'.$sessionCode.'/'.$number;
-            $Staff_User->email = $request->email;
-            $Staff_User->password = bcrypt($request->surname);
-            $Staff_User->save();
-
-
-
-            $Emergency_Contact = new EmergencyContact();
-            $Emergency_Contact->surname = $request->em_surname;
-            $Emergency_Contact->firstname = $request->em_firstname;
-            $Emergency_Contact->middlename = $request->em_middlename;
-            $Emergency_Contact->occupation = $request->em_occupation;
-            $Emergency_Contact->mobile_no = $request->em_mobile_no;
-            $Emergency_Contact->email = $request->em_email;
-            $Emergency_Contact->address = $request->em_address;
-            $Emergency_Contact->save();
-
-
-            
-            $Staff = new Staff();
-            $Staff->staff_no = $schoolCode.'/'.'STAFF'.'/'.$sessionCode.'/'.$number;
-            $Staff->user_id = $Staff_User->id;
-            $Staff->department_id = $request->department_id;
-            $Staff->designations_id = $request->designations_id;
-            $Staff->role_id = 3;
-            $Staff->surname = $request->surname;
-            $Staff->firstname = $request->firstname;
-            $Staff->middlename = $request->middlename;
-            $Staff->gender_id = $request->gender;
-            $Staff->marital_status_id = $request->marital_status_id;
-            $Staff->complexions_id = $request->complexions_id;
-            $Staff->date_of_birth = $request->dob;
-            $Staff->nationality_id = $request->country;
-            $Staff->state_id = $request->state;
-            $Staff->lga_id = $request->lga;
-            $Staff->tribe_id = $request->tribe;
-            $Staff->email = $request->email;            
-            $Staff->mobile_no = $request->mobile_no;
-            $Staff->active_status = 1;        
-            $Staff->religion_id = $request->religion;            
-            $Staff->current_address = $request->address;
-            $Staff->permanent_address = $request->pm_address;
-            $Staff->qualification_id = $request->qualification_id;
-            $Staff->specialization = $request->specialization;
-            $Staff->emergency_contact_id = $Emergency_Contact->id;
-            $Staff->staff_passport = $request->file('staff_passport')->storeAs('passports/staff', $schoolCode.'STAFF'.$sessionCode.$number.'.'.$request->file('staff_passport')->getClientOriginalExtension());       
-            $Staff->save();
-
-            $notifications = array(
-                'message' => 'Staff Enrolled Successfully!',
-                'alert-type' => 'success'
-            );
-
-            return redirect()->back()->with($notifications);
-
-        } catch(\Excetion $e){
-            $notifications = array(
-                'message' => 'Staff Enrollment Failed!',
-                'alert-type' => 'error'
-            );
-
-            return redirect()->back()->with($notifications);
-        }      
-        
-
-    }
-    
-    public function StaffView(){ 
-        //$data['School_Sessions'] = SchoolSessions::all();        
         $data['Staffs'] = Staff::join('emergency_contacts', 'emergency_contacts.id', '=', 'staff.emergency_contact_id')
             ->join('departments', 'departments.id', 'staff.department_id')
             ->join('genders', 'genders.id', 'staff.gender_id')
@@ -141,10 +53,126 @@ class StaffController extends Controller
                 'departments.name As dep_name', 'designations.name As des_name',
                 'genders.gendername As gender')->get();
 
-        return view('backend.Staff.staff_list', $data);
+        return view('backend.Staff.staff',$data);
     }
 
+    public function StoreStudentAdmission(Request $request){
+        $validated = $request->validate([
 
+        ]);
+
+        $lastID = Staff::max('id');
+        $schoolCode = 'GIC';
+        $number = $lastID + 1;
+        $year = SchoolSessions::select('school_sessions.name')->where('id',CurrentAcademicId()->currentSession)->first();
+        $year_code = strpos($year->name,"_") ? explode("_",$year->name) : explode("/",$year->name);            
+        $sessionCode = substr($year_code[0], -2);
+
+        try{
+            DB::beginTransaction();
+            try {
+
+                $Staff_User = new User();
+                $Staff_User->usertype = 3;        
+                $Staff_User->name = $request->surname.', '.$request->firstname.' '.$request->middlename;
+                $Staff_User->username = $schoolCode.'/'.'STAFF'.'/'.$sessionCode.'/'.$number;
+                $Staff_User->email = $request->surname.'staff@gospelschools.sch.ng';
+                $Staff_User->password = bcrypt(strtolower($request->surname));
+                $Staff_User->save();
+                $Staff_User->toArray();
+
+                try {
+
+                    $Emergency_Contact = new EmergencyContact();
+                    $Emergency_Contact->surname = $request->em_surname;
+                    $Emergency_Contact->firstname = $request->em_firstname;
+                    $Emergency_Contact->middlename = $request->em_middlename;
+                    $Emergency_Contact->occupation = $request->em_occupation;
+                    $Emergency_Contact->mobile_no = $request->em_mobile_no;
+                    $Emergency_Contact->email = $request->em_email;
+                    $Emergency_Contact->address = $request->em_address;
+                    $Emergency_Contact->save();
+                    $Emergency_Contact->toArray();
+
+                    try {                        
+                        $Staff = new Staff();
+                        $Staff->staff_no = $schoolCode.'/'.'STAFF'.'/'.$sessionCode.'/'.$number;
+                        $Staff->user_id = $Staff_User->id;
+                        $Staff->department_id = $request->department_id;
+                        $Staff->designations_id = $request->designations_id;
+                        $Staff->role_id = 3;
+                        $Staff->surname = strtoupper($request->surname);
+                        $Staff->firstname = strtoupper($request->firstname);
+                        $Staff->middlename = strtoupper($request->middlename);
+                        $Staff->gender_id = $request->gender;
+                        $Staff->marital_status_id = $request->marital_status_id;
+                        $Staff->complexions_id = $request->complexions_id;
+                        $Staff->date_of_birth = $request->dob;
+                        $Staff->nationality_id = $request->country;
+                        $Staff->state_id = $request->state;
+                        $Staff->lga_id = $request->lga;
+                        $Staff->tribe_id = $request->tribe;
+                        $Staff->email = $request->email;            
+                        $Staff->mobile_no = $request->mobile_no;
+                        $Staff->active_status = 1;        
+                        $Staff->religion_id = $request->religion;            
+                        $Staff->current_address = $request->address;
+                        $Staff->permanent_address = $request->pm_address;
+                        $Staff->qualification_id = $request->qualification_id;
+                        $Staff->specialization = $request->specialization;
+                        $Staff->emergency_contact_id = $Emergency_Contact->id;
+                        $Staff->staff_passport = $request->file('staff_passport')->storeAs('passports/staff', $schoolCode.'STAFF'.$sessionCode.$number.'.'.$request->file('staff_passport')->getClientOriginalExtension());
+                        $Staff->save();
+                        $Staff->toArray();
+
+                        $notifications = array(
+                            'message' => 'Staff Enrolled Successfully!',
+                            'alert-type' => 'success'
+                        );
+
+                        DB::commit();
+                        return redirect()->back()->with($notifications);
+                    } catch (\Exception $e) {
+                        $notifications = [
+                            'message' => 'Staff Enrolment Failed!',
+                            'alert-type' => 'error'
+                        ];
+    
+                        DB::rollBack();
+                        return redirect()->back()->with($notifications);
+                    }
+                } catch (\Exception $e) {
+                    $notifications = [
+                        'message' => 'Emergency Contact Information Creation Failed!',
+                        'alert-type' => 'error'
+                    ];
+
+                    DB::rollBack();
+                    return redirect()->back()->with($notifications);
+                }
+            } catch (\Exception $e) {
+                $notifications = [
+                    'message' => $e,
+                    'alert-type' => 'error'
+                ];
+
+                DB::rollBack();
+                return redirect()->back()->with($notifications);
+            }
+
+        } catch(\Exception $e){            
+            $notifications = array(
+                'message' => 'Staff Enrolment Unsuccessful!',
+                'alert-type' => 'error'
+            );
+
+            DB::rollBack();
+            return redirect()->back()->with($notifications);
+        }      
+        
+
+    }
+    
     public function StaffProfile($id){
         $Profile = Staff::join('emergency_contacts', 'emergency_contacts.id', '=', 'staff.emergency_contact_id')
         ->join('departments', 'departments.id', 'staff.department_id')->join('tribes', 'tribes.id', 'staff.tribe_id')
@@ -167,6 +195,10 @@ class StaffController extends Controller
             return redirect()->back();
         }
         
+
+    }
+
+    public function employmentLetter() {
 
     }
 }

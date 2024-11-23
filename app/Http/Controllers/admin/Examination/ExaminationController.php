@@ -3,17 +3,15 @@
 namespace App\Http\Controllers\Admin\Examination;
 
 use App\Http\Controllers\Controller;
+use App\Models\StudentClass;
 use Illuminate\Http\Request;
 use App\Models\Students;
-use App\Models\SchoolHouses;
-use App\Models\Gender;
 use App\Models\SchoolClass;
 use App\Models\SchoolSessions;
 use App\Models\SchoolTerm;
 use App\Models\SchoolArms;
 use App\Models\MarksRegisters;
 use App\Models\ResultPositions;
-use App\Models\User;
 use Auth;
 
 
@@ -25,72 +23,88 @@ class ExaminationController extends Controller
 
     }
 
-    public function Index(){
-       if(Auth::user()->usertype != 'Super Admin'){
-            return redirect()->route('login');
-       } else {
-            $data['SchoolClasses'] = SchoolClass::all();
-            $data['SchoolSessions'] = SchoolSessions::all();
-            $data['SchoolTerm'] = SchoolTerm::all();
+    public function Index()
+    {       
+          try {
+               $data['SchoolClasses'] = SchoolClass::all();
+               $data['SchoolArms'] = SchoolArms::all();
+               return view('backend.Examination.exam_card', $data);
 
+          } catch(\Exception $e) {
+               $notifications = [
+                    'message' => 'Error processing request',
+                    'alert-type' => 'error'
+               ];
 
-            return view('backend.Examination.exam_card', $data);
-       }
+               return back()->with($notifications);
+          }       
     }
 
 
     public function GenerateExamCard(Request $request)
-    {
-       if(Auth::user()->usertype != 'Super Admin'){
-        return redirect()->route('login');
-       } else {
-            $Class_id = $request->class;
-            $Acad_Session_id = $request->sid;
-            $data['Current_term'] = SchoolTerm::find($request->term_id);        
-            $data['Current_sessions'] = SchoolSessions::find($request->sid); 
-            $data['Students'] = Students::join('school_houses', 'school_houses.id', '=', 'students.school_houses_id')->orderBy('students.surname', 'ASC')
-            ->join('school_classes', 'school_classes.id', '=', 'students.class')
-            ->join('genders', 'genders.id', '=', 'students.gender')
-                ->where('class','=',$Class_id)
-                    ->where('session_admitted','=',$Acad_Session_id)->get()->all();
+    {      
+          try {
+               $data['Students'] = StudentClass::join('students', 'students.students_id', '=', 'student_classes.student_id')
+                    ->orderBy('students.surname', 'ASC')
+                         ->join('school_classes', 'school_classes.id', '=', 'student_classes.class_id')
+                              ->join('school_arms', 'school_arms.id', '=', 'student_classes.school_arm_id')
+                                   ->join('genders', 'genders.id', '=', 'students.gender')
+                                        ->where('class_id','=',$request->class)
+                                             ->where('school_arm_id','=',$request->arm_id)
+                                                  ->where('academic_session_id','=',Active_Session()->id)->get()->all();
 
-            return view('backend.Examination.exam_card_view', $data);
-       }
+               $notifications = [
+                    'message' => 'No Student(s) found in the selected class for '. Active_Session()->name . ' academic session',
+                    'alert-type' => 'info'
+               ];
+               return count($data['Students']) ? view('backend.Examination.exam_card_view', $data) : back()->with($notifications);
+          } catch(\Exception $e){
+               
+               $notifications = [
+                    'message' => 'System could not generate students\' exam card.',
+                    'alert-type' => 'error'
+               ];
+
+               return back()->with($notifications);
+          }      
     }
 
-    public function Attendance(){
-        if(Auth::user()->usertype != 'Super Admin'){
-             return redirect()->route('login');
-        } else {
-             $data['SchoolClasses'] = SchoolClass::all();
-             $data['SchoolSessions'] = SchoolSessions::all();
-             $data['SchoolTerm'] = SchoolTerm::all();
- 
- 
-             return view('backend.Examination.exam_attendance', $data);
-        }
+    public function Attendance()
+    {        
+          $data['SchoolClasses'] = SchoolClass::all();
+          $data['SchoolArms'] = SchoolArms::all();
+          return view('backend.Examination.exam_attendance', $data);        
      }
  
  
      public function AttendanceGenerate(Request $request)
-     {
-        if(Auth::user()->usertype != 'Super Admin'){
-         return redirect()->route('login');
-        } else {
-             $Class_id = $request->class;
-             $Acad_Session_id = $request->sid;
-             $data['current_term'] = SchoolTerm::find($request->term_id);
-             $data['current_session'] = SchoolSessions::find($request->sid);
-             $data['Classes'] = SchoolClass::all();
-             $data['current_class'] = SchoolClass::find($Class_id);              
-             $data['Students'] = Students::join('school_houses', 'school_houses.id', '=', 'students.school_houses_id')->orderBy('students.surname', 'ASC')
-             ->join('school_classes', 'school_classes.id', '=', 'students.class')
-             ->join('genders', 'genders.id', '=', 'students.gender')
-                 ->where('class','=',$Class_id)
-                     ->where('session_admitted','=',$Acad_Session_id)->get()->all();
- 
-             return view('backend.Examination.attendance_view', $data);
-        }
+     {        
+          try {                       
+               $data['current_class'] = SchoolClass::find($request->class);
+               $data['class_arm'] = SchoolArms::find($request->class_arm);
+               $data['Students'] = StudentClass::join('students', 'students.students_id', '=', 'student_classes.student_id')
+                    ->orderBy('student_classes.roll_number', 'ASC')
+                         ->join('school_classes', 'school_classes.id', '=', 'student_classes.class_id')
+                              ->join('school_arms', 'school_arms.id', '=', 'student_classes.school_arm_id')
+                                   ->join('genders', 'genders.id', '=', 'students.gender')
+                                        ->where('class_id','=',$request->class)
+                                             ->where('school_arm_id','=',$request->class_arm)
+                                                  ->where('academic_session_id','=',Active_Session()->id)->get()->all();
+
+               $notifications = [
+                    'message' => 'No Student(s) found in the selected class for '. Active_Session()->name . ' academic session',
+                    'alert-type' => 'info'
+               ];
+               return count($data['Students']) ? view('backend.Examination.attendance_view', $data) : back()->with($notifications);
+          } catch(\Exception $e) {
+               $notifications = [
+                    'message' => 'System could not generate students\' attendance sheet.',
+                    'alert-type' => 'error'
+               ];
+
+               return back()->with($notifications);
+          }
+        
      }
 
      public function computeResult()
@@ -112,11 +126,11 @@ class ExaminationController extends Controller
           $arm_id = $request->arm_id;          
           try {
                $Result_details = MarksRegisters::select('student_id', 'class_id', 'total_scores', 'term_id', 'session_id', 'subject_id')
-                              ->where('class_id', $class_id)
-                                   ->where('session_id', $session_id)
-                                        ->where('term_id', $term_id)
-                                             ->where('total_scores', '>', 0)
-                                                  ->get()->groupBy('student_id');               
+                    ->where('class_id', $class_id)
+                         ->where('session_id', $session_id)
+                              ->where('term_id', $term_id)
+                                   ->where('total_scores', '>', 0)
+                                        ->get()->groupBy('student_id');               
 
                
                $rows = [];
@@ -128,8 +142,7 @@ class ExaminationController extends Controller
                     foreach ($Student_result as $key => $Results) {
                          $obtained_marks += $Results->total_scores;
                          $student_id = $Results->student_id; 
-                         $NumSubOffered[] =  $Results->subject_id; 
-                         
+                         $NumSubOffered[] =  $Results->subject_id;
                     }
                     
                     $row = [];
@@ -170,7 +183,7 @@ class ExaminationController extends Controller
                     $position->save();
                }
                
-          } catch (Exception $e) {
+          } catch (\Exception $e) {
                dd($e->getMessage());
           }
      }

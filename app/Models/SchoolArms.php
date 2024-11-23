@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class SchoolArms extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'arm_name',
+        'active status'
+    ];
 }

@@ -32,5 +32,13 @@ class SchoolTermController extends Controller
         return redirect()->route('school-terms');
     }
 
+    public function edit($term_id){
+        $Terms['Term_Information'] = SchoolTerm::find($term_id);
+
+        return view('backend.Setup.school_term_update', $Terms);
+    }
+    public function Update($term_id) {
+        SchoolTerm::where('id',$term_id)->update([]);
+    }
     
 }

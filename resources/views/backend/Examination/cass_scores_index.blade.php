@@ -65,7 +65,7 @@
                                     <select name="arm_id" id="arm_id" required class="form-control p-10">
                                         <option value="">Select Arm</option>
                                         @foreach($ClassArms as $key => $Arm)
-                                        <option value="{{ $Arm->id }}">{{ $Arm->name }}</option>
+                                        <option value="{{ $Arm->id }}">{{ $Arm->arm_name }}</option>
                                         @endforeach                                        
                                     </select>
                                     </div>
@@ -79,7 +79,7 @@
                                     <select name="subject_id" id="term" required class="form-control p-10">
                                         <option value="">Select Subjects</option>
                                         @foreach($SchoolSubjects as $key => $Subject)
-                                        <option value="{{ $Subject->id }}">{{ $Subject->name }}</option>
+                                        <option value="{{ $Subject->id }}">{{ $Subject->subject_name }}</option>
                                         @endforeach                                        
                                     </select>
                                     </div>
@@ -88,7 +88,7 @@
 							<div class="col-sm-4">
 								<div class="form-group">									
 									<div class="text-xs-right pt-25">
-										<input type="submit" value="Input Scores" class="btn  btn-info">
+										<input type="submit" value="Get CASS Scores" class="btn  btn-info">
 									</div>
 								</div>
 							</div>

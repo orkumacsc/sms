@@ -108,18 +108,21 @@
                             <tr>
                                 <td>{{ $key+1 }}</td>
                                 <td>{{ $Student->admission_no }}</td>
-                                <td><a href="{{ route('view_student_profile', $Student->id) }}" class="text-success" target="_blank">{{ $Student->surname.', '.$Student->firstname.' '.$Student->middlename }}</a></td>
+                                <td><a href="{{ route('view_student_profile', $Student->students_id) }}" class="text-success" target="_blank">{{ $Student->surname.', '.$Student->firstname.' '.$Student->middlename }}</a></td>
 								<td>{{ $Student->gendername }}</td>
                                 <td>{{ $Student->classname }} {{ $Student->arm_name }}</td>
 								<td>{{ $Student->name }}</td>
 								<td>{{ $Student->date_of_birth }}
-								<td><a href="{{ route('admission_letter', $Student->id) }}" target="_blank">
+								<td><a href="{{ route('admission_letter', $Student->students_id) }}" target="_blank">
 											<i class="text-warning mdi mdi-printer"></i>
 									</a>
-									<a href="{{ route('edit_student_record', $Student->id) }}" target="_blank">
+									<a href="{{ route('edit_student_record', $Student->students_id) }}" target="_blank">
 											<i class="text-warning mdi mdi-pencil-box-outline"></i> 
 									</a>
-									<a href="{{ route('delete_student_record', $Student->id) }}" onclick="return confirm('Are You Sure You Want To Delete The Selected Student')">
+									<a href="{{ route('delete_student_record', $Student->students_id) }}" onclick="return confirm('Are You Sure You Want To Delete The Selected Student?')">
+											<i class="text-warning mdi mdi-delete"></i> 
+									</a>
+									<a href="{{ route('suspend_student', $Student->students_id) }}" onclick="return confirm('Do you wish to suspend the selected student?')">
 											<i class="text-warning mdi mdi-delete"></i> 
 									</a>
 								</td>								

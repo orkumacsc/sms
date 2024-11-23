@@ -5,14 +5,16 @@
 
 
 <style media="print">
-    @page:first{        
+    @page:first{ 
+		   
         margin-top: 0px;
         margin-left: 0px;
         margin-right: 0px;
         margin-bottom: 50px;               
     }
 
-    @page{        
+    @page{ 
+		      
         margin-top: 50px;
         margin-left: 0px;
         margin-right: 0px;
@@ -21,8 +23,7 @@
 
     .box-header{display:none;}
     .table{
-            font-size: 20px !important;
-            
+            font-size: 20px !important;            
             padding:0%;
             margin:0px;
             
@@ -30,16 +31,21 @@
 
 	thead {
 		font-weight: bold;
+		
 	}
 
     .table-responsive > .table tr th, .table-responsive > .table tr td {
         white-space: nowrap !important;
-        padding:1% !important;        
+        padding:1% !important; 
+		color: black !important;       
     }
     .inderline{
         border-bottom: 1px solid #000000 !important;
     }
     .main-footer{display:none;}
+	* {
+		color: black !important;
+	}
 </style>
 
 <div class="content-wrapper">
@@ -65,10 +71,10 @@
 							<tr>
 								<div class="row">                
 								<div class="col-sm-12 text-center p-0 m-0">                                        
-									<h1>{{ $current_term->name }} {{ $current_session->name }} ACADEMIC SESSION</h3>
+									<h1>{{ Active_Term()->term_name }} - {{ Active_Session()->name }} ACADEMIC SESSION</h3>
 									<h2>EXAMINATION ATTENDANCE SHEET</h3>
 									<div class="row mt-10 text-center">
-										<div class="col-sm-3 m-0 p-0"><h4>CLASS: {{ $current_class->classname }}</h4></div>
+										<div class="col-sm-3 m-0 p-0"><h4>CLASS: {{ $current_class->classname }} {{ $class_arm->arm_name }}</h4></div>
 										<div class="col-sm-6 m-0 p-0"><h4>SUBJECT: __________________________________</h4></div>
 										<div class="col-sm-3 m-0 p-0"><h4>TIME:  _____________</h4></div>                        
 									</div>
@@ -91,7 +97,7 @@
 						<tbody>
                             @foreach($Students as $key => $Student)
                             <tr>
-                                <td>{{ $key+1 }}</td>
+                                <td>{{ $Student->roll_number }}</td>
                                 <td>{{ $Student->admission_no }}</td>
                                 <td>{{ $Student->surname.', '.$Student->firstname.' '.$Student->middlename }}</td>								
 								<td>{{ $Student->gendername }}</td>								
