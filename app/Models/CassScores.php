@@ -9,8 +9,8 @@ class CassScores extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'cass_type', 'student_id', 'session_id',
-        'class_id', 'term_id', 'subject_id', 'scores'
+        'cass_type', 'student_id', 'academic_session_id',
+        'class_id', 'class_arm_id', 'term_id', 'subject_id', 'scores'
     ];
 
     public function create($rows) {
@@ -19,8 +19,9 @@ class CassScores extends Model
                 CassScores::updateOrCreate([
                     'cass_type' => $row['cass_type'],
                     'student_id' => $row['student_id'],
-                    'session_id' => $row['session_id'],
+                    'academic_session_id' => $row['academic_session_id'],
                     'class_id' => $row['class_id'],
+                    'class_arm_id' => $row['class_arm_id'],
                     'term_id' => $row['term_id'],
                     'subject_id' => $row['subject_id']
                 ],['scores' => $row['scores']]);

@@ -8,7 +8,7 @@
 	  	<section class="content">
 		  <div class="box">
 			<div class="box-header with-border">
-			  <h4 class="box-title">CASS Scores Entry Request Form</h4>			  
+			  <h4 class="box-title">Select Result Upload Criteria</h4>			  
 			</div>
 			<!-- /.box-header -->
 			<div class="box-body">
@@ -16,33 +16,7 @@
 				<div class="col">
 					<form method="get" action="{{ route('cass_scores_form') }}">
 					    <div class="row">
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <h5>Session<span class="text-danger">*</span></h5>
-                                    <div class="controls">
-                                    <select name="s_id" id="s_id" required class="form-control p-10">
-                                    <option value="">Select Session</option>                                        
-                                        @foreach($SchoolSessions as $key => $Session)
-                                        <option value="{{ $Session->id }}">{{ $Session->name }}</option> 
-                                        @endforeach                                       
-                                    </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <h5>Term<span class="text-danger">*</span></h5>
-                                    <div class="controls">
-                                    <select name="term_id" id="term" required class="form-control p-10">
-                                        <option value="">Select Term</option>
-                                        @foreach($SchoolTerm as $key => $Term)
-                                        <option value="{{ $Term->id }}">{{ $Term->name }}</option>
-                                        @endforeach                                        
-                                    </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
+                            <div class="col-md-6 col-lg-3">
                                 <div class="form-group">
                                     <h5>Class<span class="text-danger">*</span></h5>
                                     <div class="controls">
@@ -55,10 +29,8 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">                            
-                            
-							<div class="col-sm-4">
+
+							<div class="col-md-6 col-lg-3">
                                 <div class="form-group">
                                     <h5>Arm<span class="text-danger">*</span></h5>
                                     <div class="controls">
@@ -72,7 +44,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-sm-4">
+                            <div class="col-md-6 col-lg-4">
                                 <div class="form-group">
                                     <h5>Subjects<span class="text-danger">*</span></h5>
                                     <div class="controls">
@@ -82,10 +54,10 @@
                                     </div>
                                 </div>
                             </div>
-							<div class="col-sm-4">
+							<div class="col-md-6 col-lg-2">
 								<div class="form-group">									
 									<div class="text-xs-right pt-25">
-										<input type="submit" value="Get CASS Entry Form" class="btn  btn-info">
+										<input type="submit" value="Submit" class="btn  btn-info">
 									</div>
 								</div>
 							</div>

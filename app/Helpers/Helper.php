@@ -57,4 +57,10 @@ function formatCurrency($camount){
 }
 
 
+if(!function_exists('isFound')) {
+    function isFound($students) {
+        return count($students) ? true : false;
+    }
+}
+
 

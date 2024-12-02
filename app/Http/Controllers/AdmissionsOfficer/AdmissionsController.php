@@ -25,12 +25,12 @@ use DB;
 class AdmissionsController extends Controller
 {
     public function admission() {
-        $data['SchoolClasses'] = SchoolClass::where('session_created','=',2)->get();
+        $data['SchoolClasses'] = SchoolClass::all();
         $data['ClassArms'] = SchoolArms::all();
         $data['SchoolSessions'] = SchoolSessions::all();
         $data['Countries'] = Countries::all();
         $data['States'] = States::all();
-        $data['lgas'] = LocalGovts::all();
+        $data['LGAs'] = LocalGovts::where('states_id',7)->get();
         $data['Houses'] = SchoolHouses::all();
         $data['Complexions'] = Complexions::all();
         $data['Religions'] = Religions::all();
@@ -47,7 +47,7 @@ class AdmissionsController extends Controller
         $data['School_Terms'] = SchoolTerm::all();
         $data['Countries'] = Countries::all();
         $data['States'] = States::all();
-        $data['lgas'] = LocalGovts::all();
+        $data['LGAs'] = LocalGovts::where('states_id',7)->get();
         $data['Houses'] = SchoolHouses::all();
         $data['Complexions'] = Complexions::all();
         $data['Religions'] = Religions::all();
@@ -234,10 +234,18 @@ class AdmissionsController extends Controller
         $Acad_Session_id = $request->acad_session;
         $term_id = $request->term_id;
         
-        $data['Classes'] = SchoolClass::all();
+        $data['SchoolClasses'] = SchoolClass::all();
         $data['ClassArms'] = SchoolArms::all();
-        $data['School_Sessions'] = SchoolSessions::all(); 
+        $data['SchoolSessions'] = SchoolSessions::all(); 
         $data['School_Terms'] = SchoolTerm::all();
+        $data['Countries'] = Countries::all();
+        $data['States'] = States::all();
+        $data['LGAs'] = LocalGovts::where('states_id',7)->get();
+        $data['Houses'] = SchoolHouses::all();
+        $data['Complexions'] = Complexions::all();
+        $data['Religions'] = Religions::all();
+        $data['Tribes'] = Tribes::all();
+        $data['genders'] = Gender::all();  
 
         if($Class_id && $Classarm_id & $Acad_Session_id && $term_id) {            
             $data['Students'] = Students::join('school_houses', 'school_houses.id', '=', 'students.school_houses_id')->orderBy('students.surname', 'ASC')

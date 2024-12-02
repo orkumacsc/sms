@@ -63,9 +63,9 @@ Route::middleware(['admission_officer'])->group(function(){
     })->name('admissions_dashboard');
 
     Route::prefix('/Admissions')->group(function(){
-        Route::get('StudentEntrollment', [AdmissionsController::class, 'admission'])->name('admissions');
+        // Route::get('StudentEntrollment', [AdmissionsController::class, 'admission'])->name('admissions');
         Route::post('StudentEntrollment', [AdmissionsController::class, 'store_student_enrolment'])->name('store_student_enrolment');
-        Route::get('', [AdmissionsController::class, 'admission_index'])->name('admissions_view');
+        Route::get('', [AdmissionsController::class, 'admission_index'])->name('admissions');
         Route::get('Enroled', [AdmissionsController::class, 'admission_list'])->name('admissions_list');
         Route::get('AdmissionLetter/{student_id}', [AdmissionsController::class, 'admission_letter'])->name('student_admission_letter');
     });
@@ -145,9 +145,9 @@ Route::prefix('Students')->middleware(['super_admin'])->group(function(){
     Route::get('GenerateRollNumber', [StudentsClassController::class, 'index'])->name('generate_reg_no');
     Route::post('GenerateRollNumber', [StudentsClassController::class, 'store_reg_no'])->name('store_reg_no');
     Route::patch('Suspend/{student_id}', [StudentsClassController::class, 'suspend_student'])->name('suspend_student');
-    Route::get('ReEnrol', [StudentPromteController::class, 'ReEnrol'])->name('re_enrol_student');
-    Route::get('UpdateReEnrol', [StudentPromteController::class, 'CreateReEnrol'])->name('create_re_enrol');
-    Route::post('UpdateReEnrol', [StudentPromteController::class, 'UpdateReEnrol'])->name('update_re_enrol');
+    Route::get('/', [StudentPromteController::class, 'ReEnrol'])->name('re_enrol_student');
+    Route::get('ReEnrol', [StudentPromteController::class, 'CreateReEnrol'])->name('create_re_enrol');
+    Route::post('ReEnrol', [StudentPromteController::class, 'UpdateReEnrol'])->name('update_re_enrol');
 });
 
 Route::prefix('Academics')->group(function(){
@@ -176,16 +176,19 @@ Route::prefix('/')->group(function(){
     Route::get('AsignAssessment', [AssessmentController::class, 'AssIndex'])->name('asign_assessment');
     Route::post('AsingAssessmentStore', [AssessmentController::class, 'StoreAsignAssessment'])->name('store_asign_assessment');
     Route::get('ScoreSheet', [AssessmentController::class, 'ScoreSheetIndex'])->name('score_sheet_form');
-    Route::get('ScoresheetView', [AssessmentController::class, 'ViewScoreSheet'])->name('score_sheet_view');
-    Route::get('UploadCassScores', [CassScoresController::class, 'InputScoreIndex'])->name('input_cass_scores');
-    Route::get('CassScoresForm', [CassScoresController::class, 'InputScoreForm'])->name('cass_scores_form');
-    Route::post('StoreCassScores', [CassScoresController::class, 'StoreScores'])->name('store_scores');
+    Route::get('ScoresheetView', [AssessmentController::class, 'ViewScoreSheet'])->name('score_sheet_view');    
     Route::get('CASSScores', [CassViewController::class, 'index'])->name('cass_scores');
     Route::get('ViewCassScores', [CassViewController::class, 'viewCass'])->name('view_cass_scores');
 
     Route::get('ResultSeummary', [CassViewController::class, 'resultSummary'])->name('result_summary');
-    Route::get('ViewResultSeummary', [CassViewController::class, 'viewResultSummary'])->name('view_result_summary');    
-        
+    Route::get('ViewResultSeummary', [CassViewController::class, 'viewResultSummary'])->name('view_result_summary');
+});
+
+Route::prefix('UploadResult')->group(function() {
+    Route::get('/', [CassScoresController::class, 'upload'])->name('input_cass_scores');
+    Route::get('Scores', [CassScoresController::class, 'uploadForm'])->name('cass_scores_form');
+    Route::post('Scores', [CassScoresController::class, 'uploadScores'])->name('store_scores');
+    Route::get('UpdateScores',[CassScoresController::class, 'updateScores'])->name('update_scores');
 });
 
 

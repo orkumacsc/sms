@@ -125,7 +125,7 @@
                                 <tr>
                                 <div class="row">                
                     <div class="col-sm-12 text-center p-0 m-0">                                        
-                        <h3>{{ $current_term->name }} {{ $current_session->name }} ACADEMIC SESSION</h3>
+                        <h3>{{ Active_Term()->term_name }} {{ Active_Session()->name }} ACADEMIC SESSION</h3>
                         <div class="row mt-10">
                             <div class="col-sm-4"><h4>CLASS: {{ $Current_Class->classname }} {{ $Class_Arm->arm_name }}</h4></div>
                             <div class="col-sm-8 "><h4>SUBJECT: {{ $subject->subject_name }}</h4></div>                        
@@ -161,8 +161,8 @@
                     @endforeach	                               							
                 </tr>                            
                 @endforeach
-                <input type="hidden" name="current_term" value="{{ $current_term->id }}">
-                <input type="hidden" name="current_session" value="{{ $current_session->id }}">
+                <input type="hidden" name="current_term" value="{{ Active_Term()->term_id }}">
+                <input type="hidden" name="current_session" value="{{ Active_Session()->id }}">
                 <input type="hidden" name="class_id" value="{{ $Current_Class->id }}">
                 <input type="hidden" name="subject" value="{{ $subject->id }}">
                 <input type="hidden" name="class_arm_id" value="{{ $Class_Arm->id }}">

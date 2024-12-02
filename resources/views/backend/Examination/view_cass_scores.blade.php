@@ -22,64 +22,58 @@
 					<div class="table-responsive">
 					  <table id="" class="table table-bordered nowrap">
 						<thead>
-                            <tr>
-                            <div class="row">                
-                <div class="col-sm-12 text-center p-0 m-0">                                        
-                    <h3> ACADEMIC SESSION</h3>
-                    <div class="row mt-10">
-                        <div class="col-sm-4"><h4>CLASS: </h4></div>
-                        <div class="col-sm-8 "><h4>SUBJECT: </h4></div>                        
-                    </div>
+              <tr>
+                <div class="row">                
+                  <div class="col-sm-12 text-center p-0 m-0">                                        
+                      <h3> ACADEMIC SESSION</h3>
+                      <div class="row mt-10">
+                          <div class="col-sm-4"><h4>CLASS: {{ $SchoolClasses->classname }} {{ $class_arms->arm_name}} </h4></div>
+                          <div class="col-sm-8 "><h4>SUBJECT: {{ $subject->subject_name }} </h4></div>                        
+                      </div>
+                  </div>
                 </div>
-            </div>
-                            </tr>
+              </tr>
 							<tr>
 								<th>S/No</th>
 								<th>Admission No</th>
 								<th>Full Name</th>
-                                @foreach($Assessments as $key => $Ass)
-                                    @if($Ass->class_id == $SchoolClasses->id)                            
-								        <th>{{ $Ass->name }} ({{ $Ass->percentage }})</th>
-                                    @endif
-                                @endforeach	
-                                <th>TOTAL (100)</th>										
-                                <th>POSITION</th>
+                @foreach($Assessments as $key => $Ass)
+                  @if($Ass->class_id == $SchoolClasses->id)                            
+                    <th>{{ $Ass->name }} ({{ $Ass->percentage }})</th>
+                  @endif
+                @endforeach	
+                <th>TOTAL (100)</th>										
+                <th>POSITION</th>
 							</tr>
 						</thead>
-            
-              @csrf
 						<tbody>
-            @foreach($Students as $key => $Student)                            
-            <tr>
-                <td>{{ $key+1 }}</td>
-                <td>{{ $Student->admission_no }}</td>
-                <td>{{ $Student->surname.', '.$Student->firstname.' '.$Student->middlename }}</td>
-                @foreach($CASS_Scores as $key => $Ass)
-                @if($Ass->student_id == $Student->id)                            
-                <td>
-                  {{ $Ass->scores}}
-                </td>                
-                @endif                
-                @endforeach 
-                
-                @foreach($Marks_Registers as $id => $Marks)
-                @if($Marks->student_id == $Student->id)
-                <td>
-                    {{ $Marks->total_scores }}
-                </td>
-                @endif
-                @endforeach
+              @foreach($Students as $key => $Student)                            
+              <tr>
+                  <td>{{ $key+1 }}</td>
+                  <td>{{ $Student->admission_no }}</td>
+                  <td>{{ $Student->surname.', '.$Student->firstname.' '.$Student->middlename }}</td>
+				  @foreach ($CASS_Scores as $scores )				 
+				  	<td>
+						@foreach ($scores as $score )
+							@if ($score->student_id == $Student->id)
+								{{$score->scores}}
+							@endif						
+						@endforeach
+					</td>
+				  @endforeach
 
-                @foreach($Marks_Registers as $id => $Marks)
-                @if($Marks->student_id == $Student->id)
-                <td>
-                    {{ $Marks->subject_position }}
-                </td>
-                @endif
-                @endforeach
-            </tr>                            
-            @endforeach
-            			  
+					@foreach($Marks_Registers as $id => $Marks)
+					@if($Marks->student_id == $Student->id)
+					<td>
+						{{ $Marks->total_scores }}
+					</td>
+					<td>
+						{{ $Marks->subject_position }}
+					</td>
+					@endif
+					@endforeach
+              </tr>                            
+              @endforeach            			  
         </tbody>        
         
 					</table>

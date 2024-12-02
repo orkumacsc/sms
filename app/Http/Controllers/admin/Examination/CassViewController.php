@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\admin\Examination;
 
 use App\Http\Controllers\Controller;
+use App\Models\StudentClass;
+use DB;
 use Illuminate\Http\Request;
 use App\Models\CassScores;
 use App\Models\Students;
@@ -32,42 +34,59 @@ class CassViewController extends Controller
     public function viewCass(Request $request){
 
         try {
-            // Retrieving Form Data
-        $s_id = $request->s_id;
-        $class_id = $request->class_id;
-        $term_id = $request->term_id;
-        $subject_id = $request->subject_id;
-        $classarm_id = $request->arm_id;
+            $data['current_session'] = SchoolSessions::find($request->academic_session_id);
+            $data['SchoolClasses'] = SchoolClass::find($request->class_id);
+            $data['class_arms'] = SchoolArms::find($request->class_arm_id);
+            $data['current_term'] = SchoolTerm::find($request->term_id);
+            $data['subject'] = SchoolSubjects::find($request->subject_id);
+            $data['Students'] = StudentClass::join('students','students.students_id','student_classes.student_id')
+            ->where('class_id','=',$request->class_id)
+            ->where('school_arm_id',$request->class_arm_id)                
+            ->where('academic_session_id',$request->academic_session_id)
+            ->orderBy('roll_number')
+            ->get();
 
-        $data['current_session'] = SchoolSessions::find($request->s_id);
-        $data['SchoolClasses'] = SchoolClass::find($request->class_id);
-        $data['current_term'] = SchoolTerm::find($request->term_id);
-        $data['subject'] = SchoolSubjects::find($request->subject_id);             
-        $data['Students'] = Students::where('class','=',$request->class_id)->orderBy('students.surname', 'ASC')->get()->all();
-        
-        // Querying Database
-        $data['CASS_Scores'] = CassScores::where('cass_scores.class_id', $class_id)->where('session_id', $s_id)->where('term_id', $term_id)
-            ->where('subject_id', $subject_id)->join('students', 'students.id', 'cass_scores.student_id')->join('school_classes', 'school_classes.id', 'cass_scores.class_id')
-                ->join('school_subjects', 'school_subjects.id', 'cass_scores.subject_id')->join('school_sessions', 'school_sessions.id', 'cass_scores.session_id')
-                    ->join('school_terms', 'school_terms.id', 'cass_scores.term_id')->join('school_assessments', 'school_assessments.id', 'cass_scores.cass_type')->get();
-        
-        $data['Assessments'] = SchoolAssessments::where('class_id', '=', $request->class_id)->join('school_classes', 'school_classes.id', '=', 'school_assessments.class_id')
-            ->orderBy('school_classes.id', 'ASC')->orderBy('school_assessments.id', 'ASC')
-                ->join('assessment__types', 'assessment__types.id', '=', 'school_assessments.ass_type_id')->get();
-
-
-        // Marks Registers' Table
-        $data['Marks_Registers'] = MarksRegisters::where('marks_registers.class_id', $class_id)->where('session_id', $s_id)->where('term_id', $term_id)
-        ->where('subject_id', $subject_id)->join('students', 'students.id', 'marks_registers.student_id')->join('school_classes', 'school_classes.id', 'marks_registers.class_id')
-            ->join('school_subjects', 'school_subjects.id', 'marks_registers.subject_id')->join('school_sessions', 'school_sessions.id', 'marks_registers.session_id')
-                ->join('school_terms', 'school_terms.id', 'marks_registers.term_id')->get();
+            $data['CASS_Scores'] = CassScores::select('student_id','cass_type','scores')            
+                ->where('class_id','=',$request->class_id)
+                    ->where('class_arm_id',$request->class_arm_id)
+                        ->where('academic_session_id',$request->academic_session_id)
+                            ->where('term_id',$request->term_id)
+                                ->where('subject_id',$request->subject_id)                                                                   
+                                    ->get()->groupBy('cass_type');
             
-        return view('backend.Examination.view_cass_scores', $data);
+            $data['Marks_Registers'] = MarksRegisters::where('class_id','=',$request->class_id)
+            ->where('class_arm_id',$request->class_arm_id)
+                ->where('academic_session_id',$request->academic_session_id)
+                    ->where('term_id',$request->term_id)
+                        ->where('subject_id',$request->subject_id)
+                                    ->get()->all();
+
+
+            $data['Assessments'] = SchoolAssessments::where('class_id', '=', $request->class_id)
+            ->join('school_classes', 'school_classes.id', '=', 'school_assessments.class_id')
+                ->orderBy('school_classes.id', 'ASC')->orderBy('school_assessments.id', 'ASC')
+                    ->join('assessment__types', 'assessment__types.id', '=', 'school_assessments.ass_type_id')
+                        ->get();
+
+            $cass_notification = [
+                'message' => 'No Continuous Assessment Found the selected Class',
+                'alert-type' => 'info'
+            ];
+            $students_notification = [
+                'message' => 'There is no student in the selected class.',
+                'alert-type' => 'info'
+            ];
+                
+            return  isFound($data['Students']) ? 
+                        (isFound($data['CASS_Scores']) ? 
+                            view('backend.Examination.view_cass_scores', $data) :
+                            back()->with($cass_notification)) :
+                                back()->with($students_notification);
 
         } catch (\Exception $e) {
             
             $notifications = array([
-                'message' => $e->getMessage(),
+                'message' => $e,
                 'alert-type' => 'error'
             ]);
 

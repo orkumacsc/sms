@@ -238,6 +238,7 @@ throw new Error('template requires jQuery')
   var PushMenu = function (options) {
     this.options = options
     this.init()
+    this.onLoad()
   }
 
   PushMenu.prototype.init = function () {
@@ -246,14 +247,14 @@ throw new Error('template requires jQuery')
       this.expandOnHover()
       $('body').addClass(ClassName.expandFeature)
     }
-
+    
     $(Selector.contentWrapper).on(function () {
       // Enable hide menu when clicking on the content-wrapper on small screens
       if ($(window).width() <= this.options.collapseScreenSize && $('body').hasClass(ClassName.open)) {
         this.close()
       }
     }.bind(this))
-
+    
     // __Fix for android devices
     $(Selector.searchInput).on(function (e) {
       e.stopPropagation()
@@ -266,13 +267,21 @@ throw new Error('template requires jQuery')
 
     if (windowWidth <= this.options.collapseScreenSize) {
       isOpen = $('body').hasClass(ClassName.open)
-    }
-
+    }   
+    
     if (!isOpen) {
       this.open()
     } else {
       this.close()
     }
+  }
+
+  PushMenu.prototype.onLoad = function () {
+    var isOpened = ($(window).width() <= this.options.collapseScreenSize) ? $('body').hasClass(ClassName.open) : !$('body').hasClass(ClassName.collapsed);
+    if(isOpened){
+      this.close()
+    } 
+      
   }
 
   PushMenu.prototype.open = function () {

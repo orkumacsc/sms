@@ -24,7 +24,7 @@ class LoginController extends Controller
                 break;
         
             case 7:
-                return redirect('admissions_dashboard');
+                return redirect('Admissions');
                 break;
             default:
                 

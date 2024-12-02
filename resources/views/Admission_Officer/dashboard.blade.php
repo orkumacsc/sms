@@ -26,7 +26,7 @@
 				</div>	
 				
 				<div class="col-xl-4 col-6 col-12">
-					<a href="{{ route('admissions_view') }}">
+					<a href="{{ route('admissions') }}">
 					<div class="box overflow-hidden pull-up">
 						<div class="box-body">							
 							<div class="icon bg-warning-light rounded w-60 h-60">

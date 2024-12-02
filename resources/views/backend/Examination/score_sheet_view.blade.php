@@ -78,27 +78,27 @@
 								<th>S/No</th>
 								<th>Admission No</th>
 								<th>Full Name</th>
-                                @foreach($Assessments as $key => $Ass)
-                                    @if($Ass->class_id == $SchoolClasses->id)                            
-								        <th>{{ $Ass->name }} ({{ $Ass->percentage }})</th>
-                                    @endif
-                                @endforeach											
+                @foreach($Assessments as $key => $Ass)
+                    @if($Ass->class_id == $SchoolClasses->id)                            
+                      <th>{{ $Ass->name }} ({{ $Ass->percentage }})</th>
+                    @endif
+                @endforeach											
 							</tr>
 						</thead>
 						<tbody>
-                            @foreach($Students as $key => $Student)
-                            <tr>
-                                <td>{{ $key+1 }}</td>
-                                <td>{{ $Student->admission_no }}</td>
-                                <td>{{ $Student->surname.', '.$Student->firstname.' '.$Student->middlename }}</td>
-								@foreach($Assessments as $key => $Ass)
-                                    @if($Ass->class_id == $SchoolClasses->id)                            
-								        <td></td>
-                                    @endif
-                                @endforeach	                               							
-                            </tr>
-                            @endforeach
-                        </tbody>
+              @foreach($Students as $key => $Student)
+              <tr>
+                  <td>{{ $key+1 }}</td>
+                  <td>{{ $Student->admission_no }}</td>
+                  <td>{{ $Student->surname.', '.$Student->firstname.' '.$Student->middlename }}</td>
+                      @foreach($Assessments as $key => $Ass)
+                        @if($Ass->class_id == $SchoolClasses->id)                            
+                        <td></td>
+                      @endif
+                  @endforeach	                               							
+              </tr>
+              @endforeach
+          </tbody>
 					</table>
 					</div>              
 				</div>

@@ -10,7 +10,7 @@
 
 		  <div class="row mt-0"> 
 
-			<div class="col-xl-6">
+			<div class="col-sm-12 col-xxl-6">
 
 			  <div class="box">
 				<div class="box-header with-border">

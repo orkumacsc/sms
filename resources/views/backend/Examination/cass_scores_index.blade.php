@@ -20,7 +20,7 @@
                                 <div class="form-group">
                                     <h5>Session<span class="text-danger">*</span></h5>
                                     <div class="controls">
-                                    <select name="s_id" id="s_id" required class="form-control p-10">
+                                    <select name="academic_session_id" id="academic_session_id" required class="form-control p-10">
                                     <option value="">Select Session</option>                                        
                                         @foreach($SchoolSessions as $key => $Session)
                                         <option value="{{ $Session->id }}">{{ $Session->name }}</option> 
@@ -62,7 +62,7 @@
                                 <div class="form-group">
                                     <h5>Arm<span class="text-danger">*</span></h5>
                                     <div class="controls">
-                                    <select name="arm_id" id="arm_id" required class="form-control p-10">
+                                    <select name="class_arm_id" id="class_arm_id" required class="form-control p-10">
                                         <option value="">Select Arm</option>
                                         @foreach($ClassArms as $key => $Arm)
                                         <option value="{{ $Arm->id }}">{{ $Arm->arm_name }}</option>

@@ -18,7 +18,8 @@ class MarksRegisters extends Model
                     'total_scores' => $record['total_scores'],
                     'subject_id' => $record['subject_id'],
                     'class_id' => $record['class_id'],
-                    'session_id' => $record['session_id'],
+                    'class_arm_id' => $record['class_arm_id'],
+                    'academic_session_id' => $record['academic_session_id'],
                     'student_id' => $record['student_id'],
                     'term_id' => $record['term_id']
                 ]);
