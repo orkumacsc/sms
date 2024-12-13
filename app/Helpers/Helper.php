@@ -1,4 +1,6 @@
 <?php
+use App\Models\CassScores;
+use App\Models\MarksRegisters;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
@@ -63,4 +65,80 @@ if(!function_exists('isFound')) {
     }
 }
 
+if(!function_exists('isScoresUploaded'))
+{
+    function isScoresUploaded($class_id, $class_arm_id, $subject_id)
+    {
+        $CASS_Scores = CassScores::select('student_id','cass_type','scores')            
+        ->where('class_id','=',$class_id)
+            ->where('class_arm_id',$class_arm_id)
+                ->where('academic_session_id',Active_Session()->id)
+                    ->where('term_id',Active_Term()->term_id)
+                        ->where('subject_id',$subject_id)                                                                   
+                            ->get()->groupBy('cass_type');
+    
+        $Marks_Registers = MarksRegisters::where('class_id','=',$class_id)
+        ->where('class_arm_id',$class_arm_id)
+            ->where('academic_session_id',Active_Session()->id)
+                ->where('term_id',Active_Term()->term_id)
+                    ->where('subject_id',$subject_id)
+                                ->get()->all();
+        return (count($CASS_Scores) && $Marks_Registers) ? true : false;
+    
+    }
+}
+
+if(!function_exists('processUpload'))
+{
+    function processUpload($filename) 
+        {            
+            $records  = [];            
+            $openedFile = fopen($filename,'r');
+
+            while(($data = fgetcsv($openedFile)))
+            {            
+                    $records[] = $data;
+            }
+            
+            fclose($openedFile);
+            array_shift($records);
+            return $records;
+        }
+}
+
+if(!function_exists('cass'))
+{
+    function cass($filename) 
+        {          
+            $openedFile = fopen($filename,'r');
+            $records = fgetcsv($openedFile);
+            fclose($openedFile); 
+
+            return $records[0];
+        }
+}
+
+if(!function_exists('generatePositions')) {
+    function generatePositions($CASS_scores){
+        $students_marks = [];
+        foreach ($CASS_scores as $student_id => $marks) { 
+            $students_marks[$student_id] = array_sum($marks);
+        }       
+        arsort($students_marks);
+        $students_positions = [];
+        
+        $i = 0;
+        $prev = 0;
+        foreach ($students_marks as $student_id => $subject_total) {
+            if($prev != $subject_total)
+            {
+                $prev = $subject_total;                
+                $i++;
+            }
+            $students_positions[$student_id] = $i;
+        } 
+
+        return $students_positions;
+    }
+}
 

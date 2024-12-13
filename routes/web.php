@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdmissionsOfficer\AdmissionsController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\CheckResultController;
 use App\Http\Controllers\SchoolSetupController;
 use App\Models\SchoolSetup;
 use Illuminate\Support\Facades\Route;
@@ -85,10 +86,9 @@ Route::get('/admin/logout', [AdminController::class, 'Logout'])->name('admin.log
 
 
 //Users Routes
-Route::prefix('users')->group(function(){
-    Route::get('view', [userController::class, 'UserView'])->name('user.view');
-    Route::get('add', [userController::class, 'AddUser'])->name('user.add');
-    Route::post('store', [userController::class, 'StoreUser'])->name('user.store');
+Route::prefix('Users')->group(function(){
+    Route::get('view', [userController::class, 'UserView'])->name('user.view');    
+    Route::post('store', [userController::class, 'StoreUser'])->name('store_user');
     Route::get('edit/{id}', [userController::class, 'EditUser'])->name('user.edit');
     Route::get('delete/{id}', [userController::class, 'DeleteUser'])->name('user.delete');
     Route::get('profile/{id}', [userController::class, 'UserProfile'])->name('user.view_profile');
@@ -163,10 +163,8 @@ Route::prefix('/Examination')->group(function(){
     Route::get('ExamCardView', [ExaminationController::class, 'GenerateExamCard'])->name('GenerateExamCard');
     Route::get('Attendance', [ExaminationController::class, 'Attendance'])->name('exam_attendance');
     Route::get('ExamAttendanceView', [ExaminationController::class, 'AttendanceGenerate'])->name('exam_attendance_view');
-
     Route::get('ComputeResult', [ExaminationController::class, 'computeResult'])->name('compute_result');
-    Route::post('StoreComputeResult', [ExaminationController::class, 'storeComputeResult'])->name('store_compute_result');
-    
+    Route::post('StoreComputeResult', [ExaminationController::class, 'storeComputeResult'])->name('store_compute_result');    
 });
 
 
@@ -176,10 +174,7 @@ Route::prefix('/')->group(function(){
     Route::get('AsignAssessment', [AssessmentController::class, 'AssIndex'])->name('asign_assessment');
     Route::post('AsingAssessmentStore', [AssessmentController::class, 'StoreAsignAssessment'])->name('store_asign_assessment');
     Route::get('ScoreSheet', [AssessmentController::class, 'ScoreSheetIndex'])->name('score_sheet_form');
-    Route::get('ScoresheetView', [AssessmentController::class, 'ViewScoreSheet'])->name('score_sheet_view');    
-    Route::get('CASSScores', [CassViewController::class, 'index'])->name('cass_scores');
-    Route::get('ViewCassScores', [CassViewController::class, 'viewCass'])->name('view_cass_scores');
-
+    Route::get('ScoresheetView', [AssessmentController::class, 'ViewScoreSheet'])->name('score_sheet_view');
     Route::get('ResultSeummary', [CassViewController::class, 'resultSummary'])->name('result_summary');
     Route::get('ViewResultSeummary', [CassViewController::class, 'viewResultSummary'])->name('view_result_summary');
 });
@@ -188,7 +183,10 @@ Route::prefix('UploadResult')->group(function() {
     Route::get('/', [CassScoresController::class, 'upload'])->name('input_cass_scores');
     Route::get('Scores', [CassScoresController::class, 'uploadForm'])->name('cass_scores_form');
     Route::post('Scores', [CassScoresController::class, 'uploadScores'])->name('store_scores');
-    Route::get('UpdateScores',[CassScoresController::class, 'updateScores'])->name('update_scores');
+    Route::get('UpdateUploadedCass',[CassScoresController::class, 'updateUploadedCass'])->name('update_uploaded_cass');    
+    Route::post('OfflineUpload',[CassScoresController::class, 'offlineUpload'])->name('upload_offline');
+    Route::get('DownloadOffline',[CassScoresController::class, 'downloadOffline'])->name('download_offline');    
+    Route::post('ViewUploadedResult', [CassViewController::class, 'viewCass'])->name('view_cass_scores');
 });
 
 
@@ -245,7 +243,6 @@ Route::prefix('SchoolFees')->group(function(){
 
 
 Route::prefix('Reports')->group(function(){
-
     Route::get('/', [ReportController::class, 'index'])->name('reports');
     Route::get('ClassResult', [ReportController::class, 'classResult'])->name('class_result');
     Route::get('ReportCard', [ReportController::class, 'studentDossier'])->name('report_card');
@@ -260,3 +257,9 @@ Route::prefix('Reports')->group(function(){
 
     //Get number of students admitted in a class
     Route::get('AdmittedStudents/{class_info}', [GeneralController::class, 'AdmittedStudents'])->name('number_of_admitted');
+    
+
+    Route::prefix('CheckResult')->group(function(){
+        Route::get('/',[CheckResultController::class, 'index']);
+        Route::post('/',[CheckResultController::class, 'process'])->name('check_result');    
+    });

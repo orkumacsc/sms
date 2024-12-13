@@ -16,9 +16,9 @@ class userController extends Controller
 
     }
     
-    public function UserView(){
-        //$allData = User::all();
-        $data['allData'] = User::all();
+    public function UserView(){        
+        $data['allData'] = User::orderBy('usertype')->get();
+        $data['userRoles'] = Roles::all();
         return view('backend.user.view_user', $data);
     }
 

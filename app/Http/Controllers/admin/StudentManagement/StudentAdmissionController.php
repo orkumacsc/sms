@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin\StudentManagement;
 
 use App\Http\Controllers\Controller;
 use App\Models\SchoolArms;
+use App\Models\SchoolTerm;
 use Illuminate\Http\Request;
 use App\Models\Students;
 use App\Models\SchoolClass;
@@ -162,7 +163,7 @@ class StudentAdmissionController extends Controller
         return view('backend.admin.StudentManagement.student_list', $data);
     }
 
-    public function ViewStudentByClass(Request $request){
+    public function admission_list(Request $request){
         $Class_id = $request->class;
         $Classarm_id = $request->classarm_id;
         $Acad_Session_id = $request->acad_session;
@@ -175,9 +176,158 @@ class StudentAdmissionController extends Controller
         ->join('genders', 'genders.id', '=', 'students.gender')
             ->where('class','=',$Class_id)
                 ->where('classarm_id',$Classarm_id)
-                    ->where('session_admitted','=',$Acad_Session_id)->get()->all();
+                    ->where('session_admitted','=',$Acad_Session_id)->get()->all();       
 
         return view('backend.admin.StudentManagement.view_student_by_class', $data);
+    }
+
+    public function ViewStudentByClass(Request $request) {        
+        $Class_id = $request->class;
+        $Classarm_id = $request->classarm_id;
+        $Acad_Session_id = $request->acad_session;
+        $term_id = $request->term_id;
+        
+        $data['Classes'] = SchoolClass::all();
+        $data['ClassArms'] = SchoolArms::all();
+        $data['School_Sessions'] = SchoolSessions::all(); 
+        $data['School_Terms'] = SchoolTerm::all();
+        $data['Countries'] = Countries::all();
+        $data['States'] = States::all();
+        $data['LGAs'] = LocalGovts::where('states_id',7)->get();
+        $data['Houses'] = SchoolHouses::all();
+        $data['Complexions'] = Complexions::all();
+        $data['Religions'] = Religions::all();
+        $data['Tribes'] = Tribes::all();
+        $data['genders'] = Gender::all();  
+
+        if($Class_id && $Classarm_id & $Acad_Session_id && $term_id) {            
+            $data['Students'] = StudentClass::join('students','students.students_id','student_classes.student_id')
+            ->join('school_houses', 'school_houses.id', '=', 'students.school_houses_id')->orderBy('students.surname', 'ASC')
+            ->join('school_classes', 'school_classes.id', '=', 'students.class')
+            ->join('school_arms', 'school_arms.id','=','students.classarm_id')
+            ->join('genders', 'genders.id', '=', 'students.gender')
+                ->where('class','=',$Class_id)
+                    ->where('classarm_id', "=",$Classarm_id)
+                        ->where('session_admitted','=',$Acad_Session_id)
+                            ->where('term_admitted',"=",$term_id)->get()->all();
+
+            if($data['Students']) {
+                return view('backend.admin.StudentManagement.view_student_by_class', $data);
+            } else {
+                $notifications = [
+                    'message' => 'Students have not been admitted for the selected class this academic session',
+                    'alert_type' => 'error',
+                ];
+                return redirect()->back()->with($notifications);
+            }
+
+        } elseif ($Acad_Session_id && $term_id && $Class_id && !$Classarm_id) {
+
+            $data['Students'] = StudentClass::join('students','students.students_id','student_classes.student_id')
+            ->join('school_houses', 'school_houses.id', '=', 'students.school_houses_id')->orderBy('students.surname', 'ASC')
+            ->join('school_classes', 'school_classes.id', '=', 'students.class')
+            ->join('school_arms', 'school_arms.id','=','students.classarm_id')
+            ->join('genders', 'genders.id', '=', 'students.gender')
+                ->where('class','=',$Class_id)                    
+                    ->where('session_admitted','=',$Acad_Session_id)
+                        ->where('term_admitted',"=",$term_id)->get()->all();
+
+            if($data['Students']) {
+                return view('backend.admin.StudentManagement.view_student_by_class', $data);
+            } else {
+                $notifications = [
+                    'message' => 'Students have not been admitted for the selected class this academic session',
+                    'alert_type' => 'error',
+                ];
+                return redirect()->back()->with($notifications);
+            }
+
+        } elseif ($Acad_Session_id && $term_id && !$Class_id && !$Classarm_id) {
+            
+            $data['Students'] = StudentClass::join('students','students.students_id','student_classes.student_id')
+            ->join('school_houses', 'school_houses.id', '=', 'students.school_houses_id')->orderBy('students.surname', 'ASC')
+            ->join('school_classes', 'school_classes.id', '=', 'students.class')
+            ->join('school_arms', 'school_arms.id','=','students.classarm_id')
+            ->join('genders', 'genders.id', '=', 'students.gender')                                  
+                ->where('session_admitted','=',$Acad_Session_id)
+                    ->where('term_admitted',"=",$term_id)->get()->all();
+
+            if($data['Students']) {
+                return view('backend.admin.StudentManagement.view_student_by_class', $data);
+            } else {
+                $notifications = [
+                    'message' => 'Students have not been admitted for the selected Term',
+                    'alert_type' => 'error',
+                ];
+                return redirect()->back()->with($notifications);
+            }
+
+        } elseif($Acad_Session_id && !$term_id && !$Class_id && !$Classarm_id) {
+            $data['Students'] = StudentClass::join('students','students.students_id','student_classes.student_id')
+            ->join('school_houses', 'school_houses.id', '=', 'students.school_houses_id')->orderBy('students.surname', 'ASC')
+            ->join('school_classes', 'school_classes.id', '=', 'students.class')
+            ->join('school_arms', 'school_arms.id','=','students.classarm_id')
+            ->join('genders', 'genders.id', '=', 'students.gender')                                  
+                    ->where('session_admitted','=',$Acad_Session_id)->get()->all();
+
+            if($data['Students']) {                
+                return view('backend.admin.StudentManagement.view_student_by_class', $data);
+            } else {
+                $notifications = [
+                    'message' => 'Students have not been admitted for the selected academic session',
+                    'alert_type' => 'error',
+                ];
+                return redirect()->back()->with($notifications);
+            }
+
+        } elseif($Acad_Session_id && !$term_id && $Class_id && $Classarm_id) {
+            $data['Students'] = StudentClass::join('students','students.students_id','student_classes.student_id')
+            ->join('school_houses', 'school_houses.id', '=', 'students.school_houses_id')->orderBy('students.surname', 'ASC')
+            ->join('school_classes', 'school_classes.id', '=', 'students.class')
+            ->join('school_arms', 'school_arms.id','=','students.classarm_id')
+            ->join('genders', 'genders.id', '=', 'students.gender')                                  
+                ->where('session_admitted','=',$Acad_Session_id)
+                    ->where('class','=',$Class_id)
+                        ->where('classarm_id', "=",$Classarm_id)->get()->all();
+
+            if($data['Students']) {                
+                return view('backend.admin.StudentManagement.view_student_by_class', $data);
+            } else {
+                $notifications = [
+                    'message' => 'Students have not been admitted for the selected academic session',
+                    'alert_type' => 'error',
+                ];
+                return redirect()->back()->with($notifications);
+            }
+
+        }  elseif($Acad_Session_id && !$term_id && $Class_id && !$Classarm_id) {
+            $data['Students'] = StudentClass::join('students','students.students_id','student_classes.student_id')
+            ->join('school_houses', 'school_houses.id', '=', 'students.school_houses_id')->orderBy('students.surname', 'ASC')
+            ->join('school_classes', 'school_classes.id', '=', 'students.class')
+            ->join('school_arms', 'school_arms.id','=','students.classarm_id')
+            ->join('genders', 'genders.id', '=', 'students.gender')                                  
+                ->where('session_admitted','=',$Acad_Session_id)
+                    ->where('class','=',$Class_id)->get()->all();
+
+            if($data['Students']) {                
+                return view('backend.admin.StudentManagement.view_student_by_class', $data);
+            } else {
+                $notifications = [
+                    'message' => 'Students have not been admitted for the selected academic session',
+                    'alert_type' => 'error',
+                ];
+                return redirect()->back()->with($notifications);
+            }
+        } else {
+            $notifications = [
+                'message' => 'Select the correct combination criteria.',
+                'alert_type' => 'error',
+            ];
+            return redirect()->back()->with($notifications);
+        }
+        
+            
+    
     }
 
     public function PrintAdmissionLetter($id){

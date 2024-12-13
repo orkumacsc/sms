@@ -33,7 +33,7 @@
                                 <div class="form-group">
                                     <h5>Class<span class="text-danger">*</span></h5>
                                     <div class="controls">
-                                    <select name="class" id="class" required class="form-control p-10">
+                                    <select name="class" id="class"  class="form-control p-10">
                                         <option value="">Select Class</option>
                                         @foreach($Classes as $key => $Class)
                                         <option value="{{ $Class->id }}">{{ $Class->classname }}</option>
@@ -46,7 +46,7 @@
                                 <div class="form-group">
                                     <h5>Class Arm<span class="text-danger">*</span></h5>
                                     <div class="controls">
-                                    <select name="classarm_id" id="classarm_id" required class="form-control p-10">
+                                    <select name="classarm_id" id="classarm_id"  class="form-control p-10">
                                         <option value="">Select Class Arm</option>
                                         @foreach($ClassArms as $key => $class_arm)
                                         <option value="{{ $class_arm->id }}">{{ $class_arm->arm_name }}</option>

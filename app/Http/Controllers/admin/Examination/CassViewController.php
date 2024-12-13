@@ -60,8 +60,7 @@ class CassViewController extends Controller
                     ->where('term_id',$request->term_id)
                         ->where('subject_id',$request->subject_id)
                                     ->get()->all();
-
-
+                                    
             $data['Assessments'] = SchoolAssessments::where('class_id', '=', $request->class_id)
             ->join('school_classes', 'school_classes.id', '=', 'school_assessments.class_id')
                 ->orderBy('school_classes.id', 'ASC')->orderBy('school_assessments.id', 'ASC')

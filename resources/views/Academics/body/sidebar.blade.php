@@ -16,7 +16,7 @@ $route = Route::current()->getName();
               <!-- logo for regular state and mobile devices -->
               <div class="d-flex align-items-center justify-content-center">					 	
                   <img src="{{ asset('backend/images/logo-dark.png') }}" alt="">
-                  <h3>{{ @Auth::user()->name }}</h3>
+                  <h3>{{ @Auth::user()->name }} | Super Admin</h3>
               </div>
             </a>
           </div>
@@ -24,7 +24,7 @@ $route = Route::current()->getName();
       
       <!-- sidebar menu-->
       <ul class="sidebar-menu" data-widget="tree"> 
-		    <li class=" {{ ($route == 'dashboard') ? 'active' : ''}} ">
+		    <li class=" {{ ($route == 'dashboard')? 'active' : ''}} ">
           <a href="{{ route('dashboard') }}">
             <i data-feather="pie-chart"></i>
 			      <span>Dashboard</span>
@@ -106,7 +106,8 @@ $route = Route::current()->getName();
             <li><a href="{{ route('ass_registration') }}"><i class="ti-more"></i>Add Ass Type</a></li>
             <li><a href="{{ route('asign_assessment') }}"><i class="ti-more"></i>Assign Assessment</a></li>
             <li><a href="{{ route('score_sheet_form') }}"><i class="ti-more"></i>Score Sheets</a></li>          
-            <li><a href="{{ route('input_cass_scores') }}"><i class="ti-more"></i>Upload CASS Scores</a></li>            
+            <li><a href="{{ route('input_cass_scores') }}"><i class="ti-more"></i>Upload CASS Scores</a></li>
+            <li><a href="{{ route('cass_scores') }}"><i class="ti-more"></i>View CASS Scores</a></li>
             <li><a href="{{ route('result_summary') }}"><i class="ti-more"></i>Results Summary</a></li>
           </ul>
         </li>
