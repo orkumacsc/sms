@@ -1,0 +1,58 @@
+@media print {
+    * {
+        color: black !important;
+    }
+
+    table,
+    th,
+    td {
+        border: 1.5px solid black !important;
+
+    }
+
+    th,
+    td {
+        padding: .4em !important;
+    }
+
+
+    @page: first {
+        margin-top: 0px;
+        margin-left: 0px;
+        margin-right: 0px;
+        margin-bottom: 20px;
+    }
+
+    @page {
+        margin-top: 50px;
+        margin-left: 0px;
+        margin-right: 0px;
+        margin-bottom: 25px;
+    }
+
+    .main-footer,
+    .box-header,
+    .hidebox {
+        display: none;
+    }
+}
+
+    table,
+    th,
+    td {
+        border: 1px solid gray;
+
+    }
+
+    table {
+        width: 100%;
+    }
+
+    th,
+    td {
+        padding: .4em;
+    }
+
+    .vertical {
+        writing-mode: vertical-rl;
+    }

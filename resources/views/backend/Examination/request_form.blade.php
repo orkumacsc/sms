@@ -79,7 +79,7 @@
                 <form method="post" action="{{ route('upload_offline') }}" enctype="multipart/form-data">
                   @csrf
                   <div class="modal-header">
-                    <h5 class="modal-title" id="StaffEnrolmentModal">Select Result Upload Criteria</h5>
+                    <h5 class="modal-title" id="OfflineUploadModal">Upload Offline Prefilled Scoresheet</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="close">
                       <span aria-hidden="true">&times;</span>
                     </button>
@@ -143,7 +143,7 @@
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="close"><i class="ti-arrow-left"> Cancel</i></button>
-                    <input type="submit" value="Upload" class="btn  btn-info">
+                    <input type="submit" value="Upload" class="btn  btn-info" disabled>
                   </div>
                 </form>							
               </div>
@@ -156,7 +156,7 @@
                 <form method="get" action="{{ route('download_offline') }}" enctype="multipart/form-data">
                   @csrf
                   <div class="modal-header">
-                    <h5 class="modal-title" id="StaffEnrolmentModal">Select Result Upload Criteria</h5>
+                    <h5 class="modal-title" id="StaffEnrolmentModal">Download Offline Scoresheet Upload File</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="close">
                       <span aria-hidden="true">&times;</span>
                     </button>
@@ -219,7 +219,8 @@
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
               <div class="modal-content box">
                 <form method="get" action="{{ route('update_uploaded_cass') }}" enctype="multipart/form-data">                  
-                  <div class="modal-header">                    
+                  <div class="modal-header">
+                  <h5 class="modal-title" id="StaffEnrolmentModal">Update Uploaded Result</h5>                    
                     <button type="button" class="close" data-dismiss="modal" aria-label="close">
                       <span aria-hidden="true">&times;</span>
                     </button>
@@ -244,7 +245,7 @@
                           <div class="form-group">
                               <h5>Arm<span class="text-danger">*</span></h5>
                               <div class="controls">
-                              <select name="arm_id" id="arm_id" required class="form-control p-10">
+                              <select name="class_arm_id" id="class_arm_id" required class="form-control p-10">
                                   <option value="">Select Arm</option>
                                   @foreach($ClassArms as $key => $Arm)
                                   <option value="{{ $Arm->id }}">{{ $Arm->arm_name }}</option>

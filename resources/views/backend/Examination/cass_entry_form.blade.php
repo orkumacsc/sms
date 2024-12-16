@@ -62,7 +62,7 @@
                   <input type="hidden" name="class_id" value="{{ $Current_Class->id }}">
                   <input type="hidden" name="subject" value="{{ $subject->id }}">
                   <input type="hidden" name="class_arm_id" value="{{ $Class_Arm->id }}">
-              </tbody> 
+                  </tbody> 
               
                 <tfoot>
                   <tr>

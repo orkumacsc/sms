@@ -2,7 +2,7 @@
 
 @section('mainContent')
 
-<style media="print">
+<style media="print">	
 	@page: first {
 		size: landscape !important;
 		margin-top: 0px;
@@ -16,7 +16,7 @@
 		margin-top: 50px;
 		margin-left: 0px;
 		margin-right: 0px;
-		margin-bottom: 20px;
+		margin-bottom: 25px;
 	}
 
 	* {
@@ -24,12 +24,17 @@
 	}
 
 	.main-footer,
+	.box-header,
+	.hidebox {
+		display: none;
+	}
+
 	.box-header {
 		display: none;
 	}
 
 	.table {
-		font-size: 12px !important;
+		font-size: 14px !important;
 		padding: 0%;
 		margin: 0px;
 	}
@@ -37,17 +42,34 @@
 	.table-responsive>.table tr th,
 	.table-responsive>.table tr td {
 		white-space: nowrap !important;
-		padding: .3% !important;
+		padding: .5% !important;
 		border-color: black !important;
 	}
 
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
+	h1, h2, h3, h4, h5, h6{
 		font-family: 'Times New Roman', Times, serif !important;
+	}	
+</style>
+<style>
+	table,
+	th,
+	td {
+		border: 1px solid gray;
+
+	}
+
+	table {
+		width: 100%;
+	}
+
+	th,
+	td {
+		padding: .4em;
+	}
+
+	.vertical {
+		writing-mode: vertical-rl;
+
 	}
 </style>
 
@@ -59,7 +81,7 @@
 				<div class="col-12">
 					<div class="box">
 						<div class="box-header with-border">
-							<h3 class="box-title">SUBJECT SUMMARY</h3>
+							<h3 class="box-title">BROADSHEET</h3>
 						</div>
 						<!-- /.box-header -->
 						<div class="box-body">
@@ -69,15 +91,10 @@
 										<tr>
 											<div class="row">
 												<div class="col-sm-12 text-center p-0 m-0">
-													<!-- <h1>GOSPEL INTERNATIONAL COLLEGE, ZAKI-BIAM</h1> -->
-													<h4>SUBJECT SUMMARY FOR {{ $academic_session->name}}
-														ACADEMIC SESSION
-													</h4>
-													<h5>TERM: {{ $term->name }} | CLASS:
-														{{ $school_class->classname }}
-														{{ $class_arm->arm_name }} | SUBJECT:
-														{{ $subject->subject_name }}
-													</h5>
+													<h1>GOSPEL INTERNATIONAL COLLEGE, ZAKI-BIAM</h1>
+													<h4>BROADSHEET FOR {{ $term->name }} {{ $academic_session->name}}
+														ACADEMIC SESSION | CLASS: {{ $school_class->classname }}
+														{{ $class_arm->arm_name }} </h4>
 												</div>
 											</div>
 										</tr>
@@ -85,15 +102,19 @@
 											<th>S/No</th>
 											<th>Admission No</th>
 											<th>Full Name</th>
-											@foreach($Assessments as $key => $Ass)
-												@if($Ass->class_id == $school_class->id)
-													<th>{{ $Ass->name }} ({{ $Ass->percentage }})</th>
-												@endif
+											@foreach($subjects_in_class as $key => $subjects)
+
+												<th class="vertical">{{ $subjects->subject_name }}</th>
+
 											@endforeach
-											<th>TOTAL (100)</th>
-											<th>POSITION</th>
+											<th class="vertical">TOTAL NO. OF SUBJECTS</th>
+											<th class="vertical">OBTAINABLE MARKS</th>
+											<th class="vertical">TOTAL MARKS OBTAINED</th>
+											<th class="vertical">AVERAGE</th>
+											<th class="vertical">POSITION</th>
 										</tr>
 									</thead>
+
 									<tbody>
 										@foreach($Students as $key => $Student)                            
 											<tr>
@@ -101,29 +122,41 @@
 												<td>{{ $Student->admission_no }}</td>
 												<td>{{ $Student->surname . ', ' . $Student->firstname . ' ' . $Student->middlename }}
 												</td>
-												@foreach ($Assessments as $assessment)
+
+												@foreach ($subjects_in_class as $subjects)
 													<td class="text-center">
-														@foreach ($CASS_Scores as $scores)
-															@foreach ($scores as $score)
-																@if ($score->student_id == $Student->id && $score->cass_type == $assessment->id)
-																	{{$score->scores}}
-																@endif
-															@endforeach
+														@foreach($subject_summary as $id => $Marks)
+															@if($Marks->student_id == $Student->id && $Marks->subject_id == $subjects->id)
+																{{ $Marks->total_scores }}
+															@endif
 														@endforeach
 													</td>
 												@endforeach
 
 												<td class="text-center">
-													@foreach($Marks_Registers as $id => $Marks)
-														@if($Marks->student_id == $Student->id)
-															{{ $Marks->total_scores }}
+													{{ count($subjects_in_class)}}
+												</td>
+												<td class="text-center">
+													{{ count($subjects_in_class) * 100 }}
+												</td>
+												<td class="text-center">
+													@foreach($computed_results as $id => $positions)
+														@if($positions->student_id == $Student->id)
+															{{ $positions->obtained_marks }}
 														@endif
 													@endforeach
 												</td>
 												<td class="text-center">
-													@foreach($Marks_Registers as $id => $Marks)
-														@if($Marks->student_id == $Student->id)
-															{{ $Marks->subject_position }}
+													@foreach($computed_results as $id => $positions)
+														@if($positions->student_id == $Student->id)
+															{{ $positions->average_score }}
+														@endif
+													@endforeach
+												</td>
+												<td class="text-center">
+													@foreach($computed_results as $id => $positions)
+														@if($positions->student_id == $Student->id)
+															{{ $positions->position_in_class }}
 														@endif
 													@endforeach
 												</td>
@@ -131,6 +164,7 @@
 										@endforeach
 									</tbody>
 								</table>
+
 							</div>
 						</div>
 						<!-- /.box-body -->
@@ -142,6 +176,7 @@
 			<!-- /.row -->
 		</section>
 		<!-- /.content -->
+
 	</div>
 </div>
 

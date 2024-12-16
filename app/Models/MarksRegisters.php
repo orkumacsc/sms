@@ -19,15 +19,13 @@ class MarksRegisters extends Model
         try {
             foreach($records as $record){
                 MarksRegisters::updateOrCreate([
-                    'total_scores' => $record['total_scores'],
-                    'subject_position' => $record['subject_position'],
                     'subject_id' => $record['subject_id'],
                     'class_id' => $record['class_id'],
                     'class_arm_id' => $record['class_arm_id'],
                     'academic_session_id' => $record['academic_session_id'],
                     'student_id' => $record['student_id'],
                     'term_id' => $record['term_id']
-                ]);
+                ], ['total_scores' => $record['total_scores'], 'subject_position' => $record['subject_position']]);
             }
         } catch (\Exception $e) {
             throw new \Exception('Failed to update students marks. '.$e->getMessage());

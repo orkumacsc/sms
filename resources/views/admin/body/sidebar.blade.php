@@ -106,8 +106,7 @@ $route = Route::current()->getName();
             <li><a href="{{ route('ass_registration') }}"><i class="ti-more"></i>Add Ass Type</a></li>
             <li><a href="{{ route('asign_assessment') }}"><i class="ti-more"></i>Assign Assessment</a></li>
             <li><a href="{{ route('score_sheet_form') }}"><i class="ti-more"></i>Score Sheets</a></li>          
-            <li><a href="{{ route('input_cass_scores') }}"><i class="ti-more"></i>Upload CASS Scores</a></li>            
-            <li><a href="{{ route('result_summary') }}"><i class="ti-more"></i>Results Summary</a></li>
+            <li><a href="{{ route('input_cass_scores') }}"><i class="ti-more"></i>Upload CASS Scores</a></li>
           </ul>
         </li>
         
@@ -123,26 +122,20 @@ $route = Route::current()->getName();
           </a>
           <ul class="treeview-menu">
             <li><a href="{{ route('ExamCard') }}"><i class="ti-more"></i>Exam Cards</a></li>            
-            <li><a href="{{ route('exam_attendance') }}"><i class="ti-more"></i>Attendance Sheets</a></li>
-            <li><a href="{{ route('compute_result') }}"><i class="ti-more"></i>Compute Result</a></li>
+            <li><a href="{{ route('exam_attendance') }}"><i class="ti-more"></i>Attendance Sheets</a></li>            
           </ul>
-        </li>
+        </li>       
         
         
-        
-        <li class="treeview {{ ($prefix == '/Assessment')? 'active' : ''}}">
-          <a href="javascript:void(0)">
+        <li class="{{ ($prefix == '/ResultManagement')? 'active' : ''}}">
+          <a href="{{ route('compute_result') }}">
             <i data-feather="edit"></i>
-            <span>Report Management</span>
+            <span>Result Management</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-right pull-right"></i>
             </span>
-          </a>
-          <ul class="treeview-menu">
-            <li><a href="{{ route('reports') }}"><i class="ti-more"></i>Students' Report Card</a></li>            
-          </ul>
-        </li>
-        
+          </a>         
+        </li>       
         
         
         <li class="treeview {{ ($prefix == '/setup')? 'active' : ''}}">

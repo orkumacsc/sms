@@ -11,24 +11,26 @@ class ResultPositions extends Model
 
     protected $guarded = [];
 
-    public function create($records) 
+    public function create($records)
     {
         try {
-            foreach($records as $record){
+            foreach ($records as $record) {
                 ResultPositions::updateOrCreate([
-                    'obtained_marks' => $record['obtained_marks'],
-                    'classarm_id' => $record['classarm_id'],
+                    'class_arm_id' => $record['class_arm_id'],
                     'class_id' => $record['class_id'],
                     'session_id' => $record['session_id'],
                     'student_id' => $record['student_id'],
-                    'term_id' => $record['term_id'],
-                    'computed_by' => $record['computed_by'],
+                    'term_id' => $record['term_id']
+                ], [
+                    'obtained_marks' => $record['obtained_marks'],
                     'total_subjects_offered' => $record['total_subjects_offered'],
-                    'obtainable_marks' => $record['obtainable_marks']
+                    'obtainable_marks' => $record['obtainable_marks'],
+                    'average_score' => $record['average_score'],
+                    'position_in_class' => $record['position_in_class']
                 ]);
             }
         } catch (\Exception $e) {
-            throw new \Exception('Failed to update students marks. '.$e->getMessage());
+            throw new \Exception('Failed to update students marks. ' . $e->getMessage());
         }
     }
 }

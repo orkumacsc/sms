@@ -46,6 +46,10 @@ Route::get('/', function () {
     return view('auth/login');
 })->name('main_login');
 
+//Login Routes
+Route::get('/login', [LoginController::class, 'login'])->name('login');
+Route::get('/admin/logout', [AdminController::class, 'Logout'])->name('admin.logout');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -79,11 +83,6 @@ Route::middleware(['teachers'])->group(function(){
     })->name('Staff_Dashboard');
 
 });
-
-//Login Routes
-Route::get('/login', [LoginController::class, 'login'])->name('login');
-Route::get('/admin/logout', [AdminController::class, 'Logout'])->name('admin.logout');
-
 
 //Users Routes
 Route::prefix('Users')->group(function(){
@@ -163,10 +162,7 @@ Route::prefix('/Examination')->group(function(){
     Route::get('ExamCardView', [ExaminationController::class, 'GenerateExamCard'])->name('GenerateExamCard');
     Route::get('Attendance', [ExaminationController::class, 'Attendance'])->name('exam_attendance');
     Route::get('ExamAttendanceView', [ExaminationController::class, 'AttendanceGenerate'])->name('exam_attendance_view');
-    Route::get('ComputeResult', [ExaminationController::class, 'computeResult'])->name('compute_result');
-    Route::post('StoreComputeResult', [ExaminationController::class, 'storeComputeResult'])->name('store_compute_result');    
 });
-
 
 Route::prefix('/')->group(function(){
     Route::get('AssRegistration', [AssessmentController::class, 'Index'])->name('ass_registration');
@@ -189,6 +185,13 @@ Route::prefix('UploadResult')->group(function() {
     Route::post('ViewUploadedResult', [CassViewController::class, 'viewCass'])->name('view_cass_scores');
 });
 
+Route::prefix('ResultManagement')->group(function() {
+    Route::get('/', [ExaminationController::class, 'resultIndex'])->name('compute_result');
+    Route::post('ComputeResult', [ExaminationController::class, 'storeComputeResult'])->name('store_compute_result'); 
+    Route::post('Broadsheet',[CassViewController::class,'broadsheet'])->name('broadsheet');
+    Route::post('ClassReportCards',[ReportController::class,'classReport'])->name('class_report_cards');
+    Route::post('StudentReportCard',[ReportController::class,'studentReport'])->name('student_report_card');
+});
 
 Route::prefix('Staff')->group(function(){
     Route::get('/', [StaffController::class, 'Staff'])->name('staff');
@@ -199,7 +202,6 @@ Route::prefix('Staff')->group(function(){
     Route::post('update_staff_record/{id}', [StaffController::class, 'UpdateStudentRecord'])->name('update_staff_record');
     Route::get('delete_staff_record/{id}', [StaffController::class, 'DeleteStudentRecord'])->name('delete_staff_record');    
 });
-
 
 Route::prefix('SchoolFees')->group(function(){
     //Fees Type Routes
@@ -241,25 +243,16 @@ Route::prefix('SchoolFees')->group(function(){
 
 });
 
-
-Route::prefix('Reports')->group(function(){
-    Route::get('/', [ReportController::class, 'index'])->name('reports');
-    Route::get('ClassResult', [ReportController::class, 'classResult'])->name('class_result');
-    Route::get('ReportCard', [ReportController::class, 'studentDossier'])->name('report_card');
-
+Route::prefix('CheckResult')->group(function(){
+    Route::get('/',[CheckResultController::class, 'index']);
+    Route::get('/Result',[CheckResultController::class, 'processResult'])->name('check_result');    
 });
 
-    Route::get('FeesResponse/{id}', [GeneralController::class, 'SchoolFees'])->name('fees_response');
-    Route::get('GetStudent/{id}', [GeneralController::class, 'StudentByClass'])->name('students');
-    Route::get('FeesDue/{id}', [GeneralController::class, 'FeesDue'])->name('students');
-    Route::get('GetClass/{id}', [GeneralController::class, 'getSubject'])->name('get_class');
-    Route::get('GetLGA/{id}', [GeneralController::class, 'GetLGA'])->name('get_lgas');
-
-    //Get number of students admitted in a class
-    Route::get('AdmittedStudents/{class_info}', [GeneralController::class, 'AdmittedStudents'])->name('number_of_admitted');
+Route::get('FeesResponse/{id}', [GeneralController::class, 'SchoolFees'])->name('fees_response');
+Route::get('GetStudent/{id}', [GeneralController::class, 'StudentByClass'])->name('students');
+Route::get('FeesDue/{id}', [GeneralController::class, 'FeesDue'])->name('students');
+Route::get('GetClass/{id}', [GeneralController::class, 'getSubject'])->name('get_class');
+Route::get('GetLGA/{id}', [GeneralController::class, 'GetLGA'])->name('get_lgas');
+Route::get('AdmittedStudents/{class_info}', [GeneralController::class, 'AdmittedStudents'])->name('number_of_admitted');
+Route::get('GetStudents/{students}', [GeneralController::class, 'students']);
     
-
-    Route::prefix('CheckResult')->group(function(){
-        Route::get('/',[CheckResultController::class, 'index']);
-        Route::post('/',[CheckResultController::class, 'process'])->name('check_result');    
-    });

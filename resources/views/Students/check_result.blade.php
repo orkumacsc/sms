@@ -19,7 +19,7 @@
 	<link rel="stylesheet" href="{{ asset('backend/css/skin_color.css') }}">
 
 </head>
-<body class="hold-transition dark-skin theme-primary">
+<body class="hold-transition dark-skin theme-primary" oncontextmenu="return false" onkeydown="return false">
 	
 	<div class="container h-p100">
 		<div class="row align-items-center justify-content-md-center h-p100">	
@@ -31,8 +31,7 @@
 							<img src="{{ asset('backend/images/logo-wide-footer.png')}}"	/>
 						</div>
 						<div class="p-50 box-shadowed b-2">		
-							<form method="post" action="{{ route('check_result') }}">
-								@csrf
+							<form method="get" action="{{ route('check_result') }}">								
 								<div class="row">
 									<div class="col-12">
 										<div class="form-group">
@@ -49,10 +48,10 @@
 										<div class="form-group">
 											<h5>Academic Session<span class="text-danger">*</span></h5>
 											<div class="controls">
-											<select name="class" id="class" required class="form-control p-10">
+											<select name="academic_session_id" id="academic_session_id" required class="form-control p-10">
 												<option value="">Select Academic Session</option>
 												@foreach($school_academic_sessions as $key => $academic_session)
-												<option value="{{ $academic_session->id }}">{{ $academic_session->name }}</option>
+												<option value="{{ $academic_session->id }}" {{$academic_session->id == Active_Session()->id ? 'selected' : ''}}>{{ $academic_session->name }}</option>
 												@endforeach                                        
 											</select>
 											</div>
@@ -62,10 +61,10 @@
 										<div class="form-group">
 											<h5>Term<span class="text-danger">*</span></h5>
 											<div class="controls">
-											<select name="class" id="class" required class="form-control p-10">
+											<select name="term_id" id="term_id" required class="form-control p-10">
 												<option value="">Select Term</option>
 												@foreach($school_terms as $key => $terms)
-												<option value="{{ $terms->id }}">{{ $terms->name }}</option>
+												<option value="{{ $terms->id }}" {{$terms->id == Active_Term()->term_id ? 'selected' : ''}}>{{ $terms->name }}</option>
 												@endforeach                                        
 											</select>
 											</div>
@@ -75,7 +74,7 @@
 										<div class="form-group">
 											<h5>Class<span class="text-danger">*</span></h5>
 											<div class="controls">
-											<select name="class" id="class" required class="form-control p-10">
+											<select name="class_id" id="class" required class="form-control p-10">
 												<option value="">Select Class</option>
 												@foreach($school_classes as $Class)
 												<option value="{{ $Class->id }}">{{ $Class->classname }}</option>
@@ -88,7 +87,7 @@
 										<div class="form-group">
 											<h5>Class Arm<span class="text-danger">*</span></h5>
 											<div class="controls">
-											<select name="arm_id" id="class" required class="form-control p-10">
+											<select name="class_arm_id" id="class" required class="form-control p-10">
 												<option value="">Select Class Arm</option>
 												@foreach($school_arms as $class_arm)
 												<option value="{{ $class_arm->id }}">{{ $class_arm->arm_name }}</option>
