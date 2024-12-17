@@ -4,9 +4,10 @@
 
 <div class="content-wrapper">
 	  <div class="container-full">
-        <!-- Score Entry Request Form -->
+        
 	  <section class="content">
         <div class="row">
+          <!-- Forms -->
           <div class="modal fade" id="OnlineUpload" tabindex="-1" role="document" aria-labelledby="OnlineUploadModal" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
               <div class="modal-content box">
@@ -143,7 +144,7 @@
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="close"><i class="ti-arrow-left"> Cancel</i></button>
-                    <input type="submit" value="Upload" class="btn  btn-info" disabled>
+                    <input type="submit" value="Upload" class="btn  btn-info">
                   </div>
                 </form>							
               </div>
@@ -283,8 +284,7 @@
           <div class="modal fade" id="ViewUploadedCass" tabindex="-1" role="document" aria-labelledby="ViewUploadedCassModal" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
               <div class="modal-content box">
-                <form method="post" action="{{ route('view_cass_scores') }}" enctype="multipart/form-data"> 
-                  @csrf                 
+                <form method="get" action="{{ route('view_cass_scores') }}" enctype="multipart/form-data"> 
                   <div class="modal-header">                    
                     <button type="button" class="close" data-dismiss="modal" aria-label="close">
                       <span aria-hidden="true">&times;</span>
@@ -372,7 +372,9 @@
               </div>
             </div>
           </div>
+          <!-- /Forms -->
 
+          <!-- Navigations -->
             <div class="col-12 col-md-6 col-xl-2">
               <a href="#" data-toggle="modal" data-target="#OnlineUpload">                
                 <div class="box overflow-hidden pull-up">
@@ -448,9 +450,11 @@
                 </div>                
               </a>
             </div>
+            <!-- /Navigations -->
+
         </div>		  
 		</section>
-        <!-- /Score Entry Request Form -->
+        
 	  </div>
 </div>
 

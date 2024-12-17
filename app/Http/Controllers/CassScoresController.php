@@ -18,6 +18,7 @@ use App\Models\MarksRegisters;
 
 use Auth;
 use Response;
+use Storage;
 
 
 class CassScoresController extends Controller
@@ -263,7 +264,7 @@ class CassScoresController extends Controller
 
     public function downloadOffline(Request $request)
     {
-        $data['Students'] = StudentClass::select('students_id', 'admission_no', 'surname', 'firstname', 'middlename')
+        $data['Students'] = StudentClass::select('id', 'students_id', 'admission_no', 'surname', 'firstname', 'middlename')
             ->join('students', 'students.students_id', 'student_classes.student_id')
             ->where('class_id', '=', $request->class_id)
             ->where('school_arm_id', $request->arm_id)
@@ -289,7 +290,7 @@ class CassScoresController extends Controller
         $rows[] = ['Students_id', 'Admission No.', 'Full Name', ...$columns];
 
         foreach ($data['Students'] as $student) {
-            $rows[] = [$student->students_id, $student->admission_no, trim("$student->surname $student->firstname $student->middlename")];
+            $rows[] = [$student->id, $student->admission_no, trim("$student->surname $student->firstname $student->middlename")];
         }
 
 
@@ -312,21 +313,137 @@ class CassScoresController extends Controller
 
     public function offlineUpload(Request $request)
     {
-        if (!isScoresUploaded($request->class_id, $request->class_arm_id, $request->subject_id)) {
-            try {
-                $filename = $request->file('scoresheet');
-                $students_info = array_map('str_getcsv', file($request->file('scoresheet')->getRealPath()));
-                array_shift($students_info);
-                $cass = $students_info[0];
+        try {
+            //Checks if there are students in the selected class
+            $students_numbers = (function ($class_id, $class_arm_id) {
+                $students = StudentClass::select('id', 'students_id', 'admission_no', 'surname', 'firstname', 'middlename')
+                    ->join('students', 'students.students_id', 'student_classes.student_id')
+                    ->where('class_id', '=', $class_id)
+                    ->where('school_arm_id', $class_arm_id)
+                    ->where('academic_session_id', Active_Session()->id)
+                    ->orderBy('roll_number', 'ASC')->get();
 
+                $students_numbers = [];
+                foreach ($students as $student) {
+                    $students_numbers[$student->students_id] = $student->id;
+                }
+
+                return $students_numbers;
+            })($request->class_id, $request->class_arm_id);
+
+            $notifications = [
+                'message' => 'There is no student in the selected class!',
+                'alert-type' => 'info'
+            ];
+            if (count($students_numbers) <= 0)
+                return back()->with($notifications);
+
+            //Checks if assessment category/type has been assigned to the selected class
+            $cass_type = (function ($class_id) {
+                $assessment = SchoolAssessments::where('class_id', '=', $class_id)->join('school_classes', 'school_classes.id', '=', 'school_assessments.class_id')
+                    ->orderBy('school_classes.id', 'ASC')->orderBy('school_assessments.id', 'ASC')
+                    ->join('assessment__types', 'assessment__types.id', '=', 'school_assessments.ass_type_id')->get()->all();
+
+                $cass_type = [];
+                foreach ($assessment as $cass) {
+                    $cass_type[] = $cass->id;
+                }
+
+                return $cass_type;
+            })($request->class_id);
+
+            $notifications = [
+                'message' => 'There is no assessment type/category assigned to the selected class!',
+                'alert-type' => 'info'
+            ];
+
+            if (count($cass_type) <= 0)
+                return back()->with($notifications);
+
+            //Validates the correctness of the selected parameters against the scoresheet file submited
+            $_class = SchoolClass::find($request->class_id);
+            $class_arm = SchoolArms::find($request->class_arm_id);
+            $subject = SchoolSubjects::find($request->subject_id);
+            $uploaded_filename = $request->file('scoresheet')->getClientOriginalName();
+
+            $isClassMatch = strpos($uploaded_filename, $_class->classname) !== false ? true : false;
+            $isClassArmMatch = strpos($uploaded_filename, $class_arm->arm_name) !== false ? true : false;
+            $isSubjectMatch = strpos($uploaded_filename, $subject->subject_name) !== false ? true : false;
+
+            $info = [
+                'class_info' => $notifications = [
+                    'message' => "Selected class and uploaded scoresheet file class do not match! Please check and submit again!",
+                    'alert-type' => 'info'
+                ],
+                'subject' => $notifications = [
+                    'message' => "Selected subject and uploaded scoresheet file subject do not match! Please check and submit again!",
+                    'alert-type' => 'info'
+                ]
+            ];
+
+            if (($isClassMatch !== true || $isClassArmMatch !== true))
+                return back()->with($info['class_info']);
+
+            if ($isSubjectMatch !== true)
+                return back()->with($info['subject']);
+            //End validation
+
+            $students_info = array_map('str_getcsv', file($request->file('scoresheet')->getRealPath()));
+            array_shift($students_info);
+
+            //Determines the position of students in the selected subject
+            $students_positions = (function ($CASS_scores, $cass_type) {
+                $students_marks = [];
+                foreach ($CASS_scores as $student_id => $marks) {
+                    $students_marks[$marks[0]] = array_sum(array_slice($marks, -count($cass_type)));
+                }
+
+                arsort($students_marks);
+                $students_positions = [];
+
+                $i = 0;
+                $prev = 0;
+                foreach ($students_marks as $student_id => $subject_total) {
+                    if ($prev != $subject_total) {
+                        $prev = $subject_total;
+                        $i++;
+                    }
+                    $students_positions[$student_id] = $i;
+                }
+
+                return $students_positions;
+            })($students_info, $cass_type);
+
+            //Checks if Students class_id exists in $students_numbers @param
+            function numberExists($class_id, $students_numbers)
+            {
+                return array_key_exists($class_id[0], $students_numbers) ? $students_numbers[$class_id[0]] : $class_id[0];
+            }
+
+            //Deletes existing continuous assessment records if exits
+            CassScores::where('class_id', '=', $request->class_id)
+                ->where('class_arm_id', $request->class_arm_id)
+                ->where('academic_session_id', Active_Session()->id)
+                ->where('term_id', Active_Term()->term_id)
+                ->where('subject_id', $request->subject_id)
+                ->delete();
+
+            MarksRegisters::where('class_id', '=', $request->class_id)
+                ->where('class_arm_id', $request->class_arm_id)
+                ->where('academic_session_id', Active_Session()->id)
+                ->where('term_id', Active_Term()->term_id)
+                ->where('subject_id', $request->subject_id)
+                ->delete();
+
+            try {
                 $rows = [];
                 foreach ($students_info as $marks) {
                     $i = 3;
                     while ($i != count($marks)) {
                         $row = [];
-                        $row['student_id'] = $marks[0];
+                        $row['student_id'] = numberExists($marks, $students_numbers);
                         $row['subject_id'] = $request->subject_id;
-                        $row['cass_type'] = $cass[$i];
+                        $row['cass_type'] = $cass_type[$i - 3];
                         $row['scores'] = $marks[$i] != null ? $marks[$i] : 0;
                         $row['class_id'] = $request->class_id;
                         $row['class_arm_id'] = $request->class_arm_id;
@@ -336,69 +453,57 @@ class CassScoresController extends Controller
                         $i++;
                     }
                 }
+
                 $cassScores = new CassScores();
                 $cassScores->create($rows);
-                // End CASS Scores
 
-                $records = [];
-                foreach ($students_info as $student) {
-                    $record = [];
-                    $record['student_id'] = $student[0];
-                    $record['total_scores'] = array_sum(array_slice($student, 7));
-                    $record['subject_id'] = $request->subject_id;
-                    $record['class_id'] = $request->class_id;
-                    $record['class_arm_id'] = $request->class_arm_id;
-                    $record['academic_session_id'] = Active_Session()->id;
-                    $record['term_id'] = Active_Term()->term_id;
-                    $records[] = $record;
-                }
 
-                $MarksRegisters = new MarksRegisters();
-                $MarksRegisters->create($records);
-                // // End Marks Register
-
-                // Students' Subject Position
-                $Marks_Total = MarksRegisters::select('total_scores', 'id', 'subject_position')
-                    ->where('class_id', $request->class_id)
-                    ->where('class_arm_id', $request->class_arm_id)
-                    ->where('academic_session_id', Active_Session()->id)
-                    ->where('term_id', Active_Term()->term_id)
-                    ->where('subject_id', $request->subject_id)
-                    ->orderBy('total_scores', 'DESC')->get();
-                $i = 0;
-                $prev = 0;
-                foreach ($Marks_Total as $id => $subject_total) {
-
-                    if ($prev != $subject_total->total_scores) {
-                        $prev = $subject_total->total_scores;
-                        $i++;
+                try {
+                    $records = [];
+                    foreach ($students_info as $student) {
+                        $record = [];
+                        $record['student_id'] = numberExists($student, $students_numbers);
+                        $record['total_scores'] = array_sum(array_slice($student, -count($cass_type)));
+                        $record['subject_position'] = $students_positions[$student[0]];
+                        $record['subject_id'] = $request->subject_id;
+                        $record['class_id'] = $request->class_id;
+                        $record['class_arm_id'] = $request->class_arm_id;
+                        $record['academic_session_id'] = Active_Session()->id;
+                        $record['term_id'] = Active_Term()->term_id;
+                        $records[] = $record;
                     }
 
-                    $position = MarksRegisters::find($subject_total->id);
-                    $position->subject_position = $i;
-                    $position->save();
-                }
+                    $MarksRegisters = new MarksRegisters();
+                    $MarksRegisters->create($records);
 
-                $notifications = [
-                    'message' => 'Continuous Assessment Scores Successfully Uploaded!',
-                    'alert-type' => 'success'
-                ];
-                return back()->with($notifications);
+                    $notifications = [
+                        'message' => 'Continuous Assessment Scores Successfully Uploaded!',
+                        'alert-type' => 'success'
+                    ];
+                    return back()->with($notifications);
+
+                } catch (\Exception $e) {
+                    $notifications = [
+                        'message' => "Continuous Assessment Scores Calculated Failed! Please Contact Support!",
+                        'alert-type' => 'error'
+                    ];
+                    return back()->with($notifications);
+                }
 
             } catch (\Exception $e) {
                 $notifications = [
-                    'message' => $e,
-                    'alert-type' => 'success'
+                    'message' => "Continuous Assessement Upload Failed! Please Contact Support!",
+                    'alert-type' => 'error'
                 ];
                 return back()->with($notifications);
             }
-        } else {
+
+        } catch (\Exception $e) {
             $notifications = [
-                'message' => 'Continous Assessment Scores already uploaded for the selected class & subject',
-                'alert-type' => 'info'
+                'message' => "Operation Failed! Please Contact Support!",
+                'alert-type' => 'error'
             ];
             return back()->with($notifications);
         }
-
     }
 }

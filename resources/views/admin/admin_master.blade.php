@@ -23,7 +23,7 @@
      
   </head>
 
-<body class="hold-transition dark-skin sidebar-mini theme-primary fixed" oncontextmenu="return false" onkeydown="return false">
+<body class="hold-transition dark-skin sidebar-mini theme-primary fixed" oncontextmenu="return false">
 	
 <div class="wrapper">
 

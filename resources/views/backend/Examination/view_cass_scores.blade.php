@@ -41,6 +41,15 @@
 		border-color: black !important;
 	}
 
+	.box,
+	.content,
+	.table-responsive,
+	.box-boday {
+		margin: 0;
+		padding: 0;
+		overflow: hidden;
+	}
+
 	h1,
 	h2,
 	h3,
@@ -60,6 +69,9 @@
 					<div class="box">
 						<div class="box-header with-border">
 							<h3 class="box-title">SUBJECT SUMMARY</h3>
+							<div class="text-right">
+								<a href="javascript:window.print()" class="btn btn-info">print</a>
+							</div>
 						</div>
 						<!-- /.box-header -->
 						<div class="box-body">

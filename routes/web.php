@@ -182,7 +182,7 @@ Route::prefix('UploadResult')->group(function() {
     Route::get('UpdateUploadedCass',[CassScoresController::class, 'updateUploadedCass'])->name('update_uploaded_cass');    
     Route::post('OfflineUpload',[CassScoresController::class, 'offlineUpload'])->name('upload_offline');
     Route::get('DownloadOffline',[CassScoresController::class, 'downloadOffline'])->name('download_offline');    
-    Route::post('ViewUploadedResult', [CassViewController::class, 'viewCass'])->name('view_cass_scores');
+    Route::get('ViewUploadedResult', [CassViewController::class, 'viewCass'])->name('view_cass_scores');
 });
 
 Route::prefix('ResultManagement')->group(function() {
