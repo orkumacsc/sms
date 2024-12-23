@@ -150,9 +150,9 @@ Route::prefix('Students')->middleware(['super_admin'])->group(function(){
 });
 
 Route::prefix('Academics')->group(function(){
-    Route::get('Subjects', [AcademicController::class, 'SchoolSubjects'])->name('school_subjects');
-    Route::post('school.subjects.store', [AcademicController::class, 'StoreSchoolSubjects'])->name('school.subjects.store');    
-    Route::post('StoreAssingSubject', [AcademicController::class, 'StoreAssignedSubject'])->name('store_assigned_subject');
+    Route::get('SchoolSubjects', [AcademicController::class, 'SchoolSubjects'])->name('school_subjects');
+    Route::post('SchoolSubjects', [AcademicController::class, 'storeSchoolSubjects'])->name('store_school_subject');    
+    Route::post('ClassSubject', [AcademicController::class, 'storeClassSubjects'])->name('store_class_subject');
     Route::get('MarksGrade', [MarksGradeController::class, 'MarksGrades'])->name('marks_grades');
     Route::post('StoreMarksGrades', [MarksGradeController::class, 'StoreMarksGrades'])->name('store_marks_grades');
 });
@@ -188,8 +188,8 @@ Route::prefix('UploadResult')->group(function() {
 Route::prefix('ResultManagement')->group(function() {
     Route::get('/', [ExaminationController::class, 'resultIndex'])->name('compute_result');
     Route::post('ComputeResult', [ExaminationController::class, 'storeComputeResult'])->name('store_compute_result'); 
-    Route::post('Broadsheet',[CassViewController::class,'broadsheet'])->name('broadsheet');
-    Route::post('ClassReportCards',[ReportController::class,'classReport'])->name('class_report_cards');
+    Route::get('Broadsheet',[CassViewController::class,'broadsheet'])->name('broadsheet');
+    Route::get('ClassReportCards',[ReportController::class,'classReport'])->name('class_report_cards');
     Route::post('StudentReportCard',[ReportController::class,'studentReport'])->name('student_report_card');
 });
 

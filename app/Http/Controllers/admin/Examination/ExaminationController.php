@@ -117,100 +117,121 @@ class ExaminationController extends Controller
 
      public function storeComputeResult(Request $request)
      {
-          $subjects_in_class = ClassSubjects::where('class_id', $request->class_id)
-               ->join('school_subjects', 'school_subjects.id', 'class_subjects.subject_id')
-               ->orderBy('school_subjects.subject_name', 'ASC')
-               ->get();
-          $notifications = [
-               'message' => 'No subject found in class. Please add subject to class!',
-               'alert-type' => 'info'
-          ];
-
-          if (!count($subjects_in_class))
-               return back()->with($notifications);
-
-          $Result_details = MarksRegisters::select('student_id', 'total_scores')
-               ->where('class_id', $request->class_id)
-               ->where('class_arm_id', $request->class_arm_id)
-               ->where('academic_session_id', $request->academic_session_id)
-               ->where('term_id', $request->term_id)
-               ->get()->groupBy('student_id');
-
-          $notifications = [
-               'message' => 'No continuous Assessment Uploaded for the selected class.',
-               'alert-type' => 'info'
-          ];
-
-          if (!count($Result_details))
-               return back()->with($notifications);
-
-          $student_obtained_marks = (function ($data) {
-               $students_marks = [];
-               foreach ($data as $student_id => $students) {
-                    $obtained_marks = 0;
-                    foreach ($students as $student) {
-                         $obtained_marks += $student->total_scores;
-                    }
-                    $students_marks[$student_id] = $obtained_marks;
-               }
-               arsort($students_marks);
-
-               return $students_marks;
-          })($Result_details);
-
-
-          $positions = (function ($data) {
-               $students_positions = [];
-               $i = 0;
-               $prev = 0;
-               foreach ($data as $student_id => $subject_total) {
-                    if ($prev != $subject_total)
-                    {
-                         $prev = $subject_total;
-                         $i++;
-                    }
-                    $students_positions[$student_id] = $i;
-               }
-               return $students_positions;
-          })($student_obtained_marks);
-
           try {
-               $rows = [];
-               foreach ($Result_details as $student_id => $Student_result) {
-                    $row = [];
-                    $row['session_id'] = Active_Session()->id;
-                    $row['term_id'] = Active_Term()->term_id;
-                    $row['class_id'] = $request->class_id;
-                    $row['class_arm_id'] = $request->class_arm_id;
-                    $row['obtained_marks'] = $student_obtained_marks[$student_id];
-                    $row['student_id'] = $student_id;
-                    $row['computed_by'] = Auth::user()->id;
-                    $row['total_subjects_offered'] = count($Student_result);
-                    $row['obtainable_marks'] = count($subjects_in_class) * 100;
-                    $row['average_score'] = number_format(($row['obtained_marks'] * 100) / $row['obtainable_marks'], 2) ?? 0.00;
-                    $row['position_in_class'] = $positions[$student_id];
-                    $rows[] = $row;
-               }
-
-               $ResultPositions = new ResultPositions();
-               $ResultPositions->create($rows);
-
-               $success = [
-                    'message' => 'Result Successfully Computed for the selected Class',
-                    'alert-type' => 'success'
+               $class_id = SchoolClass::find($request->class_id);
+               $class_arm_id = SchoolArms::find($request->class_arm_id);
+               $department_id = strpos($class_id->classname, 'BASIC') !== false ? 4 :
+                    (strpos($class_arm_id->arm_name, 'A') !== false ? 1 :
+                         (strpos($class_arm_id->arm_name, 'B') !== false ? 2 : 3));                        
+               
+               $subjects_in_class = ClassSubjects::where('class_id', $request->class_id)
+                    ->where('department_id', $department_id)
+                    ->join('school_subjects', 'school_subjects.id', 'class_subjects.subject_id')
+                    ->orderBy('school_subjects.subject_name', 'ASC')
+                    ->get();
+               
+               $notifications = [
+                    'message' => 'No subject found in class. Please add subject to class!',
+                    'alert-type' => 'info'
                ];
 
-               return back()->with($success);
+               if (!count($subjects_in_class))
+                    return back()->with($notifications);
 
+               $Result_details = MarksRegisters::select('student_id', 'total_scores')
+                    ->where('class_id', $request->class_id)
+                    ->where('class_arm_id', $request->class_arm_id)
+                    ->where('academic_session_id', $request->academic_session_id)
+                    ->where('term_id', $request->term_id)
+                    ->get()->groupBy('student_id');
+
+               $notifications = [
+                    'message' => 'No continuous Assessment Uploaded for the selected class.',
+                    'alert-type' => 'info'
+               ];
+
+               if (!count($Result_details))
+                    return back()->with($notifications);
+
+               $student_obtained_marks = (function ($data) {
+                    $students_marks = [];
+                    foreach ($data as $student_id => $students) {
+                         $obtained_marks = 0;
+                         foreach ($students as $student) {
+                              $obtained_marks += $student->total_scores;
+                         }
+                         $students_marks[$student_id] = $obtained_marks;
+                    }
+                    arsort($students_marks);
+
+                    return $students_marks;
+               })($Result_details);
+
+
+               $positions = (function ($data) {
+                    $students_positions = [];
+                    $i = 0;
+                    $prev = 0;
+                    foreach ($data as $student_id => $subject_total) {
+                         if ($prev != $subject_total)
+                         {
+                              $prev = $subject_total;
+                              $i++;
+                         }
+                         $students_positions[$student_id] = $i;
+                    }
+                    return $students_positions;
+               })($student_obtained_marks);
+
+               $classAverage = (array_sum($student_obtained_marks) / count($student_obtained_marks) ) / count($subjects_in_class);
+               
+               try {
+                    $rows = [];
+                    foreach ($Result_details as $student_id => $Student_result) {
+                         $row = [];
+                         $row['session_id'] = Active_Session()->id;
+                         $row['term_id'] = Active_Term()->term_id;
+                         $row['class_id'] = $request->class_id;
+                         $row['class_arm_id'] = $request->class_arm_id;
+                         $row['obtained_marks'] = $student_obtained_marks[$student_id];
+                         $row['student_id'] = $student_id;
+                         $row['computed_by'] = Auth::user()->id;
+                         $row['total_subjects_offered'] = count($Student_result);
+                         $row['obtainable_marks'] = count($subjects_in_class) * 100;
+                         $row['average_score'] = number_format(($row['obtained_marks'] * 100) / $row['obtainable_marks'], 2) ?? 0.00;
+                         $row['position_in_class'] = $positions[$student_id];
+                         $rows[] = $row;
+                    }
+
+                    $ResultPositions = new ResultPositions();
+                    $ResultPositions->create($rows);
+
+                    $success = [
+                         'message' => 'Result Successfully Computed for the selected Class',
+                         'alert-type' => 'success'
+                    ];
+
+                    return back()->with($success);
+
+               } catch (\Exception $e) {
+                    $notifications = array(
+                         [
+                              'message' => 'Error in Computing Result! Contact Support.',
+                              'alert-type' => 'error'
+                         ]
+                    );
+
+                    return redirect()->back()->with($notifications);
+               }
           } catch (\Exception $e) {
                $notifications = array(
                     [
-                         'message' => 'Error in Computing Result! Contact Support.',
+                         'message' => 'Operation Failed! Contact Support.',
                          'alert-type' => 'error'
                     ]
                );
-
-               return redirect()->back()->with($notifications);
+               return back()->with($notifications);
           }
      }
+
 }

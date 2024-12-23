@@ -51,7 +51,7 @@
                       @foreach($Assessments as $key => $Ass)
                       @if($Ass->class_id == $Current_Class->id)                            
                       <td>
-                        <input type="number" name="scores[{{ $Student->id }}][{{ $Ass->id }}]" style="width: 100%;" class="form-control">
+                        <input type="number" name="scores[{{ $Student->id }}][{{ $Ass->id }}]" style="width: 100%;" class="form-control" max="{{$Ass->percentage}}">
                       </td>
                       @endif
                       @endforeach	                               							

@@ -11,13 +11,20 @@ class MarksRegisters extends Model
 
     protected $guarded = [];
     protected $fillable = [
-        'total_scores', 'student_id', 'academic_session_id', 'subject_position',
-        'class_id', 'class_arm_id', 'term_id', 'subject_id'
+        'total_scores',
+        'student_id',
+        'academic_session_id',
+        'subject_position',
+        'class_id',
+        'class_arm_id',
+        'term_id',
+        'subject_id'
     ];
 
-    public function create($records) {
+    public function create($records)
+    {
         try {
-            foreach($records as $record){
+            foreach ($records as $record) {
                 MarksRegisters::updateOrCreate([
                     'subject_id' => $record['subject_id'],
                     'class_id' => $record['class_id'],
@@ -28,7 +35,12 @@ class MarksRegisters extends Model
                 ], ['total_scores' => $record['total_scores'], 'subject_position' => $record['subject_position']]);
             }
         } catch (\Exception $e) {
-            throw new \Exception('Failed to update students marks. '.$e->getMessage());
+            $notifications = array(
+                'message' => 'Error in sumbitting records to database! Contact Support!',
+                'alert-type' => 'error'
+            );
+
+            return back()->with($notifications);
         }
     }
 }

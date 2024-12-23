@@ -97,7 +97,7 @@
           aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content box">
-              <form method="post" action="{{ route('broadsheet') }}" enctype="multipart/form-data">
+              <form method="get" action="{{ route('broadsheet') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-header">
                   <h5 class="modal-title" id="BroadsheetFormModal"> <i
@@ -182,8 +182,7 @@
           aria-labelledby="ClassReportCardsModal" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content box">
-              <form method="post" action="{{ route('class_report_cards') }}" enctype="multipart/form-data">
-                @csrf
+              <form method="get" action="{{ route('class_report_cards') }}" enctype="multipart/form-data">                
                 <div class="modal-header">
                   <h5 class="modal-title" id="ClassReportCardsModal"> <i
                       class="text-secondary mdi mdi-microsoft-excel"></i> Class Report Cards</h5>

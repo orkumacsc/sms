@@ -23,7 +23,7 @@ class CassViewController extends Controller
     {
         $this->middleware('auth');
     }
-    
+
     public function index()
     {
         $data['SchoolClasses'] = SchoolClass::all();
@@ -38,10 +38,17 @@ class CassViewController extends Controller
     public function broadsheet(Request $request)
     {
         try {
+            $class_id = SchoolClass::find($request->class_id);
+            $class_arm_id = SchoolArms::find($request->class_arm_id);
+            $department_id = strpos($class_id->classname, 'BASIC') !== false ? 4 :
+                (strpos($class_arm_id->arm_name, 'A') !== false ? 1 :
+                    (strpos($class_arm_id->arm_name, 'B') !== false ? 2 : 3));
+
             $data['academic_session'] = SchoolSessions::find($request->academic_session_id);
-            $data['school_class'] = SchoolClass::find($request->class_id);
-            $data['class_arm'] = SchoolArms::find($request->class_arm_id);
             $data['term'] = SchoolTerm::find($request->term_id);
+            $data['school_class'] = $class_id;
+            $data['class_arm'] = $class_arm_id;
+
             $data['Students'] = StudentClass::join('students', 'students.students_id', 'student_classes.student_id')
                 ->where('class_id', '=', $request->class_id)
                 ->where('school_arm_id', $request->class_arm_id)
@@ -49,24 +56,81 @@ class CassViewController extends Controller
                 ->orderBy('roll_number')
                 ->get();
 
-            $data['subject_summary'] = MarksRegisters::select('student_id', 'total_scores', 'subject_id')                
+            /* If no student is found in the class */
+            $notifications = [
+                'message' => 'There is no student in the selected class.',
+                'alert-type' => 'info'
+            ];
+
+            if (!isFound($data['Students']))
+                return back()->with($notifications);
+
+            $data['subjects_in_class'] = ClassSubjects::where('class_id', $request->class_id)
+                ->where('department_id', $department_id)
+                ->join('school_subjects', 'school_subjects.id', 'class_subjects.subject_id')
+                ->orderBy('school_subjects.subject_name', 'ASC')
+                ->get();
+
+                $notifications = [
+                    'message' => 'There is no subject assigned to the selected class.',
+                    'alert-type' => 'info'
+                ];
+    
+                if (!isFound($data['subjects_in_class']))
+                    return back()->with($notifications);
+            $data['subject_summary'] = MarksRegisters::select('student_id', 'total_scores', 'subject_id')
                 ->where('class_id', '=', $request->class_id)
                 ->where('class_arm_id', $request->class_arm_id)
                 ->where('academic_session_id', $request->academic_session_id)
                 ->where('term_id', $request->term_id)
-                ->get();
+                ->get()->groupBy('student_id')->toArray();
 
-            $data['computed_results'] = ResultPositions::select('student_id', 'average_score', 'obtained_marks', 'position_in_class')
-                ->where('class_id', '=', $request->class_id)
-                ->where('class_arm_id', $request->class_arm_id)
-                ->where('session_id', $request->academic_session_id)
-                ->where('term_id', $request->term_id)
-                ->get();
-            
-            $data['subjects_in_class'] = ClassSubjects::where('class_id', $request->class_id)
-                ->join('school_subjects', 'school_subjects.id', 'class_subjects.subject_id')
-                ->orderBy('school_subjects.subject_name', 'ASC')
-                ->get();
+
+            $student_obtained_marks = (function ($data) {
+                $students_marks = [];
+                foreach ($data as $student_id => $students) {
+                    $obtained_marks = 0;
+                    foreach ($students as $student) {
+                        $obtained_marks += $student['total_scores'];
+                    }
+                    $students_marks[$student_id] = $obtained_marks;
+                }
+                arsort($students_marks);
+
+                return $students_marks;
+            })($data['subject_summary']);
+
+            $positions = (function ($data) {
+                $students_positions = [];
+                $i = 0;
+                $prev = 0;
+                foreach ($data as $student_id => $subject_total) {
+                    if ($prev != $subject_total)
+                    {
+                        $prev = $subject_total;
+                        $i++;
+                    }
+                    $students_positions[$student_id] = $i;
+                }
+                return $students_positions;
+            })($student_obtained_marks);
+
+            $data['class_average'] = (float) number_format((array_sum($student_obtained_marks) /
+                count($student_obtained_marks)) /
+                count($data['subjects_in_class']), 2);
+
+            $rows = [];
+            foreach ($data['subject_summary'] as $student_id => $Student_result) {
+                $row = [];
+                $row['student_id'] = $student_id;
+                $row['obtained_marks'] = $student_obtained_marks[$student_id];
+                $row['total_subjects_offered'] = count($Student_result);
+                $row['obtainable_marks'] = count($data['subjects_in_class']) * 100;
+                $row['average_score'] = (float) number_format(($row['obtained_marks'] * 100) / $row['obtainable_marks'], 2) ?? 0.00;
+                $row['position_in_class'] = $positions[$student_id];
+                $rows[] = $row;
+            }
+            $data['computed_results'] = $rows;
 
             $cass_notification = [
                 'message' => 'Result has not been computed for the selected class.',

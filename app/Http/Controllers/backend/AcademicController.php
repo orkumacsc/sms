@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\backend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Departments;
+use App\Models\SchoolArms;
 use Illuminate\Http\Request;
 use App\Models\SchoolSubjects;
 use App\Models\Staff;
@@ -21,21 +23,24 @@ class AcademicController extends Controller
         $this->middleware('auth');
 
     }
-    
-    public function SchoolSubjects(){
-        $data['allData'] = SchoolSubjects::all();
-        $data['ClassSubjects'] = ClassSubjects::join('staff', 'staff.id', 'class_subjects.teacher_id')->join('school_classes', 'school_classes.id', 'class_subjects.class_id')
+
+    public function SchoolSubjects()
+    {
+        $data['ClassSubjects'] = ClassSubjects::join('school_classes', 'school_classes.id', 'class_subjects.class_id')
             ->join('school_subjects', 'school_subjects.id', 'class_subjects.subject_id')
-                ->select('school_subjects.subject_name as subjects', 'school_classes.classname as class', 'staff.surname as surname', 
-                'staff.firstname as firstname', 'staff.middlename as middlename', 'staff.id as staff_id', 'class_subjects.id as id')->get();
+            ->join('departments', 'departments.id', 'class_subjects.department_id')
+            ->select('subject_name', 'classname', 'class_subjects.id as subject_id','departments.name as department')->get();
+
         $data['SchoolClasses'] = SchoolClass::all();
         $data['SchoolSubjects'] = SchoolSubjects::all();
-        $data['Staff'] = Staff::all();
+        $data['SchoolArms'] = SchoolArms::get();
+        $data['departments'] = Departments::get();
 
         return view('backend.academics.school_subjects', $data);
     }
 
-    public function StoreSchoolSubjects(Request $request){
+    public function storeSchoolSubjects(Request $request)
+    {
         $validatedData = $request->validate([
             'name' => 'required|unique:school_subjects',
         ]);
@@ -49,31 +54,46 @@ class AcademicController extends Controller
             'alert-type' => 'success'
         );
 
-        return redirect()->route('school_subjects')->with($notifications);
+        return back()->with($notifications);
     }
 
-    public function StoreAssignedSubject(Request $request){
+    public function storeClassSubjects(Request $request)
+    {
         $validatedData = $request->validate([
             'class_id' => 'required',
-            'teacher_id' => 'required',
-            'subject_id' => 'required',            
+            'subject_id' => 'required',
+            'department_id' => 'required'
         ]);
 
-        $academicId = CurrentAcademicSeason::get('session_id');
+        try {
+            $reords = [];
+            foreach ($request->subject_id as $subject_id => $subjects) {
+                $record = [];
+                $record['class_id'] = $request->class_id;
+                $record['department_id'] = $request->department_id;
+                $record['subject_id'] = $subject_id;
+                $records[] = $record;
+            }
 
-        $data = new ClassSubjects();
-        $data->subject_id = $request->subject_id;
-        $data->class_id = $request->class_id;
-        $data->teacher_id = $request->teacher_id;
-        // $data->session_id = AcademicId();
-        $data->save();
+            $class_subjects = new ClassSubjects();
+            $class_subjects->create($records);
 
-        $notifications = array(
-            'message' => 'Subject Assigned Successfully!',
-            'alert-type' => 'success'
-        );
+            $notifications = array(
+                'message' => 'Subject(s) Successfully Assigned to Class!',
+                'alert-type' => 'success'
+            );
 
-        return redirect()->route('school_subjects')->with($notifications);
+            return back()->with($notifications);
+
+        } catch (\Exception $e) {
+
+            $notifications = array(
+                'message' => $e,
+                'alert-type' => 'error'
+            );
+            return back()->with($notifications);
+        }
+
     }
 
 

@@ -2,7 +2,7 @@
 
 @section('mainContent')
 
-<style media="print">	
+<style media="print">
 	@page: first {
 		size: landscape !important;
 		margin-top: 0px;
@@ -25,13 +25,19 @@
 
 	.main-footer,
 	.box-header,
-	.hidebox {
-		display: none;
-	}
-
+	.hidebox ,
 	.box-header {
 		display: none;
 	}
+
+	.box,
+        .content,
+        .table-responsive,
+        .box-boday {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
 
 	.table {
 		font-size: 14px !important;
@@ -46,9 +52,14 @@
 		border-color: black !important;
 	}
 
-	h1, h2, h3, h4, h5, h6{
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
 		font-family: 'Times New Roman', Times, serif !important;
-	}	
+	}
 </style>
 <style>
 	table,
@@ -82,6 +93,9 @@
 					<div class="box">
 						<div class="box-header with-border">
 							<h3 class="box-title">BROADSHEET</h3>
+							<div class="text-right">
+								<a href="javascript:window.print()" class="btn btn-info">print</a>
+							</div>
 						</div>
 						<!-- /.box-header -->
 						<div class="box-body">
@@ -94,7 +108,8 @@
 													<h1>GOSPEL INTERNATIONAL COLLEGE, ZAKI-BIAM</h1>
 													<h4>BROADSHEET FOR {{ $term->name }} {{ $academic_session->name}}
 														ACADEMIC SESSION | CLASS: {{ $school_class->classname }}
-														{{ $class_arm->arm_name }} </h4>
+														{{ $class_arm->arm_name }}
+													</h4>
 												</div>
 											</div>
 										</tr>
@@ -125,10 +140,12 @@
 
 												@foreach ($subjects_in_class as $subjects)
 													<td class="text-center">
-														@foreach($subject_summary as $id => $Marks)
-															@if($Marks->student_id == $Student->id && $Marks->subject_id == $subjects->id)
-																{{ $Marks->total_scores }}
-															@endif
+														@foreach($subject_summary as $student_id => $students)
+															@foreach ($students as $student)
+																@if($student['student_id'] == $Student->id && $student['subject_id'] == $subjects->id)
+																	{{ $student['total_scores'] }}
+																@endif
+															@endforeach
 														@endforeach
 													</td>
 												@endforeach
@@ -141,22 +158,22 @@
 												</td>
 												<td class="text-center">
 													@foreach($computed_results as $id => $positions)
-														@if($positions->student_id == $Student->id)
-															{{ $positions->obtained_marks }}
+														@if($positions['student_id'] == $Student->id)
+															{{ $positions['obtained_marks'] }}
 														@endif
 													@endforeach
 												</td>
 												<td class="text-center">
 													@foreach($computed_results as $id => $positions)
-														@if($positions->student_id == $Student->id)
-															{{ $positions->average_score }}
+														@if($positions['student_id'] == $Student->id)
+															{{ $positions['average_score'] }}
 														@endif
 													@endforeach
 												</td>
 												<td class="text-center">
 													@foreach($computed_results as $id => $positions)
-														@if($positions->student_id == $Student->id)
-															{{ $positions->position_in_class }}
+														@if($positions['student_id'] == $Student->id)
+															{{ suffix($positions['position_in_class']) }}
 														@endif
 													@endforeach
 												</td>
