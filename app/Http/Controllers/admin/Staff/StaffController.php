@@ -31,7 +31,8 @@ class StaffController extends Controller
 
     }
 
-    public function Staff(){
+    public function Staff()
+    {
         $data['Departments'] = Departments::all();
         $data['Designations'] = Designations::all();
         $data['MaritalStatus'] = MaritalStatus::all();
@@ -39,7 +40,7 @@ class StaffController extends Controller
         $data['genders'] = Gender::all();
         $data['Countries'] = Countries::all();
         $data['States'] = States::all();
-        $data['lgas'] = LocalGovts::all();        
+        $data['lgas'] = LocalGovts::all();
         $data['Complexions'] = Complexions::all();
         $data['Religions'] = Religions::all();
         $data['Tribes'] = Tribes::all();
@@ -48,15 +49,23 @@ class StaffController extends Controller
             ->join('departments', 'departments.id', 'staff.department_id')
             ->join('genders', 'genders.id', 'staff.gender_id')
             ->join('designations', 'designations.id', 'staff.designations_id')
-            ->select('staff.id', 'staff.surname', 'staff.firstname', 'staff.middlename',
-                'emergency_contacts.mobile_no As em_mobile', 'staff.staff_no',
-                'departments.name As dep_name', 'designations.name As des_name',
-                'genders.gendername As gender')->get();
+            ->select(
+                'staff.id',
+                'staff.surname',
+                'staff.firstname',
+                'staff.middlename',
+                'emergency_contacts.mobile_no As em_mobile',
+                'staff.staff_no',
+                'departments.name As dep_name',
+                'designations.name As des_name',
+                'genders.gendername As gender'
+            )->get();
 
-        return view('backend.Staff.staff',$data);
+        return view('backend.Staff.staff', $data);
     }
 
-    public function StoreStudentAdmission(Request $request){
+    public function StoreStudentAdmission(Request $request)
+    {
         $validated = $request->validate([
 
         ]);
@@ -64,25 +73,26 @@ class StaffController extends Controller
         $lastID = Staff::max('id');
         $schoolCode = 'GIC';
         $number = $lastID + 1;
-        $year = SchoolSessions::select('school_sessions.name')->where('id',CurrentAcademicId()->currentSession)->first();
-        $year_code = strpos($year->name,"_") ? explode("_",$year->name) : explode("/",$year->name);            
+        $year = SchoolSessions::select('school_sessions.name')->where('id', CurrentAcademicId()->currentSession)->first();
+        $year_code = strpos($year->name, "_") ? explode("_", $year->name) : explode("/", $year->name);
         $sessionCode = substr($year_code[0], -2);
+        $staff_no = "{$schoolCode}/STAFF/{$sessionCode}/{$number}";
+        $passportName = str_replace('/','',$staff_no).".{$request->file('staff_passport')->getClientOriginalExtension()}";
+        $fullName = "{$request->surname} {$request->firstname} {$request->middlename}";        
 
-        try{
+        try {
             DB::beginTransaction();
             try {
-
                 $Staff_User = new User();
-                $Staff_User->usertype = 3;        
-                $Staff_User->name = $request->surname.', '.$request->firstname.' '.$request->middlename;
-                $Staff_User->username = $schoolCode.'/'.'STAFF'.'/'.$sessionCode.'/'.$number;
-                $Staff_User->email = $request->surname.'staff@gospelschools.sch.ng';
+                $Staff_User->usertype = 3;
+                $Staff_User->name = strtoupper($fullName);
+                $Staff_User->username = $staff_no;
+                $Staff_User->email = strtolower(str_replace(' ', '',$fullName))."{$number}@gospelschools.sch.ng";
                 $Staff_User->password = bcrypt(strtolower($request->surname));
                 $Staff_User->save();
                 $Staff_User->toArray();
 
                 try {
-
                     $Emergency_Contact = new EmergencyContact();
                     $Emergency_Contact->surname = $request->em_surname;
                     $Emergency_Contact->firstname = $request->em_firstname;
@@ -94,9 +104,9 @@ class StaffController extends Controller
                     $Emergency_Contact->save();
                     $Emergency_Contact->toArray();
 
-                    try {                        
+                    try {
                         $Staff = new Staff();
-                        $Staff->staff_no = $schoolCode.'/'.'STAFF'.'/'.$sessionCode.'/'.$number;
+                        $Staff->staff_no = $staff_no;
                         $Staff->user_id = $Staff_User->id;
                         $Staff->department_id = $request->department_id;
                         $Staff->designations_id = $request->designations_id;
@@ -112,16 +122,16 @@ class StaffController extends Controller
                         $Staff->state_id = $request->state;
                         $Staff->lga_id = $request->lga;
                         $Staff->tribe_id = $request->tribe;
-                        $Staff->email = $request->email;            
+                        $Staff->email = $request->email;
                         $Staff->mobile_no = $request->mobile_no;
-                        $Staff->active_status = 1;        
-                        $Staff->religion_id = $request->religion;            
+                        $Staff->active_status = 1;
+                        $Staff->religion_id = $request->religion;
                         $Staff->current_address = $request->address;
                         $Staff->permanent_address = $request->pm_address;
                         $Staff->qualification_id = $request->qualification_id;
                         $Staff->specialization = $request->specialization;
                         $Staff->emergency_contact_id = $Emergency_Contact->id;
-                        $Staff->staff_passport = $request->file('staff_passport')->storeAs('passports/staff', $schoolCode.'STAFF'.$sessionCode.$number.'.'.$request->file('staff_passport')->getClientOriginalExtension());
+                        $Staff->staff_passport = $request->file('staff_passport')->storeAs('passports/staff', $passportName);
                         $Staff->save();
                         $Staff->toArray();
 
@@ -137,7 +147,7 @@ class StaffController extends Controller
                             'message' => 'Staff Enrolment Failed!',
                             'alert-type' => 'error'
                         ];
-    
+
                         DB::rollBack();
                         return redirect()->back()->with($notifications);
                     }
@@ -160,7 +170,7 @@ class StaffController extends Controller
                 return redirect()->back()->with($notifications);
             }
 
-        } catch(\Exception $e){            
+        } catch (\Exception $e) {
             $notifications = array(
                 'message' => 'Staff Enrolment Unsuccessful!',
                 'alert-type' => 'error'
@@ -168,37 +178,63 @@ class StaffController extends Controller
 
             DB::rollBack();
             return redirect()->back()->with($notifications);
-        }      
-        
+        }
+
 
     }
-    
-    public function StaffProfile($id){
+
+    public function StaffProfile($id)
+    {
         $Profile = Staff::join('emergency_contacts', 'emergency_contacts.id', '=', 'staff.emergency_contact_id')
-        ->join('departments', 'departments.id', 'staff.department_id')->join('tribes', 'tribes.id', 'staff.tribe_id')
-        ->join('genders', 'genders.id', 'staff.gender_id')->join('religions', 'religions.id', 'staff.religion_id')
-        ->join('designations', 'designations.id', 'staff.designations_id')->join('marital_statuses', 'marital_statuses.id', 'staff.marital_status_id')
-        ->join('countries', 'countries.id', 'staff.nationality_id')->join('states', 'states.id', 'staff.state_id')->join('local_govts', 'local_govts.id', 'staff.lga_id')
-        ->join('qualifications', 'qualifications.id', 'staff.qualification_id')
-        ->select('staff.id', 'staff.surname', 'staff.firstname', 'staff.middlename', 'staff.staff_no', 'staff.staff_passport',
-            'staff.current_address', 'staff.permanent_address', 'staff.date_of_birth', 'qualifications.name as qualification',
-            'countries.name as nationality', 'states.name as state', 'local_govts.name as lga', 'marital_statuses.name as marital_status',
-            'departments.name As dep_name', 'designations.name As des_name', 'tribes.name as tribe', 'staff.specialization',
-            'genders.gendername As gender', 'religions.name As religion', 'staff.date_of_employment', 'staff.mobile_no', 'staff.email',
-            'emergency_contacts.surname as em_surname', 'emergency_contacts.firstname as em_firstname', 'emergency_contacts.middlename as em_middlename',
-            'emergency_contacts.occupation as em_occupation', 'emergency_contacts.mobile_no as em_mobile', 'emergency_contacts.email as em_email',
-            'emergency_contacts.address as em_address')->find($id);
-        
-        if($Profile){
+            ->join('departments', 'departments.id', 'staff.department_id')->join('tribes', 'tribes.id', 'staff.tribe_id')
+            ->join('genders', 'genders.id', 'staff.gender_id')->join('religions', 'religions.id', 'staff.religion_id')
+            ->join('designations', 'designations.id', 'staff.designations_id')->join('marital_statuses', 'marital_statuses.id', 'staff.marital_status_id')
+            ->join('countries', 'countries.id', 'staff.nationality_id')->join('states', 'states.id', 'staff.state_id')->join('local_govts', 'local_govts.id', 'staff.lga_id')
+            ->join('qualifications', 'qualifications.id', 'staff.qualification_id')
+            ->select(
+                'staff.id',
+                'staff.surname',
+                'staff.firstname',
+                'staff.middlename',
+                'staff.staff_no',
+                'staff.staff_passport',
+                'staff.current_address',
+                'staff.permanent_address',
+                'staff.date_of_birth',
+                'qualifications.name as qualification',
+                'countries.name as nationality',
+                'states.name as state',
+                'local_govts.name as lga',
+                'marital_statuses.name as marital_status',
+                'departments.name As dep_name',
+                'designations.name As des_name',
+                'tribes.name as tribe',
+                'staff.specialization',
+                'genders.gendername As gender',
+                'religions.name As religion',
+                'staff.date_of_employment',
+                'staff.mobile_no',
+                'staff.email',
+                'emergency_contacts.surname as em_surname',
+                'emergency_contacts.firstname as em_firstname',
+                'emergency_contacts.middlename as em_middlename',
+                'emergency_contacts.occupation as em_occupation',
+                'emergency_contacts.mobile_no as em_mobile',
+                'emergency_contacts.email as em_email',
+                'emergency_contacts.address as em_address'
+            )->find($id);
+
+        if ($Profile) {
             return view('backend.Staff.staff_profile', compact('Profile'));
         } else {
             return redirect()->back();
         }
-        
+
 
     }
 
-    public function employmentLetter() {
+    public function employmentLetter()
+    {
 
     }
 }

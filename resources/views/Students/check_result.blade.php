@@ -19,7 +19,7 @@
 	<link rel="stylesheet" href="{{ asset('backend/css/skin_color.css') }}">
 
 </head>
-<body class="hold-transition dark-skin theme-primary" oncontextmenu="return false" onkeydown="return false">
+<body class="hold-transition dark-skin theme-primary" oncontextmenu="return false">
 	
 	<div class="container h-p100">
 		<div class="row align-items-center justify-content-md-center h-p100">	
@@ -69,33 +69,7 @@
 											</select>
 											</div>
 										</div>
-									</div>                         
-									<div class="col-md-6">
-										<div class="form-group">
-											<h5>Class<span class="text-danger">*</span></h5>
-											<div class="controls">
-											<select name="class_id" id="class" required class="form-control p-10">
-												<option value="">Select Class</option>
-												@foreach($school_classes as $Class)
-												<option value="{{ $Class->id }}">{{ $Class->classname }}</option>
-												@endforeach                                        
-											</select>
-											</div>
-										</div>
-									</div>
-									<div class="col-md-6">
-										<div class="form-group">
-											<h5>Class Arm<span class="text-danger">*</span></h5>
-											<div class="controls">
-											<select name="class_arm_id" id="class" required class="form-control p-10">
-												<option value="">Select Class Arm</option>
-												@foreach($school_arms as $class_arm)
-												<option value="{{ $class_arm->id }}">{{ $class_arm->arm_name }}</option>
-												@endforeach                                        
-											</select>
-											</div>
-										</div>
-									</div>									
+									</div>						
 								</div>
 								<div class="row">
 									<div class="col-12">

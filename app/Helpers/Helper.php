@@ -1,6 +1,7 @@
 <?php
 use App\Models\CassScores;
 use App\Models\MarksRegisters;
+use App\Models\Students;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
@@ -65,7 +66,6 @@ function formatCurrency($camount)
     $toCurrency = new NumberFormatter("EN", NumberFormatter::DECIMAL);
     echo $toCurrency->format($camount);
 }
-
 
 if (!function_exists('isFound')) {
     function isFound($students)
@@ -170,8 +170,8 @@ if (!function_exists('suffix')) {
     }
 }
 
-if (!function_exists('grade_remarks')) {
-    function grade_remarks($average, $is_result = true, $is_grade = true)
+if (!function_exists('gradeOrRemark')) {
+    function gradeOrRemark($average, $is_result = true, $is_grade = true)
     {
         $grade = function ($average) {
             switch ($average) {
@@ -222,3 +222,85 @@ if (!function_exists('grade_remarks')) {
     }
 }
 
+if (!function_exists('calculateObtainedMarks')) {
+    function calculateObtainedMarks($data)
+    {
+        $students_marks = [];
+        foreach ($data as $student_id => $students) {
+            $obtained_marks = 0;
+            foreach ($students as $student) {
+                $obtained_marks += $student['total_scores'];
+            }
+            $students_marks[$student_id] = $obtained_marks;
+        }
+        arsort($students_marks);
+
+        return $students_marks;
+    }
+}
+
+if (!function_exists('calculatePositions')) {
+    function calculatePositions($data)
+    {
+        $students_positions = [];
+        $i = 0;
+        $prev = 0;
+        foreach ($data as $student_id => $subject_total) {
+            if ($prev != $subject_total) {
+                $prev = $subject_total;
+                $i++;
+            }
+            $students_positions[$student_id] = $i;
+        }
+        return $students_positions;
+    }
+}
+
+if (!function_exists('computeResults')) {
+    function computeResults($result_summary, $student_obtained_marks, $subjects_in_class, $positions)
+    {
+        $rows = [];
+        foreach ($result_summary as $student_id => $Student_result) {
+            $row = [];
+            $row['student_id'] = $student_id;
+            $row['obtained_marks'] = $student_obtained_marks[$student_id];
+            $row['total_subjects_offered'] = count($Student_result);
+            $row['obtainable_marks'] = count($subjects_in_class) * 100;
+            $row['average_score'] = (float) number_format(($row['obtained_marks'] * 100) / $row['obtainable_marks'], 2) ?? 0.00;
+            $row['position_in_class'] = $positions[$student_id];
+            $rows[$student_id] = $row;
+        }
+
+        return $rows;
+    }
+}
+
+if (!function_exists('getClassAverage')) {
+    function getClassAverage($student_obtained_marks, $subjects_in_class)
+    {
+        return (float) number_format((array_sum($student_obtained_marks) /
+            count($student_obtained_marks)) /
+            count($subjects_in_class), 2);
+    }
+}
+
+if (!function_exists('getDepartmentId')) {
+    function getDepartmentId($class_name, $class_arm_name)
+    {
+        return strpos($class_name, 'BASIC') !== false ? 4 :
+            (strpos($class_arm_name, 'A') !== false ? 1 :
+                (strpos($class_arm_name, 'B') !== false ? 2 : 3));
+
+    }
+}
+
+if (!function_exists('getStudentId')) {
+    function getStudentId($admission_no)
+    {
+        $student_id = Students::select('students_id')
+            ->where('admission_no', $admission_no)
+            ->get()->first();        
+        
+        return $student_id->students_id ?? null;       
+    }
+}

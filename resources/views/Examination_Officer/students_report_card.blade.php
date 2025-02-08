@@ -84,9 +84,13 @@
                             <h4>ZAKI-BIAM, UKUM LGA, BENUE STATE, NIGERIA</h4>
                             <h5>Tel: 08030661324, 08140326189, 07030271476</h5>
                             <h5>Email: gospelcollege2019@gmail.com; website: gospelschools.sch.ng</h5>
-                            <h5 class="mt-30 line"><strong><u>TERMINAL CONTINUOUS ASSESSMENT REPORT |
-                                        {{ (strpos($school_class->classname, 'BASIC') !== false || strpos($school_class->classname, 'JSS') !== false) ?
-        'JUNIOR SECONDARY SCHOOL' : 'SENIOR SECONDARY SCHOOL'}} </u></strong>
+                            <h5 class="mt-30 line">
+                                <strong>
+                                    <u>
+                                        TERMINAL CONTINUOUS ASSESSMENT REPORT |
+                                        {{ (strpos($school_class->classname, 'BASIC') !== false || strpos($school_class->classname, 'JSS') !== false) ? 'JUNIOR SECONDARY SCHOOL' : 'SENIOR SECONDARY SCHOOL'}}
+                                    </u>
+                                </strong>
                             </h5>
                         </div>
                         <div class="col-sm-2">
@@ -137,8 +141,9 @@
                                     <th colspan="2" class="text-center">
                                         CLASS DATA
                                     </th>
-                                    <td rowspan="8" class="text-center"><img
-                                            src="{{ (!empty($students->passport)) ?? asset('backend/images/passport.png') }}">
+                                    <td rowspan="8" class="text-center">
+                                        <img src="{{ (!empty($student->passport)) ? url('storage/' . $student->passport) : asset('backend/images/passport.png') }}"
+                                            width="150" height="200">
                                     </td>
                                 </tr>
                                 <tr>
@@ -210,50 +215,32 @@
                                             @foreach ($assessments as $CASS)
                                                 <td class="text-center">
                                                     @foreach ($students_cass as $subject_scores)
-                                                        @if($subject_scores->subject_id == $subject->id)
-                                                            @if ($subject_scores->cass_type == $CASS->id)
-                                                                {{$subject_scores->scores}}
+                                                        @if($subject_scores['subject_id'] == $subject->id)
+                                                            @if ($subject_scores['cass_type'] == $CASS->id)
+                                                                {{$subject_scores['scores']}}
                                                             @endif
                                                         @endif
                                                     @endforeach
                                                 </td>
                                             @endforeach
 
-                                            <td class="text-center">
-                                                @foreach ($subject_summary as $student_subjects)
-                                                    @if($student_subjects->subject_id == $subject->id)
-                                                        {{ $student_subjects->total_scores}}
-                                                    @endif
-                                                @endforeach
-                                            </td>
 
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
-                                            <td class="text-center"></td>
+                                            @foreach ($subject_summary as $student_subjects)
+                                                @if($student_subjects['subject_id'] == $subject->id)
 
-                                            <td class="text-center">
-                                                @foreach ($subject_summary as $student_subjects)
-                                                    @if($student_subjects->subject_id == $subject->id)
-                                                        {{ suffix($student_subjects->subject_position)}}
-                                                    @endif
-                                                @endforeach                                           
-                                            </td>
-
-                                            <td class="text-center">
-                                                @foreach ($subject_summary as $student_subjects)
-                                                    @if($student_subjects->subject_id == $subject->id)
-                                                        {{$student_subjects->total_scores > 0 ? grade_remarks($student_subjects->total_scores, false) : 'F'}}
-                                                    @endif
-                                                @endforeach    
-                                            </td>
-
-                                            <td class="text-center">
-                                                @foreach ($subject_summary as $student_subjects)
-                                                    @if($student_subjects->subject_id == $subject->id)
-                                                        {{$student_subjects->total_scores > 0 ? grade_remarks($student_subjects->total_scores, false, false) : 'FAIL'}}
-                                                    @endif
-                                                @endforeach                                            
-                                            </td>
+                                                    <td class="text-center">{{ $student_subjects['total_scores']}}</td>
+                                                    <td class="text-center"></td>
+                                                    <td class="text-center"></td>
+                                                    <td class="text-center"></td>
+                                                    <td class="text-center">{{ suffix($student_subjects['subject_position']) }}</td>
+                                                    <td class="text-center">
+                                                        {{ $student_subjects['total_scores'] > 0 ? gradeOrRemark($student_subjects['total_scores'], false) : 'F' }}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        {{ $student_subjects['total_scores'] > 0 ? gradeOrRemark($student_subjects['total_scores'], false, false) : 'FAIL' }}
+                                                    </td>
+                                                @endif
+                                            @endforeach
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -282,32 +269,32 @@
                                 <tr>
                                     <th>TOTAL MARKS OBTAINED</th>
                                     <td>
-                                        {{$computed_results->obtained_marks}}
+                                        {{$computed_results['obtained_marks']}}
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>AVERAGE</th>
                                     <td>
-                                        {{$computed_results->average_score}}
+                                        {{$computed_results['average_score']}}
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>POSITION Out Of CLASS SIZE</th>
                                     <td>
-                                    {{ suffix($computed_results->position_in_class)}}
+                                        {{ suffix($computed_results['position_in_class'])}}
                                         out Of 50
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>CLASS AVERAGE</th>
                                     <td>
-                                        
+                                        {{ $class_average }}
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>PERFORMANCE REMARK (PASSED/FAILED)</th>
                                     <td>
-                                    {{ $computed_results->average > 0 ? grade_remarks($student_result->average_score) : 'FAILED'}}
+                                        {{ $computed_results['average_score'] > 0 ? gradeOrRemark($computed_results['average_score']) : 'FAILED'}}
                                     </td>
                                 </tr>
                             </table>
@@ -413,7 +400,7 @@
                             </table>
                         </div>
                     </div>
-                </div>                
+                </div>
             </div>
         </section>
     </div>

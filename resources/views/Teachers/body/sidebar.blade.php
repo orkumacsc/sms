@@ -31,24 +31,7 @@ $route = Route::current()->getName();
           </a>
         </li>        
         
-        <li class="treeview {{ ($prefix == '/students')? 'active' : ''}}">
-          <a href="javascript:void(0)">
-            <i data-feather="users"></i>
-            <span>Student Management</span>
-            <span class="pull-right-container">
-              <i class="fa fa-angle-right pull-right"></i>
-            </span>
-          </a>
-          <ul class="treeview-menu">
-            <li><a href="{{ route('admissions') }}"><i class="ti-more"></i>Enrol Student</a></li>
-            <li><a href="{{ route('generate_reg_no') }}"><i class="ti-more"></i>Generate Roll No</a></li>
-            <li><a href="{{ route('admissions_view') }}"><i class="ti-more"></i>Student Admission List</a></li>
-            <li><a href="{{ route('student_transfer') }}"><i class="ti-more"></i>Transfer Students</a></li>
-            <li><a href="{{ route('student_houses') }}"><i class="ti-more"></i>Students Houses</a></li>
-            <li><a href="{{ route('student_promotion_index') }}"><i class="ti-more"></i>Promote Students</a></li>
-          </ul>
-        </li> 
-
+        
       </ul>
     </section>
 

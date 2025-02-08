@@ -4,6 +4,7 @@ use App\Http\Controllers\AdmissionsOfficer\AdmissionsController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CheckResultController;
 use App\Http\Controllers\SchoolSetupController;
+use App\Http\Controllers\Staff\TeachersController;
 use App\Models\SchoolSetup;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
@@ -78,10 +79,7 @@ Route::middleware(['admission_officer'])->group(function(){
 
 //Teachers Routes
 Route::middleware(['teachers'])->group(function(){
-    Route::get('/Staff_Dashboard', function () {
-        return view('Teachers.dashboard');
-    })->name('Staff_Dashboard');
-
+    Route::get('/Teacher', [TeachersController::class,'dashboard'])->name('Staff_Dashboard');
 });
 
 //Users Routes
@@ -190,10 +188,10 @@ Route::prefix('ResultManagement')->group(function() {
     Route::post('ComputeResult', [ExaminationController::class, 'storeComputeResult'])->name('store_compute_result'); 
     Route::get('Broadsheet',[CassViewController::class,'broadsheet'])->name('broadsheet');
     Route::get('ClassReportCards',[ReportController::class,'classReport'])->name('class_report_cards');
-    Route::post('StudentReportCard',[ReportController::class,'studentReport'])->name('student_report_card');
+    Route::get('StudentReportCard',[ReportController::class,'studentReport'])->name('student_report_card');
 });
 
-Route::prefix('Staff')->group(function(){
+Route::middleware('super_admin')->prefix('Staff')->group(function(){
     Route::get('/', [StaffController::class, 'Staff'])->name('staff');
     Route::post('store_staff_enrollment', [StaffController::class, 'StoreStudentAdmission'])->name('store_staff_enrollment');
     Route::get('EmploymentLetter/{id}', [StaffController::class, 'employmentLetter'])->name('employment_letter');

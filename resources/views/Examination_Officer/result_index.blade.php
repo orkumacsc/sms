@@ -16,7 +16,7 @@
                 @csrf
                 <div class="modal-header">
                   <h5 class="modal-title" id="ComputeResultModal"> <i
-                      class="text-secondary mdi mdi-calculator-variant-outline"></i> Compute Student Result</h5>
+                      class="text-secondary mdi mdi-calculator-variant-outline"></i> Publish Students' Results</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="close">
                     <span aria-hidden="true">&times;</span>
                   </button>
@@ -86,7 +86,7 @@
                 <div class="modal-footer">
                   <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="close"><i
                       class="ti-arrow-left"> Cancel</i></button>
-                  <input type="submit" value="Compute Result" class="btn  btn-info">
+                  <input type="submit" value="Publish Results" class="btn  btn-info">
                 </div>
               </form>
             </div>
@@ -97,8 +97,7 @@
           aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content box">
-              <form method="get" action="{{ route('broadsheet') }}" enctype="multipart/form-data">
-                @csrf
+              <form method="get" action="{{ route('broadsheet') }}" enctype="multipart/form-data">                
                 <div class="modal-header">
                   <h5 class="modal-title" id="BroadsheetFormModal"> <i
                       class="text-secondary mdi mdi-microsoft-excel"></i> Broadsheet Report</h5>
@@ -266,8 +265,7 @@
           aria-labelledby="StudentsReportCardsModal" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
             <div class="modal-content box">
-              <form method="post" action="{{ route('student_report_card') }}" enctype="multipart/form-data">
-                @csrf
+              <form method="get" action="{{ route('student_report_card') }}" enctype="multipart/form-data">                
                 <div class="modal-header">
                   <h5 class="modal-title" id="StudentsReportCardsModal"> <i
                       class="text-secondary mdi mdi-microsoft-excel"></i> Students Report Card</h5>
@@ -369,7 +367,7 @@
                   <i class="text-info mr-0 font-size-36 mdi mdi-calculator-variant-outline"></i>
                 </div>
                 <div>
-                  <p class="text-mute mt-20 mb-0 font-size-16">Compute Result</p>
+                  <p class="text-mute mt-20 mb-0 font-size-16">Publish Results</p>
                   <h3 class="text-white mb-0 font-weight-500"></h3>
                 </div>
               </div>
