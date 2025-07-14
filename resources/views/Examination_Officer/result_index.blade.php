@@ -359,6 +359,71 @@
           </div>
         </div>
 
+        <div class="modal fade" id="UpdateSubjectsInfo" tabindex="-1" role="document"
+          aria-labelledby="UpdateSubjectsInfoModal" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content box">
+              <form method="get" action="{{ route('update_class_info') }}" enctype="multipart/form-data">                
+                <div class="modal-header">
+                  <h5 class="modal-title" id="UpdateSubjectsInfoModal"> <i
+                      class="text-secondary mdi mdi-microsoft-excel"></i> Update Total Subjects Offered in Class</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body box-body my-10">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <h5>Session<span class="text-danger">*</span></h5>
+                        <div class="controls">
+                          <select name="academic_session_id"  required
+                            class="form-control p-10">
+                            <option value="">Select Session</option>
+                            @foreach($SchoolSessions as $key => $Session)
+                <option value="{{ $Session->id }}" {{ $Session->id == Active_Session()->id ? 'selected' : '' }}>{{ $Session->name }}</option>
+              @endforeach
+                          </select>
+                        </div>
+                      </div>
+                    </div>                    
+                  
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <h5>Class<span class="text-danger">*</span></h5>
+                        <div class="controls">
+                          <select name="class_id" required class="form-control p-10">
+                            <option value="">Select Class</option>
+                            @foreach($SchoolClasses as $key => $Class)
+                <option value="{{ $Class->id }}">{{ $Class->classname }}</option>
+              @endforeach
+                          </select>
+                        </div>
+                      </div>
+                    </div>                    
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="form-group">
+                        <h5>Number of Subjects<span class="text-danger">*</span></h5>
+                        <div class="controls">
+                          <input type="number" name="total_subjects_offered" class="form-control">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="close"><i
+                      class="ti-arrow-left"> Cancel</i></button>
+                  <input type="submit" value="Save Subjects Offered" class="btn  btn-info" id="disable">
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
         <div class="col-12 col-md-6 col-xl-2">
           <a href="#" data-toggle="modal" data-target="#ComputeResult">
             <div class="box overflow-hidden pull-up">
@@ -416,6 +481,22 @@
                 </div>
                 <div>
                   <p class="text-mute mt-20 mb-0 font-size-16">Students Report Card</p>
+                  <h3 class="text-white mb-0 font-weight-500"></h3>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+
+         <div class="col-12 col-md-6 col-xl-2">
+          <a href="#" data-toggle="modal" data-target="#UpdateSubjectsInfo">
+            <div class="box overflow-hidden pull-up">
+              <div class="box-body">
+                <div class="icon bg-info-light rounded w-60 h-60">
+                  <i class="text-info mr-0 font-size-36 mdi mdi-file-chart"></i>
+                </div>
+                <div>
+                  <p class="text-mute mt-20 mb-0 font-size-16">Update Subjects Offered</p>
                   <h3 class="text-white mb-0 font-weight-500"></h3>
                 </div>
               </div>

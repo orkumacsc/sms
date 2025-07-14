@@ -54,11 +54,9 @@ $route = Route::current()->getName();
               <i class="fa fa-angle-right pull-right"></i>
             </span>
           </a>
-          <ul class="treeview-menu">
-            <li><a href="{{ route('student-admission') }}"><i class="ti-more"></i>Enrol Student</a></li>
-            <li><a href="{{ route('re_enrol_student') }}"><i class="ti-more"></i>Re-Enrol Student</a></li>
-            <li><a href="{{ route('generate_reg_no') }}"><i class="ti-more"></i>Generate Roll No</a></li>
-            <li><a href="{{ route('student_view') }}"><i class="ti-more"></i>List of Student</a></li>            
+          <ul class="treeview-menu">  
+            <li><a href="{{ route('student_view') }}"><i class="ti-more"></i>List of Student</a></li>           
+            <li><a href="{{ route('generate_reg_no') }}"><i class="ti-more"></i>Generate Roll No</a></li>                       
             <li><a href="{{ route('student_houses') }}"><i class="ti-more"></i>Students Houses</a></li>
             <li><a href="{{ route('student_promotion_index') }}"><i class="ti-more"></i>Promote Students</a></li>
           </ul>

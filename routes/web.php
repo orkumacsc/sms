@@ -63,7 +63,7 @@ Route::middleware([
 });
 
 // Admission Officer Routes
-Route::middleware(['admission_officer'])->group(function(){
+Route::middleware(['admission_officer', 'super_admin'])->group(function(){
     Route::get('/admissions_dashboard', function () {
         return view('Admission_Officer.dashboard');
     })->name('admissions_dashboard');
@@ -103,8 +103,8 @@ Route::prefix('Setup')->group(function(){
     // School Classes routes
     Route::get('SchoolClass', [SchoolClassController::class, 'SchoolClass'])->name('school_class');
     Route::post('SchoolClass', [SchoolClassController::class, 'StoreSchoolClass'])->name('save_school_class');
-    Route::get('ClassProfile', [SchoolClassController::class, 'ClassProfile'])->name('class_profile');
-    Route::get('ClassConfiguration', [SchoolClassController::class, 'ClassConfiguration'])->name('class_configuration');
+    Route::get('ClassProfile/{class_id}', [SchoolClassController::class, 'ClassProfile'])->name('class_profile');
+    
 
     // School Class Arms Routes
     Route::get('SchoolArm', [SchoolArmsController::class, 'SchoolArm'])->name('school_arm');
@@ -245,6 +245,13 @@ Route::prefix('CheckResult')->group(function(){
     Route::get('/',[CheckResultController::class, 'index']);
     Route::get('/Result',[CheckResultController::class, 'processResult'])->name('check_result');    
 });
+
+Route::prefix('SchoolClasses')->group(function(){
+    Route::get('/',[CheckResultController::class, 'index']);
+    Route::get('/Result',[CheckResultController::class, 'processResult'])->name('check_result'); 
+    Route::get('/Update',[SchoolClassController::class, 'StoreClassInfo'])->name('update_class_info');
+});
+
 
 Route::get('FeesResponse/{id}', [GeneralController::class, 'SchoolFees'])->name('fees_response');
 Route::get('GetStudent/{id}', [GeneralController::class, 'StudentByClass'])->name('students');

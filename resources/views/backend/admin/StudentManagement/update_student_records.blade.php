@@ -29,10 +29,13 @@
                                         <label for="file">
                                             <img src="{{ (!empty($Students->passport)) ? 
                                                 url('storage/'.$Students->passport) :
-                                                url(`storage/passports/profile-photos/default.png`) }}" alt="Student Passport" id="OuputStudentPassport" class="pb-20">
+                                                url('storage/passports/profile-photos/default.png') }}" 
+                                                alt="Student Passport" 
+                                                id="OuputStudentPassport" 
+                                                class="pb-20"
+                                            >
                                             <input type="file" name="StudentPassport" class="form-control" id="StudentPassport"> 
-                                        </label>
-                                        
+                                        </label>                                        
                                     </div>
                                 </div>
                                 </div>

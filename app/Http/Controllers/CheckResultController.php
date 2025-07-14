@@ -44,79 +44,175 @@ class CheckResultController extends Controller
             $input = str_replace(' ', '', $input);
         });
 
-        $students = StudentClass::select('admission_no', 'student_classes.id as id', 'surname', 'firstname', 'middlename', 'gendername', 'name', 'date_of_birth', 'passport', 'class_id', 'school_arm_id')
-            ->join('students', 'students.students_id', 'student_classes.student_id')
-            ->join('genders', 'genders.id', '=', 'students.gender')
-            ->join('school_houses', 'school_houses.id', '=', 'students.school_houses_id')
-            ->where('student_id', getStudentId($input['admission_number']))
-            ->get()->first();
+        $result_type = 2;
 
-        if (!$students)
-            return view('Students.no_records', $input);
+        if ($result_type === 1) {
 
-        $class_id = $students->class_id;
-        $class_arm_id = $students->school_arm_id;
-        $class = SchoolClass::find($class_id);
-        $class_arm = SchoolArms::find($class_arm_id);
-        $department_id = getDepartmentId($class->classname, $class_arm->arm_name);
-        $academic_session = SchoolSessions::find($input['academic_session_id']);
-        $term = SchoolTerm::find($input['term_id']);
+            try {
+                $students = StudentClass::select('admission_no', 'student_classes.id as id', 'surname', 'firstname', 'middlename', 'gendername', 'name', 'date_of_birth', 'passport', 'class_id', 'school_arm_id')
+                    ->join('students', 'students.students_id', 'student_classes.student_id')
+                    ->join('genders', 'genders.id', '=', 'students.gender')
+                    ->join('school_houses', 'school_houses.id', '=', 'students.school_houses_id')
+                    ->where('student_id', getStudentId($input['admission_number']))
+                    ->get()->first();
 
-        $students_cass = CassScores::select('student_id', 'cass_type', 'scores', 'subject_id')
-            ->where('class_id', '=', $class_id)
-            ->where('class_arm_id', $class_arm_id)
-            ->where('academic_session_id', $input['academic_session_id'])
-            ->where('term_id', $input['term_id'])
-            ->get()->groupBy('student_id')->toArray();
+                if (!$students)
+                    return view('Students.no_records', $input);
 
-        $subject_summary = MarksRegisters::select('student_id', 'total_scores', 'subject_id', 'subject_position')
-            ->where('class_id', '=', $class_id)
-            ->where('class_arm_id', $class_arm_id)
-            ->where('academic_session_id', $input['academic_session_id'])
-            ->where('term_id', $input['term_id'])
-            ->get()->groupBy('student_id')->toArray();
+                $class_id = $students->class_id;
+                $class_arm_id = $students->school_arm_id;
+                $class = SchoolClass::find($class_id);
+                $class_arm = SchoolArms::find($class_arm_id);
+                $department_id = getDepartmentId($class->classname, $class_arm->arm_name);
+                $academic_session = SchoolSessions::find($input['academic_session_id']);
+                $term = SchoolTerm::find($input['term_id']);
 
-        if (!($students_cass && $subject_summary)) {
+                $students_cass = CassScores::select('student_id', 'cass_type', 'scores', 'subject_id')
+                    ->where('class_id', '=', $class_id)
+                    ->where('class_arm_id', $class_arm_id)
+                    ->where('academic_session_id', $input['academic_session_id'])
+                    ->where('term_id', $input['term_id'])
+                    ->get()->groupBy('student_id')->toArray();
 
-            $check_back['students'] = $students;
-            $check_back['academic_session'] = $academic_session->name;
-            $check_back['term'] = $term->name;
+                $subject_summary = MarksRegisters::select('student_id', 'total_scores', 'subject_id', 'subject_position')
+                    ->where('class_id', '=', $class_id)
+                    ->where('class_arm_id', $class_arm_id)
+                    ->where('academic_session_id', $input['academic_session_id'])
+                    ->where('term_id', $input['term_id'])
+                    ->get()->groupBy('student_id')->toArray();
 
-            return view('Students.check_back', $check_back);
+                if (!($students_cass && $subject_summary)) {
+
+                    $check_back['students'] = $students;
+                    $check_back['academic_session'] = $academic_session->name;
+                    $check_back['term'] = $term->name;
+
+                    return view('Students.check_back', $check_back);
+                }
+
+                $subjects_in_class = ClassSubjects::where('class_id', $class_id)
+                    ->where('department_id', $department_id)
+                    ->join('school_subjects', 'school_subjects.id', 'class_subjects.subject_id')
+                    ->orderBy('school_subjects.subject_name', 'ASC')
+                    ->get();
+
+                $assessments = SchoolAssessments::where('class_id', '=', $class_id)
+                    ->join('assessment__types', 'assessment__types.id', '=', 'school_assessments.ass_type_id')
+                    ->orderBy('school_assessments.id', 'ASC')
+                    ->get();
+
+                $student_obtained_marks = calculateObtainedMarks($subject_summary);
+                $positions = calculatePositions($student_obtained_marks);
+                $max_subjects_allowed = getTotalSubjects($class_id, $subjects_in_class);
+                $computed_results = computeResults($subject_summary, $student_obtained_marks, $positions, $max_subjects_allowed);
+                $class_average = getClassAverage($student_obtained_marks, $max_subjects_allowed);
+                $students_id = $students->id;
+
+                $data['academic_session'] = $academic_session;
+                $data['school_class'] = $class;
+                $data['class_arm'] = $class_arm;
+                $data['term'] = $term;
+                $data['computed_results'] = $computed_results[$students_id];
+                $data['subject_summary'] = $subject_summary[$students_id];
+                $data['students_cass'] = $students_cass[$students_id];
+                $data['students'] = $students;
+                $data['assessments'] = $assessments;
+                $data['subjects_in_class'] = $subjects_in_class;
+                $data['max_subjects_allowed'] = $max_subjects_allowed;
+                $data['class_average'] = $class_average;
+                $data['class_size'] = count($computed_results);
+
+                unset($request);
+                return view('Students.termly_report_card', $data);
+
+            } catch (\Exception $e) {
+                $notifications = array(
+                    [
+                        'message' => 'Error in Processing Class Result! Contact Support.',
+                        'alert-type' => 'error'
+                    ]
+                );
+
+                return redirect()->back()->with($notifications);
+            }
+        } elseif ($result_type === 2) {
+            try {
+                $students = StudentClass::select('student_id','admission_no', 'student_classes.id as id', 'surname', 'firstname', 'middlename', 'gendername', 'name', 'date_of_birth', 'passport', 'class_id', 'school_arm_id')
+                    ->join('students', 'students.students_id', 'student_classes.student_id')
+                    ->join('genders', 'genders.id', '=', 'students.gender')
+                    ->join('school_houses', 'school_houses.id', '=', 'students.school_houses_id')
+                    ->where('student_id', getStudentId($input['admission_number']))
+                    ->get()->first();
+
+                if (!$students)
+                    return view('Students.no_records', $input);
+
+                $class_id = $students->class_id;
+                $class_arm_id = $students->school_arm_id;
+                $class = SchoolClass::find($class_id);
+                $class_arm = SchoolArms::find($class_arm_id);
+                $department_id = getDepartmentId($class->classname, $class_arm->arm_name);
+                $academic_session = SchoolSessions::find($input['academic_session_id']);
+                $terms = SchoolTerm::get()->all();
+
+                $subject_summary = MarksRegisters::select('student_id', 'total_scores', 'subject_id', 'subject_position', 'term_id')
+                    ->where('class_id', '=', $class_id)
+                    ->where('class_arm_id', $class_arm_id)
+                    ->where('academic_session_id', $input['academic_session_id'])                 
+                    ->where('total_scores', '>', 0)
+                    ->get()->groupBy('student_id')
+                    ->toArray();
+
+
+                if (!$subject_summary) {
+                    $check_back['students'] = $students;
+                    $check_back['academic_session'] = $academic_session->name;                 
+                    
+                    return view('Students.check_back', $check_back);
+                }
+
+                $subjects_in_class = ClassSubjects::where('class_id', $class_id)
+                    ->where('department_id', $department_id)
+                    ->join('school_subjects', 'school_subjects.id', 'class_subjects.subject_id')
+                    ->orderBy('school_subjects.subject_name', 'ASC')
+                    ->get();               
+
+                $student_obtained_marks = calculateObtainedMarks($subject_summary);
+                $positions = calculatePositions($student_obtained_marks);
+                $max_subjects_allowed = getTotalSubjects($class_id, $subjects_in_class);
+                $computed_results = computeResults($subject_summary, $student_obtained_marks, $positions, $max_subjects_allowed);
+                $class_average = getClassAverage($student_obtained_marks, $max_subjects_allowed);
+                $students_id = $students->id;
+
+                dd($subjects_in_class);
+
+                $data['academic_session'] = $academic_session;
+                $data['school_class'] = $class;
+                $data['class_arm'] = $class_arm;                
+                $data['computed_results'] = $computed_results[$students_id];
+                $data['subject_summary'] = $subject_summary[$students_id];                
+                $data['students'] = $students;
+                $data['terms'] = $terms;
+                $data['subjects_in_class'] = $subjects_in_class;
+                $data['max_subjects_allowed'] = $max_subjects_allowed;
+                $data['class_average'] = $class_average;
+                $data['class_size'] = count($computed_results);
+
+                unset($request);
+                return view('Students.annual_report_card', $data);
+
+            } catch (\Exception $e) {
+                $notifications = array(
+                    [
+                        'message' => 'Error in Processing Class Result! Contact Support.',
+                        'alert-type' => 'error'
+                    ]
+                );
+
+                return redirect()->back()->with($notifications);
+            }
+
+
         }
-
-        $subjects_in_class = ClassSubjects::where('class_id', $class_id)
-            ->where('department_id', $department_id)
-            ->join('school_subjects', 'school_subjects.id', 'class_subjects.subject_id')
-            ->orderBy('school_subjects.subject_name', 'ASC')
-            ->get();
-
-        $assessments = SchoolAssessments::where('class_id', '=', $class_id)
-            ->join('assessment__types', 'assessment__types.id', '=', 'school_assessments.ass_type_id')
-            ->orderBy('school_assessments.id', 'ASC')
-            ->get();
-
-        $student_obtained_marks = calculateObtainedMarks($subject_summary);
-        $positions = calculatePositions($student_obtained_marks);
-        $computed_results = computeResults($subject_summary, $student_obtained_marks, $subjects_in_class, $positions);
-        $class_average = getClassAverage($student_obtained_marks, $subjects_in_class);
-        $students_id = $students->id;
-
-        $data['academic_session'] = $academic_session;
-        $data['school_class'] = $class;
-        $data['class_arm'] = $class_arm;
-        $data['term'] = $term;
-        $data['computed_results'] = $computed_results[$students_id];
-        $data['subject_summary'] = $subject_summary[$students_id];
-        $data['students_cass'] = $students_cass[$students_id];
-        $data['students'] = $students;
-        $data['assessments'] = $assessments;
-        $data['subjects_in_class'] = $subjects_in_class;
-        $data['class_average'] = $class_average;
-        $data['class_size'] = count($computed_results);
-
-        unset($request);
-        return view('Students.students_report_card', $data);
-
     }
 }

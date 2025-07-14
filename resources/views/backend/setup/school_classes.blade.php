@@ -90,7 +90,7 @@
 											</a>
 											<ul class="dropdown-menu animated flipInX">
 												<li class="user-body">
-													<a class="dropdown-item text-success" href="{{ route('class_configuration',$schoolclass->id) }}" onclick=""><i class="mr-2 ti-eye"></i> Enter Class</a>
+													<a class="dropdown-item text-success" href="{{ route('class_profile',$schoolclass->id) }}" onclick=""><i class="mr-2 ti-eye"></i> Enter Class</a>
 													<div class="dropdown-divider"></div>
 													<a class="dropdown-item text-warning" href=""><i class="mr-2 mdi mdi-pencil-box-outline"></i> Edit Class</a>
 													<div class="dropdown-divider"></div>

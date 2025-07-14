@@ -18,6 +18,7 @@ use App\Models\SchoolAssessments;
 use App\Models\MarksRegisters;
 use App\Models\SchoolSubjects;
 use App\Models\ResultPositions;
+use App\Models\SchoolClassInfo;
 
 class ReportController extends Controller
 {
@@ -25,7 +26,7 @@ class ReportController extends Controller
     {
         $this->middleware('auth');
     }
-
+    
     public function classReport(Request $request)
     {
         try {
@@ -146,6 +147,7 @@ class ReportController extends Controller
                 (strpos($class_arm_id->arm_name, 'A') !== false ? 1 :
                     (strpos($class_arm_id->arm_name, 'B') !== false ? 2 : 3));
 
+
             $data['academic_session'] = SchoolSessions::find($request->academic_session_id);
             $data['term'] = SchoolTerm::find($request->term_id);
             $data['school_class'] = $class_id;
@@ -161,7 +163,7 @@ class ReportController extends Controller
                 ->where('academic_session_id', $request->academic_session_id)
                 ->orderBy('roll_number')
                 ->find($request->student_id, ['admission_no', 'student_classes.id as id', 'surname', 'firstname', 'middlename', 'gendername', 'name', 'date_of_birth', 'passport']);
-            
+
             $assessments = SchoolAssessments::where('class_id', '=', $request->class_id)
                 ->join('assessment__types', 'assessment__types.id', '=', 'school_assessments.ass_type_id')
                 ->orderBy('school_assessments.id', 'ASC')
@@ -206,30 +208,31 @@ class ReportController extends Controller
 
             $student_obtained_marks = calculateObtainedMarks($subject_summary);
             $positions = calculatePositions($student_obtained_marks);
-
+            $max_subjects_allowed = getTotalSubjects($class_id->id, $subjects_in_class);
             $class_average = (float) number_format((array_sum($student_obtained_marks) /
                 count($student_obtained_marks)) /
-                count($subjects_in_class), 2);
+                $max_subjects_allowed, 2);            
 
             $rows = [];
             foreach ($subject_summary as $student_id => $Student_result) {
                 $row = [];
                 $row['student_id'] = $student_id;
                 $row['obtained_marks'] = $student_obtained_marks[$student_id];
-                $row['total_subjects_offered'] = count($Student_result);
-                $row['obtainable_marks'] = count($subjects_in_class) * 100;
+                $row['total_subjects_offered'] = $max_subjects_allowed;
+                $row['obtainable_marks'] =  $max_subjects_allowed * 100;
                 $row['average_score'] = (float) number_format(($row['obtained_marks'] * 100) / $row['obtainable_marks'], 2) ?? 0.00;
                 $row['position_in_class'] = $positions[$student_id];
                 $rows[$student_id] = $row;
-            }            
+            }
             $computed_results = $rows;
-            
+
             $data['computed_results'] = $computed_results[$request->student_id];
             $data['subject_summary'] = $subject_summary[$request->student_id];
             $data['students_cass'] = $students_cass[$request->student_id];
             $data['students'] = $students;
             $data['assessments'] = $assessments;
             $data['subjects_in_class'] = $subjects_in_class;
+            $data['max_subjects_allowed'] = $max_subjects_allowed;
             $data['class_average'] = $class_average;
 
             return view('Examination_Officer.students_report_card', $data);
@@ -243,7 +246,7 @@ class ReportController extends Controller
             );
 
             return redirect()->back()->with($notifications);
-        }        
+        }
     }
 
 }

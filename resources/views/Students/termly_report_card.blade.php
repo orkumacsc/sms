@@ -292,13 +292,13 @@
                                     <tr>
                                         <th>TOTAL SUBJECTS OFFERED</th>
                                         <td>
-                                            {{count($subjects_in_class)}}
+                                            {{$max_subjects_allowed}}
                                         </td>
                                     </tr>
                                     <tr>
                                         <th>TOTAL MARKS OBTAINABLE</th>
                                         <td>
-                                            {{count($subjects_in_class) * 100}}
+                                            {{$max_subjects_allowed * 100}}
                                         </td>
                                     </tr>
                                     <tr>

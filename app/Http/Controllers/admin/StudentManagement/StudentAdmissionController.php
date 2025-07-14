@@ -152,6 +152,18 @@ class StudentAdmissionController extends Controller
         $data['Classes'] = SchoolClass::all();
         $data['ClassArms'] = SchoolArms::all();
         $data['School_Sessions'] = SchoolSessions::all();        
+        $data['SchoolClasses'] = SchoolClass::all();        
+        $data['SchoolSessions'] = SchoolSessions::all(); 
+        $data['School_Terms'] = SchoolTerm::all();
+        $data['Countries'] = Countries::all();
+        $data['States'] = States::all();
+        $data['LGAs'] = LocalGovts::where('states_id',7)->get();
+        $data['Houses'] = SchoolHouses::all();
+        $data['Complexions'] = Complexions::all();
+        $data['Religions'] = Religions::all();
+        $data['Tribes'] = Tribes::all();
+        $data['genders'] = Gender::all();
+
         $data['Students'] = Students::join('school_houses', 'school_houses.id', '=', 'students.school_houses_id')->orderBy('students.surname', 'ASC')
         ->join('school_classes', 'school_classes.id', '=', 'students.class')
         ->join('school_arms', 'school_arms.id','=','students.classarm_id')
@@ -167,9 +179,22 @@ class StudentAdmissionController extends Controller
         $Class_id = $request->class;
         $Classarm_id = $request->classarm_id;
         $Acad_Session_id = $request->acad_session;
-        $data['Classes'] = SchoolClass::all();
+
+        $data['SchoolClasses'] = SchoolClass::all();
         $data['ClassArms'] = SchoolArms::all();
-        $data['School_Sessions'] = SchoolSessions::all(); 
+        $data['SchoolSessions'] = SchoolSessions::all(); 
+        $data['School_Terms'] = SchoolTerm::all();
+        $data['Countries'] = Countries::all();
+        $data['States'] = States::all();
+        $data['LGAs'] = LocalGovts::where('states_id',7)->get();
+        $data['Houses'] = SchoolHouses::all();
+        $data['Complexions'] = Complexions::all();
+        $data['Religions'] = Religions::all();
+        $data['Tribes'] = Tribes::all();
+        $data['genders'] = Gender::all();
+        $data['Classes'] = SchoolClass::all();        
+        $data['School_Sessions'] = SchoolSessions::all();
+
         $data['Students'] = Students::join('school_houses', 'school_houses.id', '=', 'students.school_houses_id')->orderBy('students.surname', 'ASC')
         ->join('school_classes', 'school_classes.id', '=', 'students.class')
         ->join('school_arms', 'school_arms.id','=','students.classarm_id')
@@ -199,6 +224,9 @@ class StudentAdmissionController extends Controller
         $data['Religions'] = Religions::all();
         $data['Tribes'] = Tribes::all();
         $data['genders'] = Gender::all();  
+        $data['SchoolClasses'] = SchoolClass::all();        
+        $data['SchoolSessions'] = SchoolSessions::all();               
+        
 
         if($Class_id && $Classarm_id & $Acad_Session_id && $term_id) {            
             $data['Students'] = StudentClass::join('students','students.students_id','student_classes.student_id')

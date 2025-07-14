@@ -1,6 +1,7 @@
 <?php
 use App\Models\CassScores;
 use App\Models\MarksRegisters;
+use App\Models\SchoolClassInfo;
 use App\Models\Students;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
@@ -257,15 +258,15 @@ if (!function_exists('calculatePositions')) {
 }
 
 if (!function_exists('computeResults')) {
-    function computeResults($result_summary, $student_obtained_marks, $subjects_in_class, $positions)
+    function computeResults($result_summary, $student_obtained_marks, $positions, $no_subjects_offered)
     {
         $rows = [];
         foreach ($result_summary as $student_id => $Student_result) {
             $row = [];
             $row['student_id'] = $student_id;
             $row['obtained_marks'] = $student_obtained_marks[$student_id];
-            $row['total_subjects_offered'] = count($Student_result);
-            $row['obtainable_marks'] = count($subjects_in_class) * 100;
+            $row['total_subjects_offered'] = $no_subjects_offered ?? count($Student_result);
+            $row['obtainable_marks'] = $no_subjects_offered * 100;
             $row['average_score'] = (float) number_format(($row['obtained_marks'] * 100) / $row['obtainable_marks'], 2) ?? 0.00;
             $row['position_in_class'] = $positions[$student_id];
             $rows[$student_id] = $row;
@@ -280,7 +281,8 @@ if (!function_exists('getClassAverage')) {
     {
         return (float) number_format((array_sum($student_obtained_marks) /
             count($student_obtained_marks)) /
-            count($subjects_in_class), 2);
+            $subjects_in_class, 2
+        );
     }
 }
 
@@ -299,8 +301,20 @@ if (!function_exists('getStudentId')) {
     {
         $student_id = Students::select('students_id')
             ->where('admission_no', $admission_no)
-            ->get()->first();        
-        
-        return $student_id->students_id ?? null;       
+            ->get()->first();
+
+        return $student_id->students_id ?? null;
+    }
+}
+
+if (!function_exists('getTotalSubjects')) {
+    function getTotalSubjects($class_id, $subjects_in_class)
+    {
+        $total_subjects_offered = SchoolClassInfo::select('total_subjects_offered')
+            ->where('class_id', $class_id)
+            ->get()->first();
+
+        return  $total_subjects_offered ? (int) $total_subjects_offered->total_subjects_offered : count($subjects_in_class);
+
     }
 }
