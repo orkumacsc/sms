@@ -18,15 +18,12 @@
 	<link rel="stylesheet" href="{{ asset('backend/css/skin_color.css') }}">	
 
 </head>
-<body class="hold-transition dark-skin theme-primary">
-	
+<body class="hold-transition dark-skin theme-primary">	
 	<div class="container h-p100">
-		<div class="row align-items-center justify-content-md-center h-p100">	
-			
+		<div class="row align-items-center justify-content-md-center h-p100">			
 			<div class="col-12">
 				<div class="row justify-content-center no-gutters">
 					<div class="col-lg-5 col-md-6 col-12">
-
 						<div class="p-50 box-shadowed b-2">
 							<div class="content-top-agile pb-30">							
 								<img src="{{ asset('backend/images/logo-wide-footer.png')}}"	/>

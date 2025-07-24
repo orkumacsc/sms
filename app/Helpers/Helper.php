@@ -257,16 +257,135 @@ if (!function_exists('calculatePositions')) {
     }
 }
 
+if (!function_exists('calculateAnnualSubjectsSummary')) {
+    function calculateAnnualSubjectsSummary($subject_entries)
+    {
+        $scores_by_student = [];
+        foreach ($subject_entries as $student_id => $subject_entry) {
+
+            $scores_by_subject = [];
+            foreach ($subject_entry as $entries) {
+
+                $subject_id = $entries['subject_id'];
+                $score = $entries['total_scores'];
+
+                if (!isset($scores_by_subject[$subject_id])) {
+                    $scores_by_subject[$subject_id] = 0;
+                }
+
+                $scores_by_subject[$subject_id] += $score;
+            }
+            $scores_by_student[$student_id] = $scores_by_subject;
+        }
+
+        return $scores_by_student;
+    }
+}
+
+if (!function_exists('groupBySubject')) {
+    function groupBySubject($combined_scores)
+    {
+        $group_by_subject = [];
+        foreach ($combined_scores as $student_id => $combined_score) {
+            foreach ($combined_score as $subject_id => $score) {
+                $group_by_subject[$subject_id][$student_id] = $score;
+            }
+        }
+        return $group_by_subject;
+    }
+}
+
+if (!function_exists('groupByStudents')) {
+    function groupByStudents($combined_scores)
+    {
+        $group_by_student = [];
+        foreach ($combined_scores as $subject_id => $combined_score) {
+            foreach ($combined_score as $students_info) {
+                foreach ($students_info as $student_id => $value) {
+                    $group_by_student[$student_id][$subject_id] = $value;
+                }
+            }
+        }
+        return $group_by_student;
+    }
+}
+
+
+if (!function_exists('calculateAnnualAverage')) {
+    function calculateAnnualAverage($students_combined_scores, $no_of_terms)
+    {
+        $subjects_annual_average = [];
+        foreach ($students_combined_scores as $student_id => $combined_score) {
+            $subjects_annual_average[$student_id] = (float) number_format($combined_score / $no_of_terms, 2);
+        }
+
+        return $subjects_annual_average;
+    }
+}
+
+if (!function_exists('annualSubjectGrading')) {
+    function annualSubjectGrading($subject_combined_scores, $grade_type = 1)
+    {
+        $results = [];
+
+        $grouped_by_subjects = groupBySubject($subject_combined_scores);
+        foreach ($grouped_by_subjects as $subject_id => $student_combined_scores) {
+            $students_scores = $student_combined_scores;
+            arsort($students_scores);
+
+            switch ($grade_type) {
+                case 1:
+                    $results[$subject_id]['average'] = calculateAnnualAverage($students_scores, 3);
+                    break;
+                case 2:
+                    $results[$subject_id]['position'] = calculatePositions($students_scores);
+                    break;               
+            }
+        }
+
+        return groupByStudents($results);
+    }
+
+}
+
+
+if (!function_exists('calculateSubjectHighLow')) {
+    function calculateSubjectHighLow($subject_combined_scores)
+    {
+        $results = [];
+
+        $grouped_by_subjects = groupBySubject($subject_combined_scores);
+        foreach ($grouped_by_subjects as $subject_id => $student_combined_scores) {
+            $students_scores = $student_combined_scores;
+            arsort($students_scores); 
+
+            $results[$subject_id]['class_average'] = (float) number_format(array_sum($students_scores) / (count($students_scores) * 3), 2);
+            $results[$subject_id]['class_highest'] = max($students_scores);
+            $results[$subject_id]['class_lowest'] = min($students_scores);
+        }
+
+        return $results;
+    }
+}
+
+
+
+
 if (!function_exists('computeResults')) {
-    function computeResults($result_summary, $student_obtained_marks, $positions, $no_subjects_offered)
+    function computeResults($result_summary, $student_obtained_marks, $positions, $no_subjects_offered, $result_type = null)
     {
         $rows = [];
         foreach ($result_summary as $student_id => $Student_result) {
+
+            $total_subjects = (int) $result_type != null ?
+                ($no_subjects_offered * 3) ?? (count($Student_result) * 3) :
+                ($no_subjects_offered ?? count($Student_result));
+
             $row = [];
             $row['student_id'] = $student_id;
             $row['obtained_marks'] = $student_obtained_marks[$student_id];
-            $row['total_subjects_offered'] = $no_subjects_offered ?? count($Student_result);
-            $row['obtainable_marks'] = $no_subjects_offered * 100;
+            $row['total_subjects_offered'] = $total_subjects;
+            $row['obtainable_marks'] = $total_subjects * 100;
             $row['average_score'] = (float) number_format(($row['obtained_marks'] * 100) / $row['obtainable_marks'], 2) ?? 0.00;
             $row['position_in_class'] = $positions[$student_id];
             $rows[$student_id] = $row;
@@ -277,11 +396,15 @@ if (!function_exists('computeResults')) {
 }
 
 if (!function_exists('getClassAverage')) {
-    function getClassAverage($student_obtained_marks, $subjects_in_class)
+    function getClassAverage($student_obtained_marks, $subjects_in_class, $result_type = null)
     {
-        return (float) number_format((array_sum($student_obtained_marks) /
-            count($student_obtained_marks)) /
-            $subjects_in_class, 2
+        $total_subjects = (int) $result_type != null ? $subjects_in_class * 3 : $subjects_in_class;
+
+        return (float) number_format(
+            (array_sum($student_obtained_marks) /
+                count($student_obtained_marks)) /
+            $total_subjects,
+            2
         );
     }
 }
@@ -314,7 +437,7 @@ if (!function_exists('getTotalSubjects')) {
             ->where('class_id', $class_id)
             ->get()->first();
 
-        return  $total_subjects_offered ? (int) $total_subjects_offered->total_subjects_offered : count($subjects_in_class);
+        return $total_subjects_offered ? (int) $total_subjects_offered->total_subjects_offered : count($subjects_in_class);
 
     }
 }

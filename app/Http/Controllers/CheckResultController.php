@@ -44,7 +44,7 @@ class CheckResultController extends Controller
             $input = str_replace(' ', '', $input);
         });
 
-        $result_type = 2;
+        $result_type = (int) $input['result_type'];
 
         if ($result_type === 1) {
 
@@ -137,7 +137,7 @@ class CheckResultController extends Controller
             }
         } elseif ($result_type === 2) {
             try {
-                $students = StudentClass::select('student_id','admission_no', 'student_classes.id as id', 'surname', 'firstname', 'middlename', 'gendername', 'name', 'date_of_birth', 'passport', 'class_id', 'school_arm_id')
+                $students = StudentClass::select('student_id', 'admission_no', 'student_classes.id as id', 'surname', 'firstname', 'middlename', 'gendername', 'name', 'date_of_birth', 'passport', 'class_id', 'school_arm_id')
                     ->join('students', 'students.students_id', 'student_classes.student_id')
                     ->join('genders', 'genders.id', '=', 'students.gender')
                     ->join('school_houses', 'school_houses.id', '=', 'students.school_houses_id')
@@ -158,7 +158,7 @@ class CheckResultController extends Controller
                 $subject_summary = MarksRegisters::select('student_id', 'total_scores', 'subject_id', 'subject_position', 'term_id')
                     ->where('class_id', '=', $class_id)
                     ->where('class_arm_id', $class_arm_id)
-                    ->where('academic_session_id', $input['academic_session_id'])                 
+                    ->where('academic_session_id', $input['academic_session_id'])
                     ->where('total_scores', '>', 0)
                     ->get()->groupBy('student_id')
                     ->toArray();
@@ -166,8 +166,8 @@ class CheckResultController extends Controller
 
                 if (!$subject_summary) {
                     $check_back['students'] = $students;
-                    $check_back['academic_session'] = $academic_session->name;                 
-                    
+                    $check_back['academic_session'] = $academic_session->name;
+
                     return view('Students.check_back', $check_back);
                 }
 
@@ -175,22 +175,29 @@ class CheckResultController extends Controller
                     ->where('department_id', $department_id)
                     ->join('school_subjects', 'school_subjects.id', 'class_subjects.subject_id')
                     ->orderBy('school_subjects.subject_name', 'ASC')
-                    ->get();               
+                    ->get();
 
                 $student_obtained_marks = calculateObtainedMarks($subject_summary);
                 $positions = calculatePositions($student_obtained_marks);
                 $max_subjects_allowed = getTotalSubjects($class_id, $subjects_in_class);
-                $computed_results = computeResults($subject_summary, $student_obtained_marks, $positions, $max_subjects_allowed);
-                $class_average = getClassAverage($student_obtained_marks, $max_subjects_allowed);
+                $computed_results = computeResults($subject_summary, $student_obtained_marks, $positions, $max_subjects_allowed, $result_type);
+                $class_average = getClassAverage($student_obtained_marks, $max_subjects_allowed, $result_type);
+                $annual_subjects_summary = calculateAnnualSubjectsSummary($subject_summary);
+                $annual_subject_positions = annualSubjectGrading($annual_subjects_summary, 2);
+                $annual_subject_averages = annualSubjectGrading($annual_subjects_summary);
+                $annual_subject_high_low = calculateSubjectHighLow($annual_subjects_summary);
                 $students_id = $students->id;
 
-                dd($subjects_in_class);
 
                 $data['academic_session'] = $academic_session;
                 $data['school_class'] = $class;
-                $data['class_arm'] = $class_arm;                
+                $data['class_arm'] = $class_arm;
                 $data['computed_results'] = $computed_results[$students_id];
-                $data['subject_summary'] = $subject_summary[$students_id];                
+                $data['annual_subject_average'] = $annual_subject_averages[$students_id];
+                $data['annual_subject_position'] = $annual_subject_positions[$students_id];
+                $data['annual_subject_high_low'] = $annual_subject_high_low;
+                $data['subject_summary'] = $subject_summary[$students_id];
+                $data['annual_subjects_summary'] = $annual_subjects_summary[$students_id];
                 $data['students'] = $students;
                 $data['terms'] = $terms;
                 $data['subjects_in_class'] = $subjects_in_class;
