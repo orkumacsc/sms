@@ -172,54 +172,35 @@ if (!function_exists('suffix')) {
 }
 
 if (!function_exists('gradeOrRemark')) {
-    function gradeOrRemark($average, $is_result = true, $is_grade = true)
+    function gradeOrRemark($average, $isRemark = false, $isComment = false)
     {
-        $grade = function ($average) {
-            switch ($average) {
-                case $average >= 75:
-                    return 'A';
-                case $average >= 65:
-                    return 'B';
-                case $average >= 55:
-                    return 'C';
-                case $average >= 40:
-                    return 'D';
-                default:
-                    return 'F';
-            }
+        if ($average >= 75) {
+            $grade = 'A';
+            $remarkText = 'EXCELLENT';
+        } elseif ($average >= 65) {
+            $grade = 'B';
+            $remarkText = 'VERY GOOD';
+        } elseif ($average >= 55) {
+            $grade = 'C';
+            $remarkText = 'GOOD';
+        } elseif ($average >= 40) {
+            $grade = 'D';
+            $remarkText = 'FAIR';
+        } else {
+            $grade = 'E';
+        $remarkText = 'FAIL';
+    }
+   
+
+        $comment = fn($average) => match ($average) {
+            $average >= 75 => 'A - PASSED',
+            $average >= 65 => 'B - PASSED',
+            $average >= 55 => 'C - PASSED',
+            $average >= 40 => 'D - PASSED',
+            default => 'E - FAILED',
         };
 
-        $remarks = function ($average) {
-            switch ($average) {
-                case $average >= 75:
-                    return 'EXCELLENT';
-                case $average >= 65:
-                    return 'VERY GOOD';
-                case $average >= 55:
-                    return 'GOOD';
-                case $average >= 40:
-                    return 'FAIR';
-                default:
-                    return 'FAIL';
-            }
-        };
-
-        $result = function ($average) {
-            switch ($average) {
-                case $average >= 75:
-                    return 'A - PASSED';
-                case $average >= 65:
-                    return 'B - PASSED';
-                case $average >= 55:
-                    return 'C - PASSED';
-                case $average >= 40:
-                    return 'D - PASSED';
-                default:
-                    return 'F - FAILED';
-            }
-        };
-
-        return $is_result ? $result($average) : ($is_grade ? $grade($average) : $remarks($average));
+        return $isComment ? $comment($average) : ($isRemark ? $remarkText : $grade);
     }
 }
 

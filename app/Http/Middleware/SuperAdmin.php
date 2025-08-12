@@ -18,17 +18,26 @@ class SuperAdmin
     public function handle(Request $request, Closure $next)
     {
         if(!Auth::user()) {
-            return redirect()->route('main_login');
+            return redirect()->route('login')->with('status', 'You must be logged in to view this page.');
         }
 
-        if(Auth::user()->usertype != 1) {
+        // Define a constant for the super admin role ID
+        $superAdminRoleId = defined('SUPER_ADMIN_ROLE_ID') ? SUPER_ADMIN_ROLE_ID : 1;
 
-            $notifications = array(
-                'message' => 'You are not allowed to view this page',
+        // Optionally, use a method like isSuperAdmin() if available on the User model
+        if (method_exists(Auth::user(), 'isSuperAdmin')) {
+            $isSuperAdmin = Auth::user()?->isSuperAdmin();
+        } else {
+            $isSuperAdmin = Auth::user()?->roles_id == $superAdminRoleId;
+        }
+
+        if (!$isSuperAdmin) {
+            $notifications = [
+                'message' => 'You do not have permission to view this page.',
                 'alert-type' => 'error'
-            );
+            ];
 
-            return redirect()->back()->with($notifications);
+            return redirect()->back()->with('notifications', $notifications);
         }
 
         return $next($request);

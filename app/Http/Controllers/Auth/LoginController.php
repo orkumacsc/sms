@@ -3,34 +3,99 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\EmergencyContact;
 use App\Models\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    public function login()
+    /*
+     * Login Controller
+     * Handles user authentication and redirection based on roles.
+     */
+    
+    public function __construct()
     {
+        // $this->middleware('guest')->except('logout');
+    }
 
-        if (!Auth::user()) {
-            return redirect()->route('main_login');
-        }
-        $authenticated_user_role = Auth::user()->usertype;
+    /**
+     * Show the login form.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showLoginForm()
+    {
+        return view('auth.login');
+    }
 
-        switch ($authenticated_user_role) {
-            case 1:
-                return redirect('dashboard');
-                break;
+    /**
+     * Handle user login and redirect based on user role.
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function login(Request $request)
+    {        
+        // Validate the login request
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+            'remember_me' => 'string',
+        ]);
 
-            case 3:
-                return redirect('Teacher');
-                break;
+        // Retrieve credentials from the request
+        $credentials = $request->only('email', 'password');
+        $remember_me = $request->input('remember_me', false);
+        
+        // Attempt to authenticate the user
+        if (Auth::attempt($credentials, $remember_me)) {
+            
+            session()->regenerate();
+
+            // Authentication passed, redirect based on user role
+            $user = Auth::user();
+            if ($user->roles_id === 1) {                
+                return redirect()->route('admin_dashboard');
                 
-            case 7:
-                return redirect('Admissions');
-                break;
+            } elseif ($user->roles_id === 3) {
+
+                $profile = Staff::where('user_id', $user->id)->first();
+                if ($profile) {
+                    // Prepare staff profile data for session
+                    $staff_profile = [];
+                    $staff_profile['fullName'] = "$profile->surname, $profile->firstname $profile->middlename";
+                    $staff_profile['photo'] = $profile->staff_passport;
+                    $staff_profile['staff_id'] = $profile->staff_no;
+                    $staff_profile['gender'] = $profile->gender_id;
+
+                    session(['staff_profile' => $staff_profile]);
+
+                    return redirect()->route('staff.dashboard');
+                }
+            } elseif ($user->roles_id === 4) {
+                return redirect()->route('student.dashboard');
+            } elseif ($user->roles_id === 7) {
+                return redirect()->route('staff_dashboard');
+            } else {
+                Auth::logout();
+                return redirect()->back()->withErrors(['Unauthorized role.']);
+            }
         }
 
+        // Authentication failed, redirect back with error
+        return redirect()->back()->withErrors(['Invalid credentials.']);
+    }
+
+    /**
+     * Handle user Logout, flush session and redirect to login page
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('login')->with('status', 'You have been logged out successfully.');
     }
 }

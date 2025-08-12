@@ -16,6 +16,14 @@ class Students
      */
     public function handle(Request $request, Closure $next)
     {
+        if (!auth()->check()) {
+            return redirect()->route('login.form')->with('status', 'You must be logged in to view this page.');
+        }
+
+        if (auth()->user()->roles_id != 4) {
+            return redirect()->route('login.form')->with('status', 'You do not have permission to view this page.');
+        }
+
         return $next($request);
     }
 }

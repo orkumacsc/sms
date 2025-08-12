@@ -12,7 +12,7 @@ $route = Route::current()->getName();
 		
         <div class="user-profile">
           <div class="ulogo">
-            <a href="{{ route('dashboard') }}">
+            <a href="{{ route('admin_dashboard') }}">
               <!-- logo for regular state and mobile devices -->
               <div class="d-flex align-items-center justify-content-center">					 	
                   <img src="{{ asset('backend/images/logo-dark.png') }}" alt="">
@@ -24,8 +24,8 @@ $route = Route::current()->getName();
       
       <!-- sidebar menu-->
       <ul class="sidebar-menu" data-widget="tree"> 
-		    <li class=" {{ ($route == 'dashboard') ? 'active' : ''}} ">
-          <a href="{{ route('dashboard') }}">
+		    <li class=" {{ ($route == 'admin_dashboard') ? 'active' : ''}} ">
+          <a href="{{ route('admin_dashboard') }}">
             <i data-feather="pie-chart"></i>
 			      <span>Dashboard</span>
           </a>
@@ -87,10 +87,7 @@ $route = Route::current()->getName();
             <li><a href="{{ route('school_subjects') }}"><i class="ti-more"></i>Subjects Management</a></li> 
             <li><a href="{{ route('marks_grades') }}"><i class="ti-more"></i>Marks Grade</a></li>
           </ul>
-        </li> 
-        
-
-        
+        </li>
         
         <li class="treeview {{ ($prefix == '/Assessment')? 'active' : ''}}">
           <a href="javascript:void(0)">
@@ -145,7 +142,7 @@ $route = Route::current()->getName();
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="{{ route('schoolsetup') }}"><i class="ti-more"></i>School Information</a></li>
+            <li><a href="{{ route('schoolsetup.index') }}"><i class="ti-more"></i>School Information</a></li>
             <li><a href="{{ route('school_class') }}"><i class="ti-more"></i>Class</a></li>
             <li><a href="{{ route('school_arm') }}"><i class="ti-more"></i>Arm</a></li>
             <li><a href="{{ route('academic_session') }}"><i class="ti-more"></i>Sessions & Terms</a></li>            

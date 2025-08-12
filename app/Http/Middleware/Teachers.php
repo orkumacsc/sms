@@ -18,17 +18,11 @@ class Teachers
     public function handle(Request $request, Closure $next)
     {
         if(!Auth::user()) {
-            return redirect()->route('main_login');
+            return redirect()->route('login.form')->with('status', 'You must be logged in to view this page.');
         }
 
-        if(Auth::user()->usertype != 3) {
-
-            $notifications = array(
-                'message' => 'You are not allowed to view this page',
-                'alert-type' => 'error'
-            );
-
-            return redirect()->back()->with($notifications);
+        if(Auth::user()->roles_id != 3) {
+            return redirect()->back()->with('status', 'You do not have permission to view this page.');
         }
         return $next($request);
     }

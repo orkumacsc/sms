@@ -1,6 +1,7 @@
-@extends('admin.admin_master')
 
-@section('mainContent')
+<?php $__env->startSection('title', 'Superadmin Dashboard'); ?>
+
+<?php $__env->startSection('mainContent'); ?>
 
 	<div class="content-wrapper">
 		<div class="container-full">
@@ -10,7 +11,7 @@
 				<div class="row">
 					
 					<div class="col-xl-3 col-6 col-12">
-						<a href="{{ route('staff') }}">
+						<a href="<?php echo e(route('staff')); ?>">
 							<div class="box overflow-hidden pull-up">
 								<div class="box-body">
 									<div class="icon bg-info-light rounded w-60 h-60">
@@ -26,7 +27,7 @@
 					</div>
 
 					<div class="col-xl-3 col-6 col-12">
-						<a href="{{ route('student_view') }}">
+						<a href="<?php echo e(route('student_view')); ?>">
 							<div class="box overflow-hidden pull-up">
 								<div class="box-body">
 									<div class="icon bg-info-light rounded w-60 h-60">
@@ -42,7 +43,7 @@
 					</div>
 
 					<div class="col-xl-3 col-6 col-12">
-						<a href="{{ route('staff') }}">
+						<a href="<?php echo e(route('staff')); ?>">
 							<div class="box overflow-hidden pull-up">
 								<div class="box-body">
 									<div class="icon bg-info-light rounded w-60 h-60">
@@ -58,7 +59,7 @@
 					</div>
 
 					<div class="col-xl-3 col-6 col-12">
-						<a href="{{ route('school_class') }}">
+						<a href="<?php echo e(route('school_class')); ?>">
 							<div class="box overflow-hidden pull-up">
 								<div class="box-body">
 									<div class="icon bg-info-light rounded w-60 h-60">
@@ -74,7 +75,7 @@
 					</div>
 
 					<div class="col-xl-3 col-6 col-12">
-						<a href="{{ route('payfees') }}">
+						<a href="<?php echo e(route('payfees')); ?>">
 							<div class="box overflow-hidden pull-up">
 								<div class="box-body">
 									<div class="icon bg-info-light rounded w-60 h-60">
@@ -90,7 +91,7 @@
 					</div>
 
 					<div class="col-xl-3 col-6 col-12">
-						<a href="{{ route('compute_result') }}">
+						<a href="<?php echo e(route('compute_result')); ?>">
 							<div class="box overflow-hidden pull-up">
 								<div class="box-body">
 									<div class="icon bg-info-light rounded w-60 h-60">
@@ -106,7 +107,7 @@
 					</div>
 
 					<div class="col-xl-3 col-6 col-12">
-						<a href="{{ route('input_cass_scores') }}">
+						<a href="<?php echo e(route('input_cass_scores')); ?>">
 							<div class="box overflow-hidden pull-up">
 								<div class="box-body">
 									<div class="icon bg-info-light rounded w-60 h-60">
@@ -122,7 +123,7 @@
 					</div>
 
 					<div class="col-xl-3 col-6 col-12">
-						<a href="{{ route('compute_result') }}">
+						<a href="<?php echo e(route('compute_result')); ?>">
 							<div class="box overflow-hidden pull-up">
 								<div class="box-body">
 									<div class="icon bg-info-light rounded w-60 h-60">
@@ -143,4 +144,5 @@
 		</div>
 	</div>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('admin.admin_master', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\gospelcollege\portal.gospelschools.sch.ng\resources\views/admin/dashboard.blade.php ENDPATH**/ ?>

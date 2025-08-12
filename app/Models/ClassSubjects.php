@@ -38,4 +38,9 @@ class ClassSubjects extends Model
             return back()->with($notifications);
         }
     }
+
+    public function school_subjects()
+    {
+        return $this->belongsTo('App\SmSchoolSubject', 'subject_id', 'id');
+    }
 }

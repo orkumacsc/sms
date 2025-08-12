@@ -115,7 +115,7 @@
 				 <a class="dropdown-item" href="{{ route('user.view-profile') }}"><i class="ti-user text-muted mr-2"></i> Profile</a>
 				 <a class="dropdown-item" href=""><i class="ti-key text-muted mr-2"></i> Password</a>
 				 <div class="dropdown-divider"></div>
-				 <a class="dropdown-item" href="{{ route('admin.logout') }}"><i class="ti-lock text-muted mr-2"></i> Logout</a>
+				 <a class="dropdown-item" href="{{ route('logout') }}"><i class="ti-lock text-muted mr-2"></i> Logout</a>
 			  </li>
 			</ul>
           </li>		  

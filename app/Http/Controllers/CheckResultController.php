@@ -121,8 +121,7 @@ class CheckResultController extends Controller
                 $data['max_subjects_allowed'] = $max_subjects_allowed;
                 $data['class_average'] = $class_average;
                 $data['class_size'] = count($computed_results);
-
-                unset($request);
+                
                 return view('Students.termly_report_card', $data);
 
             } catch (\Exception $e) {
@@ -204,8 +203,7 @@ class CheckResultController extends Controller
                 $data['max_subjects_allowed'] = $max_subjects_allowed;
                 $data['class_average'] = $class_average;
                 $data['class_size'] = count($computed_results);
-
-                unset($request);
+                
                 return view('Students.annual_report_card', $data);
 
             } catch (\Exception $e) {
