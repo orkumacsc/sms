@@ -17,9 +17,10 @@
 								enctype="multipart/form-data">
 								@csrf
 								<div class="modal-header">
-									<h5 class="modal-title" id="CreateSubjectModal"> <i
-											class="text-secondary mdi mdi-calculator-variant-outline"></i> ADD SCHOOL
-										SUBJECT</h5>
+									<h5 class="modal-title" id="CreateSubjectModal"> 
+										<i class="text-secondary mdi mdi-calculator-variant-outline"></i> 
+										Add School Subjects
+									</h5>
 									<button type="button" class="close" data-dismiss="modal" aria-label="close">
 										<span aria-hidden="true">&times;</span>
 									</button>
@@ -36,11 +37,22 @@
 											</div>
 										</div>
 									</div>
+									<div class="row items-baseline">
+										<div class="col-md-12">
+											<div class="form-group">
+												<h5>CROSS-CURRICULAR<span class="text-danger">*</span></h5>
+												<div class="controls">
+													<input type="checkbox" name="cross_curricular" id="cross_curricular" value="1">
+													<label for="cross_curricular">Is this subject cross-curricular? i.e Compulsory for all classes?</label>
+												</div>
+											</div>
+										</div>
+									</div>
 								</div>
 								<div class="modal-footer">
 									<button type="button" class="btn btn-outline-danger" data-dismiss="modal"
-										aria-label="close"><i class="ti-arrow-left"> CANCEL</i></button>
-									<input type="submit" value="SAVE SUBJECT" class="btn  btn-info">
+										aria-label="close"><i class="ti-arrow-left"> Cancel</i></button>
+									<input type="submit" value="Add" class="btn  btn-info">
 								</div>
 							</form>
 						</div>
@@ -55,9 +67,9 @@
 								enctype="multipart/form-data">
 								@csrf
 								<div class="modal-header">
-									<h5 class="modal-title" id="AssignSubjectModal"> <i
-											class="text-secondary mdi mdi-calculator-variant-outline"></i> ASSIGN
-										SUBJECT TO CLASS
+									<h5 class="modal-title" id="AssignSubjectModal"> 
+										<i class="text-secondary mdi mdi-calculator-variant-outline"></i> 
+										Add Class Subjects
 									</h5>
 									<button type="button" class="close" data-dismiss="modal" aria-label="close">
 										<span aria-hidden="true">&times;</span>
@@ -141,6 +153,15 @@
 						</div>
 					</div>
 				</div>
+
+				<div class="modal fade" id="AddDisciplineSubjectsModal" tabindex="-1" role="document"
+					aria-labelledby="AddDisciplineSubjects" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered modal-md" role="document">
+						<div class="modal-content box">
+							@include('forms.add_discipline_subjects', ['routeName' => 'store_discipline_subjects', 'title' => 'Add Discipline Subjects'])
+						</div>
+					</div>
+				</div>
 				<!-- /Form Modals Section -->
 
 				<!-- Subjects Section -->
@@ -148,11 +169,11 @@
 					<!-- Subject List Box -->
 					<div class="box">
 						<div class="box-header with-border">
-							<h3 class="box-title">LIST OF SUBJECTS</h3>
+							<h3 class="box-title">School Subjects</h3>
 							<div class="text-right">
 								<button type="button" class="btn btn-info" data-toggle="modal"
 									data-target="#CreateSubject">
-									ADD SCHOOL SUBJECT
+									Add Subject
 								</button>
 							</div>
 						</div>
@@ -196,11 +217,15 @@
 				<div class="col-lg-7 col-md-12">
 					<div class="box">
 						<div class="box-header with-border">
-							<h3 class="box-title">LIST OF SUBJECTS AND CLASS ASSIGNED</h3>
+							<h3 class="box-title">Class and Subjects</h3>
 							<div class="text-right">
 								<button type="button" class="btn btn-info" data-toggle="modal"
+									data-target="#AddDisciplineSubjectsModal">
+									Add Discipline Subjects
+								</button>
+								<button type="button" class="btn btn-info" data-toggle="modal"
 									data-target="#AssignSubject">
-									ADD SUBJECT TO CLASS
+									Add Class Subjects
 								</button>
 							</div>
 						</div>
@@ -218,14 +243,20 @@
 										</tr>
 									</thead>
 									<tbody>
-										@foreach($ClassSubjects as $key => $cSubject)
+										@if(isset($disciplineSubjects) && count($disciplineSubjects) > 0)
+											@foreach($disciplineSubjects as $key => $disciplineSubject)
+												<tr>
+													<td>{{ $key + 1 }}</td>
+													<td>{{ $disciplineSubject->subject_name ?? '' }}</td>
+													<td>{{ $disciplineSubject->department ?? '' }}</td>
+													<td>{{ $disciplineSubject->classname ?? '' }}</td>
+												</tr>
+											@endforeach
+										@else
 											<tr>
-												<td>{{ $key + 1 }}</td>
-												<td>{{ $cSubject->subject_name }}</td>
-												<td>{{ $cSubject->department }}</td>												
-												<td>{{ $cSubject->classname }}</td>
+												<td colspan="4" class="text-center">No class subjects found.</td>
 											</tr>
-										@endforeach
+										@endif
 									</tbody>
 								</table>
 							</div>

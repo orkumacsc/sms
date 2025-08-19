@@ -23,6 +23,8 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'roles_id',
+        'username',
         'email',
         'password',
     ];
@@ -54,4 +56,9 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    public function staff()
+    {
+        return $this->belongsTo(Staff::class, 'user_id');
+    }
 }

@@ -115,7 +115,13 @@
 				 <a class="dropdown-item" href="<?php echo e(route('user.view-profile')); ?>"><i class="ti-user text-muted mr-2"></i> Profile</a>
 				 <a class="dropdown-item" href=""><i class="ti-key text-muted mr-2"></i> Password</a>
 				 <div class="dropdown-divider"></div>
-				 <a class="dropdown-item" href="<?php echo e(route('logout')); ?>"><i class="ti-lock text-muted mr-2"></i> Logout</a>
+				 <!-- Logout as POST for security -->
+				<a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+					<i class="ti-lock text-muted mr-2"></i> Logout
+				</a>
+				<form id="logout-form" action="<?php echo e(route('logout')); ?>" method="POST" style="display: none;">
+					<?php echo csrf_field(); ?>
+				</form>
 			  </li>
 			</ul>
           </li>		  

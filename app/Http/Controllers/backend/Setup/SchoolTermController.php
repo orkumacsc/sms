@@ -8,19 +8,15 @@ use App\Models\SchoolTerm;
 
 class SchoolTermController extends Controller
 {
+    // Ensure user is authenticated & authorized
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware(['auth', 'admin']);
 
     }
     
-    public function SchoolTerm(){
-        $data['allData'] = SchoolTerm::all();
-        return view('backend.Setup.school-terms',$data);
-    }
-
-    
-    public function StoreSchoolTerm(Request $request){
+    // Store School Term
+    public function storeSchoolTerm(Request $request){
         $validatedData = $request->validate([
             'name' => 'required|unique:school_terms',
         ]);
@@ -29,16 +25,27 @@ class SchoolTermController extends Controller
         $data->name = $request->name;
         $data->save();
 
-        return redirect()->route('school-terms');
+        return redirect()->route('school_terms')->with([
+            'message' => 'School Term Successfully Created',
+            'alert-type' => 'success'
+        ]);
     }
 
-    public function edit($term_id){
-        $Terms['Term_Information'] = SchoolTerm::find($term_id);
+    // Update School Term
+    public function storeUpdate(Request $request) {
+        // Validate the incoming request
+        $validatedData = $request->validate([
+            'term_id' => 'required|exists:school_terms,id',
+            'name' => "required|unique:school_terms,name,{$request->term_id}",
+        ]);
 
-        return view('backend.Setup.school_term_update', $Terms);
-    }
-    public function Update($term_id) {
-        SchoolTerm::where('id',$term_id)->update([]);
+        SchoolTerm::where('id', $request->term_id)->update(['name' => $request->name]);
+        
+        // Return a JSON response
+        return response()->json([
+            'success' => true,
+            'name' => $request->name
+        ]);
     }
     
 }

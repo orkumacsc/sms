@@ -12,7 +12,7 @@ use App\Models\SchoolSessions;
 
 class AcademicSessionController extends Controller
 {
-    public function AcademicSession(){        
+    public function academicSession(){        
         $data['academic_sessions'] = SchoolSessions::orderBy('active_status')->get();
         $data['school_terms'] = SchoolTerm::all();
         $data['academic_seasons'] = DB::table('current_academic_seasons')
@@ -31,11 +31,10 @@ class AcademicSessionController extends Controller
         
         return view('backend.setup.academic_session',$data);
     }
-
-
-    public function StoreAcademicSession(Request $request){
+    
+    public function storeAcademicSession(Request $request){
         $validatedData = $request->validate([            
-            'academic_session' => 'required',
+            'academic_session' => 'required|string|max:255',
         ]);
 
         $data = new SchoolSessions();
@@ -45,13 +44,13 @@ class AcademicSessionController extends Controller
         return redirect()->route('academic_session');
     }
 
-    public function store_term_configurations(Request $request) {
-        $vaidateData = $request->validate([
-            'session_id' => 'required',
-            'term_id' => 'required',
-            'term_start' => 'required',
-            'term_end' => 'required',
-            'next_term_start' => 'required'
+    public function storeAcademicSessionDates(Request $request) {
+        $validatedData = $request->validate([
+            'session_id' => 'required|int',
+            'term_id' => 'required|int',
+            'term_start' => 'required|date',
+            'term_end' => 'required|date',
+            'next_term_start' => 'required|date'
         ]);
 
         CurrentAcademicSeason::updateOrCreate(
@@ -66,42 +65,40 @@ class AcademicSessionController extends Controller
             ]
         );
 
-        $notifications = array(
+        $notifications = [
             'message' => 'Term Information Successfully Added',
             'alert-type' => 'success'
-        );
+        ];
 
         return redirect()->back()->with($notifications);
        
     }
 
-    public function set_current_term($academic_id) {
-        //Set the current Term Inactive
+    public function setCurrentTerm($academic_id) {
+        // Set the current term inactive
         CurrentAcademicSeason::where('active_status',1)->update(['active_status' => 2]);
-        //Set New Current Term     
+
+        // Set current term     
         CurrentAcademicSeason::where('id',$academic_id)->update(['active_status' => 1]);
         
-
-        $notifications = array(
-            'message' => 'Selected Term Successfully set as Current Term',
+        // Redirect with success message
+        return redirect()->back()->with([
+            'message' => 'Selected term successfully set as current term',
             'alert-type' => 'success'
-        );
-
-        return redirect()->back()->with($notifications);
+        ]);
     }
 
-    public function set_current_session($session_id) {
-        //Set the current Term Inactive
+    public function setCurrentSession($session_id) {
+        // Set the current academic session inactive
         SchoolSessions::where('active_status',1)->update(['active_status' => 2]);
-        //Set New Current Term     
-        SchoolSessions::where('id',$session_id)->update(['active_status' => 1]);
         
-
-        $notifications = array(
-            'message' => 'Selected Term Successfully set as Current Term',
+        // Set current academic session
+        SchoolSessions::where('id',$session_id)->update(['active_status' => 1]);
+       
+        // Redirect with success message
+        return redirect()->back()->with([
+            'message' => 'Selected academic session successfully set as current academic session',
             'alert-type' => 'success'
-        );
-
-        return redirect()->back()->with($notifications);
+        ]);
     }
 }

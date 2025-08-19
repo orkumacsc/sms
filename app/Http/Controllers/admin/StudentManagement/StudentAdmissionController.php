@@ -28,28 +28,10 @@ class StudentAdmissionController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-
     }
 
-    public function StudentAdmission(){
-        $data['SchoolClasses'] = SchoolClass::where('session_created','=',2)->get();
-        $data['ClassArms'] = SchoolArms::all();
-        $data['SchoolSessions'] = SchoolSessions::all();
-        $data['Countries'] = Countries::all();
-        $data['States'] = States::all();
-        $data['lgas'] = LocalGovts::all();
-        $data['Houses'] = SchoolHouses::all();
-        $data['Complexions'] = Complexions::all();
-        $data['Religions'] = Religions::all();
-        $data['Tribes'] = Tribes::all();
-        $data['genders'] = Gender::all();
-        
-
-        return view('backend.admin.StudentManagement.student-admission',$data);
-    }
-
-
-    public function StoreStudentAdmission(Request $request){
+    
+    public function store(Request $request){
         $lastID = Students::max('id');
         $pgID = ParentGuardian::max('id');
         $currentSeason = CurrentAcademicId();

@@ -80,7 +80,7 @@
 				<div class="modal fade" id="currentAcademicSeason" tabindex="-1" role="document" aria-labelledby="currentAcademicSeasonModal" aria-hidden="true">
 					<div class="modal-dialog modal-dialog-centered modal-xl" role="document">
 						<div class="modal-content box">
-							<form method="post" action="{{ route('store_term_configurations') }}">
+							<form method="post" action="{{ route('set-term-dates') }}">
 								@csrf
 								<div class="modal-header">
 									<h5 class="modal-title" id="currentAcademicSeasonModal">Create New Term</h5>
@@ -172,7 +172,7 @@
 								<div class="box pt-30 pb-30 px-20">
 								<div class="row">						  
 									<div class="col-sm-12">
-										<h4>AVAILABLE ACADEMIC SESSIONS</h4>
+										<h4>Available Academic Sessions</h4>
 										<div class="text-right">
 											<button type="button" class="btn btn-info" data-toggle="modal" data-target="#academisSessionForm">
 												Create Academic Session
@@ -196,9 +196,12 @@
 															<i class="{{ $academic_session->active_status == 1 ? 'ti-check-box' : ''}}"></i> 
 															{{ $academic_session->active_status == 1 ? 'Active Academic Session' : ' -- / --' }} </td>
 														<td>
-															<a class="dropdown-item text-success" href="{{ route('set_current_session', $academic_session->id) }}">
-																<i class="mr-2 ti-check"></i> Set Current Academic Session
-															</a>	
+															<form method="POST" action="{{ route('set-current-session', $academic_session->id) }}" style="display:inline;">
+																@csrf
+																<button type="submit" class="dropdown-item text-success" style="border:none; background:none; padding:0;">
+																	<i class="mr-2 ti-check"></i> Set Current Academic Session
+																</button>
+															</form>
 															<a class="dropdown-item text-warning" href="javascript:void(0)">
 																<i class="mr-2 ti-check"></i> Edit Academic Session
 															</a>															
@@ -220,7 +223,7 @@
 								<div class="box pt-30 pb-30 px-20">
 								<div class="row">						  
 									<div class="col-xl-8">
-										<h4>AVAILABLE TERMS</h4>
+										<h4>Available Terms</h4>
 										<div class="text-right">
 											<button type="button" class="btn btn-info" data-toggle="modal" data-target="#SchoolTerm">
 												Create School Terms
@@ -237,15 +240,61 @@
 												</thead>
 												<tbody>
 													@foreach($school_terms as $school_term)
-													<tr>														
-														<td>{{ $school_term->name }}</td>
+													<tr>
 														<td>
-															<a class="dropdown-item text-warning" href="javascript:void(0)">
+															<span id="term-name-{{ $school_term->id }}">{{ $school_term->name }}</span>
+															<form id="edit-term-form-{{ $school_term->id }}" method="post" action="{{ route('school-term.update', $school_term->id) }}" class="form-inline d-none">
+																@csrf
+																@method('PUT')
+																<input type="hidden" name="term_id" value="{{ $school_term->id }}">
+																<input type="text" name="name" value="{{ $school_term->name }}" class="form-control" required>
+																<button type="submit" class="btn btn-success btn-md ml-2">Save Update</button>
+																<button type="button" class="btn btn-secondary btn-md ml-1" onclick="cancelEdit({{ $school_term->id }})">Cancel</button>
+															</form>
+														</td>
+														<td>
+															<a class="dropdown-item text-warning" href="javascript:void(0);" onclick="editTerm({{ $school_term->id }})">
 																<i class="mr-2 ti-check"></i> Edit School Term
 															</a>
 														</td>
+														<script>
+														function editTerm(id) {
+															document.getElementById('term-name-' + id).style.display = 'none';
+															document.getElementById('edit-term-form-' + id).classList.remove('d-none');
+														}
+														function cancelEdit(id) {
+															document.getElementById('edit-term-form-' + id).classList.add('d-none');
+															document.getElementById('term-name-' + id).style.display = '';
+														}
+														document.querySelectorAll('form[id^="edit-term-form-"]').forEach(function(form) {
+															form.addEventListener('submit', function(e) {
+																e.preventDefault();
+																var id = form.id.replace('edit-term-form-', '');
+																var formData = new FormData(form);
+																fetch(form.action, {
+																	method: 'POST',
+																	headers: {
+																		'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
+																		'Accept': 'application/json'
+																	},
+																	body: formData
+																})
+																.then(response => response.json())
+																.then(data => {
+																	if(data.success) {
+																		document.getElementById('term-name-' + id).textContent = form.querySelector('input[name="name"]').value;
+																		cancelEdit(id);
+																	} else {
+																		alert('Update failed');
+																	}
+																})
+																.catch((err) => alert('Update failed: ' + err));
+															});
+														});
+														</script>
+														</td>
 													</tr>
-													@endforeach
+													@endforeach													
 												</tbody>
 											</table>
 										</div>							
@@ -261,7 +310,7 @@
 								<div class="box pt-30 pb-30 px-20">
 									<div class="row">						  
 										<div class="col-sm-12">
-											<h4>CURRENT ACADEMIC SESSEION</h4>
+											<h4>Academic Session Dates</h4>
 											<div class="text-right">
 												<button type="button" class="btn btn-info" data-toggle="modal" data-target="#currentAcademicSeason">
 													Set Current Session & Term
@@ -289,7 +338,12 @@
 																	<td>{{ $school_term->term_start }} - {{ $school_term->term_end }}</td>
 																	<td class="{{ $school_term->active_status == 1 ? 'text-success' : ''}}"> <i class="{{ $school_term->active_status == 1 ? 'ti-check-box' : ''}}"></i> {{ $school_term->active_status == 1 ? 'Current Term' : '-- / --' }}</td>
 																	<td>
-																		<a class="dropdown-item text-success" href="{{ route('set_current_term', $school_term->academic_id) }}"><i class="mr-2 ti-check"></i> Set as Current Term</a>
+																		<form method="POST" action="{{ route('set-current-term', $school_term->academic_id) }}" style="display:inline;">
+																			@csrf
+																			<button type="submit" class="dropdown-item text-success" style="border:none; background:none; padding:0;">
+																				<i class="mr-2 ti-check"></i> Set as Current Term
+																			</button>
+																		</form>
 																	</td>
 																</tr>
 															@endforeach

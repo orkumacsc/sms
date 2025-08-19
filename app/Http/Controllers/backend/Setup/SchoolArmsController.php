@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\backend\setup;
 
 use App\Http\Controllers\Controller;
-use App\Models\SchoolClassArms;
+use App\Models\ClassDiscipline;
+use App\Models\ClassesArms;
+use App\Models\Departments;
+use App\Models\SchoolSessions;
 use Illuminate\Http\Request;
 use App\Models\SchoolArms;
 use App\Models\SchoolClass;
@@ -12,50 +15,149 @@ class SchoolArmsController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        // Apply middleware for authentication and admin role
+        $this->middleware('admin');
 
     }
 
-    public function SchoolArm(){
+    /**
+     * Display the school arms and classes.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function schoolArm()
+    {
+        $data['schoolArms'] = SchoolArms::get();
+        $data['schoolClasses'] = SchoolClass::get();
+        $data['disciplines'] = Departments::get();
+        $data['academicSessions'] = SchoolSessions::get();
+        $data['classArms'] = SchoolClass::whereHas('arms')->with(['arms'])->get();
+        $data['classDisciplines'] = SchoolClass::whereHas('disciplines')->with(['disciplines'])->get();
 
-        $data['SchoolArms'] = SchoolArms::all();  
-        $data['SchoolClasses'] = SchoolClass::all();
-        $data['ClassArms'] = SchoolClassArms::join('school_classes','school_classes.id', 'school_class_arms.class_id')
-            ->join('school_arms','school_arms.id','school_class_arms.arm_id')
-                ->get()->all();
-        
-        return view('backend.setup.school_arms',$data);
+        return view('backend.setup.school_arms', $data);
     }
 
-    public function StoreClassArm(Request $request) {
-        
-            SchoolClassArms::updateOrCreate(
-                ['arm_id' => $request->arm_id, 'class_id' => $request->class_id],
-                ['active_status' => 1]
+    /**
+     * Store a new class arm.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeClassArm(Request $request)
+    {     
+        // Validate the request
+        $this->validate($request, $this->classArmValidationRules());
+
+        // Create or update the class arm
+        foreach ($request->arm_id as $armId) {
+            ClassesArms::updateOrCreate(
+            [
+                'school_arms_id' => $armId,
+                'school_classes_id' => $request->class_id
+            ],
+            [
+                'active_status' => 1,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]
             );
+        }
 
-            $notifications = array(
-                'message' => 'Arm Successfully Assigned to Class',
-                'alert-type' => 'success'
-            );
-
-            return redirect()->back()->with($notifications);
-        
-    }
-
-    public function StoreSchoolArm(Request $request) {
-        
-        SchoolArms::updateOrCreate(
-            ['arm_name' => strtoupper($request->arm_name)],
-            ['active_status' => 1]
-        );
-
-        $notifications = array(
-            'message' => 'School Arm Successfully Created',
+        // Flash a success message
+        return redirect()->back()->with([
+            'message' => 'Arm Successfully Assigned to Class',
             'alert-type' => 'success'
-        );
+        ]);
 
-        return redirect()->back()->with($notifications);
-    
-}
+    }
+
+    /**
+     * Store a new class discipline.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeClassDiscipline(Request $request)
+    {
+        // Validate the request
+        $this->validate($request, $this->classDisciplineValidationRules());
+
+        // Create the class discipline or get existing one if name already exists
+        foreach ($request->discipline_id as $disciplineId) {
+            ClassDiscipline::firstOrCreate([
+            'school_classes_id' => $request->class_id,
+            'departments_id' => $disciplineId,
+            ]);
+        }        
+
+        // Flash a success message
+        return redirect()->back()->with([
+            'message' => 'Class discipline successfully created.',
+            'alert-type' => 'success'
+        ]);
+    }
+
+    /**
+     * Store a new school arm.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeSchoolArm(Request $request)
+    {
+        // Validate the request
+        $this->validate($request, $this->schoolArmValidationRules());
+
+        // Create the school arm or get existing one if name already exists
+        SchoolArms::firstOrCreate([
+            'name' => strtoupper($request->name),
+        ]);
+
+        // Flash a success message
+        return redirect()->back()->with([
+            'message' => 'School arm successfully created.',
+            'alert-type' => 'success'
+        ]);
+    }
+
+    /**
+     * Get the validation rules for storing a school arm.
+     *
+     * @return array
+     */
+    protected function schoolArmValidationRules()
+    {
+        return [
+            'arm_name' => 'required|string|max:255',
+        ];
+    }
+
+    /**
+     * Get the validation rules for storing a class arm.
+     *
+     * @return array
+     */
+    protected function classArmValidationRules()
+    {
+        return [
+            'arm_id' => 'required|array',
+            'arm_id.*' => 'required|exists:school_arms,id',
+            'class_id' => 'required|exists:school_classes,id',
+        ];
+    }
+
+    /**
+     * Get the validation rules for storing a class discipline.
+     *
+     * @return array
+     */
+    protected function classDisciplineValidationRules()
+    {
+        return [
+            'class_id' => 'required|exists:school_classes,id',
+            'discipline_id' => 'required|array',
+            'discipline_id.*' => 'required|exists:departments,id',
+        ];
+    }
+
 }

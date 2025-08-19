@@ -59,7 +59,7 @@
 					</div>
 
 					<div class="col-xl-3 col-6 col-12">
-						<a href="{{ route('school_class') }}">
+						<a href="{{ route('school-classes-arms') }}">
 							<div class="box overflow-hidden pull-up">
 								<div class="box-body">
 									<div class="icon bg-info-light rounded w-60 h-60">

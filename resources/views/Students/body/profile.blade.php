@@ -1,3 +1,8 @@
+@php
+    $profilePhoto = !empty(session('student_profile')) && !empty(session('student_profile')['photo'])
+        ? url('storage/' . session('student_profile')['photo'])
+        : url('storage/profile-photos/default.png');
+@endphp
 <div class="modal fade" id="Profile" tabindex="-1" role="document" aria-labelledby="ProfileModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content box">
@@ -16,14 +21,14 @@
                     </div>
                     <div class="widget-user-image">
                         <img class="circle"
-                            src="{{ (!empty($staff_info['staff_passport'])) ? url('storage/' . $staff_info['staff_passport']) : url('storage/profile-photos/default.png') }}"
-                            alt="Staff Passport">
+                            src="{{ $profilePhoto }}"
+                            alt="Student Passport">
                     </div>
 
                     <div class="box-footer pt-80">
                         <div class="description-header text-center">
                             <h4 class="description-content">
-                                {{ $staff_info['surname'] . ', ' . $staff_info['firstname'] . ' ' . $staff_info['middlename'] }}
+                                {{ session('student_profile')['fullName'] ?? 'Student Name' }}
                             </h4>
                         </div>
 
@@ -43,31 +48,9 @@
                                         <h5 class="description-header">STAFF ID NO</h5>
                                     </div>
                                     <div class="col-6">
-                                        <span class="description-text">{{ $staff_info['staff_no'] }}
-                                        </span>
+                                        <span class="description-text">{{ session('student_profile')['student_id'] ?? '-' }}</span>
                                     </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-6">
-                                        <h5 class="description-header">DATE OF BIRTH</h5>
-                                    </div>
-                                    <div class="col-6">
-                                        <span class="description-text">
-                                            {{ \Carbon\Carbon::parse($staff_info['date_of_birth'])->format('d M., Y') }}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-6">
-                                        <h5 class="description-header">GENDER</h5>
-                                    </div>
-                                    <div class="col-6">
-                                        <span class="description-text">{{ $staff_info['gendername'] }}
-                                        </span>
-                                    </div>
-                                </div>
+                                </div>                               
                             </div>
                         </div>
                         <!-- /.row -->

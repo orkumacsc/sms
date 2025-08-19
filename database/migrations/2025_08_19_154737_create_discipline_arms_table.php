@@ -13,8 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('student_classes', function (Blueprint $table) {
+        Schema::create('discipline_arms', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('departments_id')->constrained('departments')->onDelete('cascade');
+            $table->foreignId('school_arms_id')->constrained('school_arms')->onDelete('cascade');
+            $table->integer('max_capacity')->default(50);
             $table->timestamps();
         });
     }
@@ -26,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('student_classes');
+        Schema::dropIfExists('discipline_arms');
     }
 };

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en-UK">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description"
+    content="Gospel International College, Zaki-Biam - Quality Christian Education in Benue State, Nigeria. Discover our academic programs, admissions, and school news.">
+  <meta name="author" content="MiEduSoft Solutions | Educational Software Company in Benue State, Nigeria">
+  <meta name="keywords"
+    content="Gospel International College, Zaki-Biam, Christian School, Benue State, Nigeria, Secondary School, Admissions, Education">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="<?php echo e(url()->current()); ?>">
+  <link rel="icon" href="<?php echo e(asset('backend/images/favicon.ico')); ?>">
+
+  <?php if (! empty(trim($__env->yieldContent('title')))): ?>
+    <title><?php echo $__env->yieldContent('title'); ?> | GOSPEL INTERNATIONAL COLLEGE, ZAKI-BIAM</title>
+  <?php else: ?>
+    <title>GOSPEL INTERNATIONAL COLLEGE, ZAKI-BIAM</title>
+  <?php endif; ?>
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:title" content="<?php echo $__env->yieldContent('title'); ?> | GOSPEL INTERNATIONAL COLLEGE, ZAKI-BIAM">
+  <meta property="og:description" content="Gospel International College, Zaki-Biam - Quality Christian Education in Benue State, Nigeria. Discover our academic programs, admissions, and school news.">
+  <meta property="og:image" content="<?php echo e(asset('backend/images/favicon.ico')); ?>">
+  <meta property="og:url" content="<?php echo e(url()->current()); ?>">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_NG">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:title" content="<?php echo $__env->yieldContent('title'); ?> | GOSPEL INTERNATIONAL COLLEGE, ZAKI-BIAM">
+  <meta property="twitter:description" content="Gospel International College, Zaki-Biam - Quality Christian Education in Benue State, Nigeria. Discover our academic programs, admissions, and school news.">
+  <meta property="twitter:image" content="<?php echo e(asset('backend/images/favicon.ico')); ?>">
+  <meta property="twitter:url" content="<?php echo e(url()->current()); ?>">
+
+  <!-- Vendors Style-->
+  <link rel="stylesheet" href="<?php echo e(asset('backend/css/vendors_css.css')); ?>">
+
+  <!-- Style-->
+  <link rel="stylesheet" href="<?php echo e(asset('backend/css/style.css')); ?>">
+  <link rel="stylesheet" href="<?php echo e(asset('backend/css/skin_color.css')); ?>">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+
+<body class="hold-transition dark-skin sidebar-mini theme-primary fixed" oncontextmenu="return false">
+
+  <div class="wrapper">
+
+    <?php echo $__env->make('Students.body.header', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+
+    <!-- Left side column. contains the logo and sidebar -->
+    <?php echo $__env->make('Students.body.sidebar', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+
+    <!-- Content Wrapper. Contains page content -->
+    <?php echo $__env->yieldContent('mainContent'); ?>
+    <!-- /.content-wrapper -->
+
+    <?php echo $__env->make('Students.body.footer', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+
+  </div>
+  <!-- ./wrapper -->
+
+
+  <!-- Vendor JS -->
+  <script src="<?php echo e(asset('backend/js/vendors.min.js')); ?>"></script>
+  <script src="<?php echo e(asset('assets/icons/feather-icons/feather.min.js')); ?>"></script>
+  <script src="<?php echo e(asset('backend/js/pages/validation.js')); ?>"></script>
+  <script src="<?php echo e(asset('backend/js/pages/form-validation.js')); ?>"></script>
+  <script src="<?php echo e(asset('assets/vendor_components/apexcharts-bundle/irregular-data-series.js')); ?>"></script>
+  <script src="<?php echo e(asset('assets/vendor_components/datatable/datatables.min.js')); ?>"></script>
+  <script src="<?php echo e(asset('backend/js/pages/data-table.js')); ?>"></script>
+
+  <!-- MiEduSoft SMS -->
+  <script src="<?php echo e(asset('backend/js/template.js')); ?>"></script>
+  <script src="<?php echo e(asset('backend/js/pages/dashboard.js')); ?>"></script>
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.x/css/materialdesignicons.min.css" rel="stylesheet">
+
+
+  <script>
+    <?php if(Session::has('message')): ?>
+    var type = "<?php echo e(Session::get('alert-type', 'info')); ?>"
+
+    switch (type) {
+      case 'info':
+      toastr.info(" <?php echo e(Session::get('message')); ?> ");
+      break;
+
+      case 'success':
+      toastr.success(" <?php echo e(Session::get('message')); ?> ");
+      break;
+
+      case 'warning':
+      toastr.warning(" <?php echo e(Session::get('message')); ?> ");
+      break;
+
+      case 'error':
+      toastr.error(" <?php echo e(Session::get('message')); ?> ");
+      break;
+
+    }
+
+  <?php endif; ?>
+
+  </script>
+
+  <script type="text/javascript">
+    $(function () {
+      $(document).on('click', '#delete', function (e) {
+        e.preventDefault();
+        var link = $(this).attr("href");
+
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "You want to delete this User?",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete the user!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = link
+            Swal.fire(
+              'Deleted!',
+              'Your file has been deleted.',
+              'success'
+            )
+          }
+        })
+
+      })
+    })
+  </script>
+
+
+</body>
+
+</html><?php /**PATH C:\xampp\htdocs\gospelcollege\portal.gospelschools.sch.ng\resources\views/Students/master.blade.php ENDPATH**/ ?>

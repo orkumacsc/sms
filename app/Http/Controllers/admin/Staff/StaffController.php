@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\admin\Staff;
 
+use DB;
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Models\SchoolSessions;
-use DB;
 use Illuminate\Http\Request;
 use App\Models\Departments;
 use App\Models\Designations;
@@ -20,7 +21,8 @@ use App\Models\Complexions;
 use App\Models\Staff;
 use App\Models\EmergencyContact;
 use App\Models\Qualifications;
-use App\Models\User;
+use App\Models\SchoolSubjects;
+use App\Models\SchoolClass;
 
 class StaffController extends Controller
 {
@@ -231,6 +233,101 @@ class StaffController extends Controller
         }
 
 
+    }
+    public function StaffEdit($id)
+    {
+        $data['Departments'] = Departments::all();
+        $data['Designations'] = Designations::all();
+        $data['MaritalStatus'] = MaritalStatus::all();
+        $data['Roles'] = Roles::all();
+        $data['genders'] = Gender::all();
+        $data['Countries'] = Countries::all();
+
+    }
+
+    public function StaffUpdate(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'surname' => 'required',
+            'firstname' => 'required',
+        ]);
+
+        $staff = Staff::find($id);
+        if (!$staff) {
+            return redirect()->back()->with('error', 'Staff not found.');
+        }
+
+        $staff->update($validated);
+
+        return redirect()->back()->with('success', 'Staff updated successfully.');
+    }
+
+    // Staff Subject Assignment
+    public function staffSubjectAssignment()
+    {
+        $data['staff'] = Staff::all();
+        $data['subjects'] = SchoolSubjects::all();
+        $data['staffSubjects'] = Staff::whereHas('subjects')->with('subjects')->get();
+        
+        return view('backend.Staff.staff_subjects', $data);
+    }
+
+    public function storeStaffSubjectAssignments(Request $request)
+    {
+        // Validate the request
+        $validated = $request->validate([
+            'staff_id' => 'required|exists:staff,id',
+            'subject_id' => 'required|array',
+            'subject_id.*' => 'exists:school_subjects,id',
+        ]);
+        // Check if the staff already has the subject assigned
+        $staff = Staff::find($request->staff_id);
+        if (!$staff) {
+            return redirect()->back()->with([
+                'message' => 'Staff not found.',
+                'alert-type' => 'error'                
+            ]);
+        }
+
+        $staff->subjects()->sync($request->subject_id);
+
+        return redirect()->back()->with([
+            'message' => 'Subjects assigned successfully.',
+            'alert-type' => 'success'
+        ]);
+    }
+
+    // Staff Class Assignment
+    public function StaffClassAssignment()
+    {
+        $data['staff'] = Staff::all();
+        $data['classes'] = SchoolClass::all();
+        $data['staffClasses'] = Staff::whereHas('classGroup')->with('classGroup')->get();
+
+        return view('backend.Staff.staff_classes', $data);
+    }
+
+    public function storeStaffClassAssignments(Request $request)
+    {
+        $validated = $request->validate([
+            'staff_id' => 'required|exists:staff,id',
+            'class_id' => 'required|exists:school_classes,id',
+        ]);
+
+        $staff = Staff::find($request->staff_id);
+        if (!$staff) {
+            return redirect()->back()->with([
+                'message' => 'Staff not found.',
+                'alert-type' => 'error'
+            ]);
+        }
+
+        $staff->classGroup()->sync($request->class_id);
+
+        return redirect()->back()->with([
+            'message' => 'Classes assigned successfully.',
+            'alert-type' => 'success'
+        ]);
     }
 
     public function employmentLetter()

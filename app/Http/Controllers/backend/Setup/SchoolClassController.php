@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\backend\Setup;
 
 use App\Http\Controllers\Controller;
+use App\Models\ClassesArms;
 use App\Models\ClassSubjects;
-use App\Models\SchoolClassArms;
-use App\Models\SchoolSessions;
 use App\Models\SchoolClassInfo;
 use Illuminate\Http\Request;
 use App\Models\SchoolClass;
@@ -15,44 +14,62 @@ class SchoolClassController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('admin');
 
     }
-    
-    public function SchoolClass(){
-        $data['allData'] = SchoolClass::all();
-        $data['sessions'] = SchoolSessions::all();
-        return view('backend.setup.school_classes',$data);
-    }
 
+    /**
+     * Store a new school class.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeSchoolClass(Request $request)
+    {
 
-    public function StoreSchoolClass(Request $request){
-        $validatedData = $request->validate([
-            'class' => 'required',
-            'session' => 'required',
+        $request->validate([
+            'class' => 'required|string|max:255',
+            'academic_session' => 'required|integer|exists:school_sessions,id',
         ]);
 
-        $data = new SchoolClass();
-        $data->classname = $request->class;
-        $data->session_created = $request->session;
-        $data->save();
+        $schoolClass = new SchoolClass();
+        $schoolClass->classname = $request->class;
+        $schoolClass->session_created = $request->academic_session;
+        $schoolClass->save();
 
-        return redirect()->route('school_classes');
+        return redirect()->back()->with([
+            'message' => 'New class created successfully.',
+            'alert-type' => 'success'
+        ]);
     }
 
-    public function ClassProfile($class_id) {
-        $data['ClassArms'] = SchoolClassArms::join('school_classes','school_classes.id', 'school_class_arms.class_id')
-        ->join('school_arms','school_arms.id','school_class_arms.arm_id')
-            ->where('class_id',$class_id)->get();
-            
-        $data['ClassSubjects'] = ClassSubjects::where('class_id',$class_id)->get();
+    /**
+     * Show the profile for a specific class.
+     *
+     * @param int $class_id
+     * @return \Illuminate\View\View
+     */
+    public function classProfile($class_id)
+    {
+        $data['ClassArms'] = ClassesArms::join('school_classes', 'school_classes.id', 'classes_arms.school_classes_id')
+            ->join('school_arms', 'school_arms.id', 'classes_arms.school_arms_id')
+            ->where('school_classes_id', $class_id)->get();
+
+        $data['ClassSubjects'] = ClassSubjects::where('class_id', $class_id)->get();
         $data['class_id'] = $class_id;
 
         return view('backend.setup.class_profile', $data);
     }
 
-    public function StoreClassInfo(Request $request) {
-        $validateData = $request->validate([
+    /**
+     * Store information about a specific class.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeClassInfo(Request $request)
+    {
+        $request->validate([
             'total_subjects_offered' => 'required',
             'academic_session_id' => 'required',
             'class_id' => 'required'
@@ -65,12 +82,10 @@ class SchoolClassController extends Controller
         $SchoolClassInfo->created_by = Auth::user()->id;
         $SchoolClassInfo->save();
 
-
-        $notifications = array(
+        return redirect()->back()->with([
             'message' => 'Total number of subjects offered by class successfully updated.',
             'alert-type' => 'success'
-        );
-
-        return redirect()->back()->with($notifications);
+        ]);
     }
-};
+}
+;

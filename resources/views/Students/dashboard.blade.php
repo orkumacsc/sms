@@ -8,7 +8,7 @@
 		<!-- Main content -->
 		<section class="content">
 			<div class="row">
-				@if (isset($staff_info))
+				@if (session('student_profile'))
 					@include('Students.body.profile')
 				@endif
 				<div class="modal fade" id="ChangePassword" tabindex="-1" role="document"

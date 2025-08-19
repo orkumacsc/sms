@@ -1,6 +1,7 @@
 @extends('admin.admin_master')
 
 @section('mainContent')
+@section('title', 'Students')
 
 <div class="content-wrapper">
 	<div class="container-full">
@@ -8,7 +9,7 @@
 		<section class="content">
 			<div class="box">
 				<div class="box-header with-border">
-					<h4 class="box-title">View Student By Classe</h4>
+					<h4 class="box-title">Filter Student By Class</h4>
 				</div>
 				<!-- /.box-header -->
 				<div class="box-body">

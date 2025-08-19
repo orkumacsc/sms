@@ -46,7 +46,7 @@ $route = Route::current()->getName();
         
         
         
-        <li class="treeview <?php echo e(($prefix == '/students')? 'active' : ''); ?>">
+        <li class="treeview <?php echo e(($prefix == 'admin/students')? 'active' : ''); ?>">
           <a href="javascript:void(0)">
             <i data-feather="users"></i>
             <span>Student Management</span>
@@ -62,20 +62,25 @@ $route = Route::current()->getName();
           </ul>
         </li> 
 
-        
-        <li class="<?php echo e(($prefix == '/staff')? 'active' : ''); ?>">
-          <a href="<?php echo e(route('staff')); ?>">
+
+        <li class="treeview <?php echo e(($prefix == 'admin/staff')? 'active' : ''); ?>">
+          <a href="javascript:void(0)">
             <i data-feather="users"></i>
-            <span>Staff</span>
+            <span>Staff Management</span>
             <span class="pull-right-container">
               <i class="fa fa-angle-right pull-right"></i>
             </span>
-          </a>          
-        </li> 
-        
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="<?php echo e(route('staff')); ?>"><i class="ti-more"></i>List of Staff</a></li>
+            <li><a href="<?php echo e(route('staff.subjects')); ?>"><i class="ti-more"></i>Subject Teachers</a></li>
+            <li><a href="<?php echo e(route('staff.classes')); ?>"><i class="ti-more"></i>Form Masters</a></li>
+            <li><a href="<?php echo e(route('staff.routines')); ?>"><i class="ti-more"></i>Teachers Routines</a></li>
+          </ul>
+        </li>
 
         
-        <li class="treeview <?php echo e(($prefix == '/academics')? 'active' : ''); ?>">
+        <li class="treeview <?php echo e(($prefix == 'admin/academics')? 'active' : ''); ?>">
           <a href="javascript:void(0)">
             <i data-feather="book-open"></i>
             <span>Academics</span>
@@ -85,7 +90,9 @@ $route = Route::current()->getName();
           </a>
           <ul class="treeview-menu">
             <li><a href="<?php echo e(route('school_subjects')); ?>"><i class="ti-more"></i>Subjects Management</a></li> 
-            <li><a href="<?php echo e(route('marks_grades')); ?>"><i class="ti-more"></i>Marks Grade</a></li>
+            <li><a href="<?php echo e(route('marks_grades')); ?>"><i class="ti-more"></i>Marks Grade</a></li>              
+            <li><a href="<?php echo e(route('school-classes-arms')); ?>"><i class="ti-more"></i>Classes & Arms</a></li>
+            <li><a href="<?php echo e(route('academic_session')); ?>"><i class="ti-more"></i>Academic Sessions & Terms</a></li>
           </ul>
         </li>
         
@@ -143,9 +150,7 @@ $route = Route::current()->getName();
           </a>
           <ul class="treeview-menu">
             <li><a href="<?php echo e(route('schoolsetup.index')); ?>"><i class="ti-more"></i>School Information</a></li>
-            <li><a href="<?php echo e(route('school_class')); ?>"><i class="ti-more"></i>Class</a></li>
-            <li><a href="<?php echo e(route('school_arm')); ?>"><i class="ti-more"></i>Arm</a></li>
-            <li><a href="<?php echo e(route('academic_session')); ?>"><i class="ti-more"></i>Sessions & Terms</a></li>            
+                        
           </ul>
         </li>
         
