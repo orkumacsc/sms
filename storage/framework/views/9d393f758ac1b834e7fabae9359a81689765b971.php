@@ -32,7 +32,7 @@
 								</td>
 								<td>
 									<input type="checkbox" id="<?php echo e($schoolArm->id); ?>" name="arm_id[]"
-										value="<?php echo e($schoolArm->id); ?>" class="checkboxes" required>
+										value="<?php echo e($schoolArm->id); ?>" class="checkboxes">
 									<label for="<?php echo e($schoolArm->id); ?>"></label>
 								</td>
 							</tr>
@@ -83,4 +83,4 @@
 				checkbox.checked = this.checked;
 			}, this);
 		});
-</script><?php /**PATH C:\xampp\htdocs\gospelcollege\portal.gospelschools.sch.ng\resources\views/forms/arm_class_assignment.blade.php ENDPATH**/ ?>
+</script><?php /**PATH C:\xampp\htdocs\gospelcollege\portal.gospelschools.sch.ng\resources\views/forms/add_discipline_arm.blade.php ENDPATH**/ ?>

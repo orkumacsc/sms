@@ -43,22 +43,22 @@
 										</tr>
 									</thead>
 									<tbody>
-										@forelse ($staffClasses as $key => $StaffClass)
+										@forelse ($classTeachers as $key => $classTeacher)
 											<tr>
 												<td>{{ $key + 1 }}</td>
-												<td>{{ $StaffClass->staff_no }}</td>
+												<td>{{ $classTeacher->staff_no }}</td>
 												<td>
-                                                    {{ "{$StaffClass->surname}, {$StaffClass->firstname} {$StaffClass->middlename}" }}
+                                                    {{ "{$classTeacher->surname}, {$classTeacher->firstname} {$classTeacher->middlename}" }}
 												</td>
-												<td>{{ $StaffClass->gender }}</td>
-												<td>{{ $StaffClass->classGroup()->first()->classname ?? 'Not Assigned Class' }}</td>
+												<td>{{ $classTeacher->gender }}</td>
+												<td>{{ $classTeacher->classGroup()->first()->classname ?? 'Not Assigned Class' }}</td>
 												<td>
-													<form action="{{ route('staff.classes.update', $StaffClass->id) }}" method="POST" class="d-inline">
+													<form action="{{ route('staff.classes.update', $classTeacher->id) }}" method="POST" class="d-inline">
                                                         @csrf
                                                         @method('PUT')
                                                         <button type="submit" class="btn btn-info btn-md" onclick="return confirm('Are you sure you want to update this class assignment?')">Update</button>
 													</form>
-													<a href="{{ route('staff.classes.delete', $StaffClass->id) }}"
+													<a href="{{ route('staff.classes.delete', $classTeacher->id) }}"
                                                         class="text-danger" onclick="return confirm('Are you sure you want to delete this class assignment?')">
                                                         <i class="mdi mdi-delete"></i>
 													</a>

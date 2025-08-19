@@ -32,9 +32,10 @@ class Staff extends Model
     {
         return $this->hasOne(User::class, 'user_id');
     }
+    
     public function classGroup()
     {
-        return $this->belongsToMany(SchoolClass::class, 'class_teachers', 'teacher_id', 'class_arm_id');
+        return $this->belongsToMany(SchoolClass::class, 'class_teachers', 'teacher_id', 'school_classes_id');
     }
 
     public function subjects()

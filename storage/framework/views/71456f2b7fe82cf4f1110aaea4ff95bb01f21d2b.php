@@ -11,7 +11,7 @@
             <div class="col-sm-12">
                 <div class="form-group">
                     <label for="staff_id">Staff <span class="text-danger">*</span></label>
-                    <select name="staff_id" id="staff_id" required class="form-control">
+                    <select name="staff_id" id="staff_id" class="form-control" data-validation-required-message="Please select a staff member">
                         <option value="">Select Staff</option>
                         <?php $__currentLoopData = $staff; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $_staff): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <option value="<?php echo e($_staff->id); ?>">
@@ -20,24 +20,67 @@
 
                             </option>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </select>
+                    </select>                    
                 </div>
             </div>                     
         </div>
+
         <div class="row">
             <div class="col-sm-12">
                 <div class="form-group">
                     <label for="class_id">Class <span class="text-danger">*</span></label>
-                    <select name="class_id" id="class_id" required class="form-control">
+                    <select name="class_id" id="class_id" class="form-control" data-validation-required-message="Please select a class">
                         <option value="">Select Class</option>
                         <?php $__currentLoopData = $classes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $class): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <option value="<?php echo e($class->id); ?>"><?php echo e($class->classname); ?></option>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </select>
-                    <small class="text-muted">Please select a class from the list above.</small>
+                    </select>                    
                 </div>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label for="class_id">Discipline <span class="text-danger">*</span></label>
+                    <select name="class_id" id="class_id" class="form-control" data-validation-required-message="Please select a discipline">
+                        <option value="">Select Discipline</option>
+                        <?php $__currentLoopData = $departments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $department): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($department->id); ?>"><?php echo e($department->name); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </select>                    
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label for="class_id">Arm <span class="text-danger">*</span></label>
+                    <select name="class_id" id="class_id" class="form-control" data-validation-required-message="Please select an arm">
+                        <option value="">Select Arm</option>
+                        <?php $__currentLoopData = $arms; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $arm): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($arm->id); ?>"><?php echo e($arm->arm_name); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </select>                    
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label for="academic_session">Academic Session <span class="text-danger">*</span></label>
+                    <select name="academic_session" id="academic_session" class="form-control" data-validation-required-message="Please select an academic session">
+                        <option value="">Select Academic Session</option>
+                        <?php $__currentLoopData = $schoolSessions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $session): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($session->id); ?>"><?php echo e($session->name); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </select>                    
+                </div>
+            </div>
+        </div>
+
         <div class="row">
              <div class="col-sm-12">
                 <div class="form-group">

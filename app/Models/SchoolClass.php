@@ -47,7 +47,7 @@ class SchoolClass extends Model
      */
     public function teachers()
     {
-        return $this->belongsToMany(Staff::class, 'class_teachers', 'class_arm_id', 'teacher_id');
+        return $this->belongsToMany(Staff::class, 'class_teachers', 'school_classes_id', 'teacher_id');
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin\Staff;
 
 use DB;
 use App\Models\User;
+use App\Models\SchoolArms;
 use App\Http\Controllers\Controller;
 use App\Models\SchoolSessions;
 use Illuminate\Http\Request;
@@ -23,6 +24,7 @@ use App\Models\EmergencyContact;
 use App\Models\Qualifications;
 use App\Models\SchoolSubjects;
 use App\Models\SchoolClass;
+use App\Models\ClassTeachers;
 
 class StaffController extends Controller
 {
@@ -302,7 +304,10 @@ class StaffController extends Controller
     {
         $data['staff'] = Staff::all();
         $data['classes'] = SchoolClass::all();
-        $data['staffClasses'] = Staff::whereHas('classGroup')->with('classGroup')->get();
+        $data['arms'] = SchoolArms::all();
+        $data['departments'] = Departments::all();
+        $data['schoolSessions'] = SchoolSessions::all();
+        $data['classTeachers'] = ClassTeachers::with(['class', 'arm', 'academicSession', 'department','teacher'])->get();
 
         return view('backend.Staff.staff_classes', $data);
     }

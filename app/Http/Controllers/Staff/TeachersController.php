@@ -33,17 +33,14 @@ class TeachersController extends Controller
      * @return \Illuminate\View\View
      */
     public function viewStudents(Request $request){
-        // Logic to retrieve and display students
-        $teacher = Staff::where('user_id', Auth::id())->first();
-
-        // If you want the current teacher's class group:
+        
+        $teacher = Staff::where('user_id', Auth::id())->first();     
         $class_id = $teacher ? $teacher->classGroup()->pluck('school_classes.id') : collect();
         
         $students = Students::whereHas('schoolClasses', function($query) use($class_id) {
             $query->whereIn('school_classes.id', $class_id);
         })->get();
-
-        // dd($students); // Uncomment for debugging
+        
         return view('Teachers.students.view', compact('class_id', 'students'));
     }
     

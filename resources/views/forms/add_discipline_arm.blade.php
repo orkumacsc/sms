@@ -1,7 +1,7 @@
 <form method="post" action="{{ route($routeName) }}" enctype="multipart/form-data">
 	@csrf
 	<div class="modal-header">
-		<h5 class="modal-title" id="AssignSubjectModal"> 
+		<h5 class="modal-title" id="AssignSubjectModal">
 			<i class="text-secondary mdi mdi-calculator-variant-outline"></i> {{ $title }}
 		</h5>
 		<button type="button" class="close" data-dismiss="modal" aria-label="close">
@@ -29,8 +29,8 @@
 								<td>{{ $schoolArm->arm_name }}
 								</td>
 								<td>
-									<input type="checkbox" id="{{ $schoolArm->id }}" name="arm_id[]" value="{{ $schoolArm->id }}"
-										class="checkboxes">
+									<input type="checkbox" id="{{ $schoolArm->id }}" name="arm_id[]"
+										value="{{ $schoolArm->id }}" class="checkboxes">
 									<label for="{{ $schoolArm->id }}"></label>
 								</td>
 							</tr>
@@ -40,17 +40,26 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-sm-12">
+			<div class="col-sm-12 col-md-6">
 				<div class="form-group">
 					<h5>Discipline Name<span class="text-danger">*</span></h5>
 					<div class="controls">
-						<select name="class_id" id="class_id" required class="form-control p-10">
+						<select name="departments_id" id="departments_id" required class="form-control p-10">
 							<option value="">Select Discipline</option>
 							@foreach($disciplines as $key => $discipline)
 								<option value="{{ $discipline->id }}">{{ $discipline->name }}
 								</option>
 							@endforeach
 						</select>
+					</div>
+				</div>
+			</div>		
+			<div class="col-sm-12 col-md-6">
+				<div class="form-group">
+					<h5>Max Students<span class="text-danger"></span></h5>
+					<div class="controls">
+						<input type="number" name="max_capacity" id="max_capacity" class="form-control p-10"
+							min="1" value="50">
 					</div>
 				</div>
 			</div>
@@ -62,8 +71,7 @@
 		<input type="submit" value="Add" class="btn  btn-info">
 	</div>
 </form>
-
-<script>	
+<script>
 	document.getElementById('selectAllCheckbox')
 		.addEventListener('change', function () {
 			let checkboxes =

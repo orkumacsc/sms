@@ -10,6 +10,7 @@ use App\Models\SchoolSessions;
 use Illuminate\Http\Request;
 use App\Models\SchoolArms;
 use App\Models\SchoolClass;
+use App\Models\DisciplineArm;
 
 class SchoolArmsController extends Controller
 {
@@ -30,10 +31,10 @@ class SchoolArmsController extends Controller
         $data['schoolArms'] = SchoolArms::get();
         $data['schoolClasses'] = SchoolClass::get();
         $data['disciplines'] = Departments::get();
-        $data['academicSessions'] = SchoolSessions::get();
-        $data['classArms'] = SchoolClass::whereHas('arms')->with(['arms'])->get();
+        $data['academicSessions'] = SchoolSessions::get();        
         $data['classDisciplines'] = SchoolClass::whereHas('disciplines')->with(['disciplines'])->get();
-
+        $data['disciplineArms'] = Departments::whereHas('arms')->with(['arms'])->get();
+        
         return view('backend.setup.school_arms', $data);
     }
 
@@ -43,17 +44,18 @@ class SchoolArmsController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function storeClassArm(Request $request)
+    public function storeDisciplineArm(Request $request)
     {     
         // Validate the request
-        $this->validate($request, $this->classArmValidationRules());
+        $this->validate($request, $this->disciplineArmValidationRules());
 
-        // Create or update the class arm
+        // Create or update the discipline arm
         foreach ($request->arm_id as $armId) {
-            ClassesArms::updateOrCreate(
+            DisciplineArm::updateOrCreate(
             [
                 'school_arms_id' => $armId,
-                'school_classes_id' => $request->class_id
+                'departments_id' => $request->departments_id,
+                'max_capacity' => $request->max_capacity
             ],
             [
                 'active_status' => 1,
@@ -137,12 +139,13 @@ class SchoolArmsController extends Controller
      *
      * @return array
      */
-    protected function classArmValidationRules()
+    protected function disciplineArmValidationRules()
     {
         return [
             'arm_id' => 'required|array',
             'arm_id.*' => 'required|exists:school_arms,id',
-            'class_id' => 'required|exists:school_classes,id',
+            'departments_id' => 'required|exists:departments,id',
+            'max_capacity' => 'integer|min:1',
         ];
     }
 

@@ -122,7 +122,7 @@ Route::middleware(['admin'])->group(function () {
         Route::get('school-classes-arms', [SchoolArmsController::class, 'schoolArm'])->name('school-classes-arms');
         Route::post('school-arms', [SchoolArmsController::class, 'storeSchoolArm'])->name('store_school_arm');
         Route::post('class-disciplines', [SchoolArmsController::class, 'storeClassDiscipline'])->name('store_class_discipline');
-        Route::post('class-arm', [SchoolArmsController::class, 'storeClassArm'])->name('store_class_arm');
+        Route::post('class-arm', [SchoolArmsController::class, 'storeDisciplineArm'])->name('store_discipline_arm');
 
         // School Academic Session routes
         Route::get('academic-session-terms', [AcademicSessionController::class, 'academicSession'])->name('academic_session');
@@ -153,7 +153,7 @@ Route::middleware(['staff'])->group(function () {
     // Form Teacher Routes
     Route::middleware(['isClassTeacher'])->group(function () {
         // Students Routes
-        Route::prefix('/students')->group(function () {
+        Route::prefix('staff/students')->group(function () {
             Route::get('/', [TeachersController::class, 'viewStudents'])->name('teachers.students.view');
         });
 

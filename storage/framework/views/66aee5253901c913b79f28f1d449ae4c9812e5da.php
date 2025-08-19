@@ -43,23 +43,23 @@
 										</tr>
 									</thead>
 									<tbody>
-										<?php $__empty_1 = true; $__currentLoopData = $staffClasses; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $StaffClass): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+										<?php $__empty_1 = true; $__currentLoopData = $classTeachers; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $classTeacher): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
 											<tr>
 												<td><?php echo e($key + 1); ?></td>
-												<td><?php echo e($StaffClass->staff_no); ?></td>
+												<td><?php echo e($classTeacher->staff_no); ?></td>
 												<td>
-                                                    <?php echo e("{$StaffClass->surname}, {$StaffClass->firstname} {$StaffClass->middlename}"); ?>
+                                                    <?php echo e("{$classTeacher->surname}, {$classTeacher->firstname} {$classTeacher->middlename}"); ?>
 
 												</td>
-												<td><?php echo e($StaffClass->gender); ?></td>
-												<td><?php echo e($StaffClass->classGroup()->first()->classname ?? 'Not Assigned Class'); ?></td>
+												<td><?php echo e($classTeacher->gender); ?></td>
+												<td><?php echo e($classTeacher->classGroup()->first()->classname ?? 'Not Assigned Class'); ?></td>
 												<td>
-													<form action="<?php echo e(route('staff.classes.update', $StaffClass->id)); ?>" method="POST" class="d-inline">
+													<form action="<?php echo e(route('staff.classes.update', $classTeacher->id)); ?>" method="POST" class="d-inline">
                                                         <?php echo csrf_field(); ?>
                                                         <?php echo method_field('PUT'); ?>
                                                         <button type="submit" class="btn btn-info btn-md" onclick="return confirm('Are you sure you want to update this class assignment?')">Update</button>
 													</form>
-													<a href="<?php echo e(route('staff.classes.delete', $StaffClass->id)); ?>"
+													<a href="<?php echo e(route('staff.classes.delete', $classTeacher->id)); ?>"
                                                         class="text-danger" onclick="return confirm('Are you sure you want to delete this class assignment?')">
                                                         <i class="mdi mdi-delete"></i>
 													</a>
