@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Departments;
+use App\Http\Controllers\api\ApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,14 +19,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/api/classes/{id}/disciplines', function ($id) {
-    // Fetch the department by ID
-    $department = Departments::find($id);
-    if (!$department) {
-        return response()->json(['error' => 'Department not found'], 404);
-    }
-    return response()->json([
-        'disciplines' => $department->arms()->get()
-    ]);
-});
-
+Route::get('classes/{id}/disciplines',[ApiController::class, 'getDisciplinesByClassId']);
+Route::get('classes/{id}/disciplines-arms',[ApiController::class, 'getDisciplinesOrArmsByClassId']);
+Route::get('disciplines/{id}/arms',[ApiController::class, 'getArmsByDisciplineId']);
+Route::get('staff/{id}/subjects',[ApiController::class, 'getSubjectsByStaffId']);
+Route::get('disciplines/{id}/subjects/arms',[ApiController::class, 'getArmsBySubjectId']);

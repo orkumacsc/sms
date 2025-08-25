@@ -168,6 +168,4 @@ class AcademicController extends Controller
             ]);
         }
     }
-
-
 }

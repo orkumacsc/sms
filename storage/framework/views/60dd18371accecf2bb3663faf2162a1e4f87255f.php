@@ -49,7 +49,7 @@
                 <li class="d-flex align-items-center nav-item" style="justify-content: flex-end;">
                     <div>
                         <h6 class="mb-0" style="text-align: left;">
-                            <?php echo e(active_term()->term_name ?? ''); ?> | <?php echo e(active_session()->name ?? ''); ?>
+                            <?php echo e(currentTerm()->term_name ?? ''); ?> | <?php echo e(currentAcademicSession()->name ?? ''); ?>
 
                         </h6>
                     </div>

@@ -81,8 +81,8 @@ class StaffController extends Controller
         $year_code = strpos($year->name, "_") ? explode("_", $year->name) : explode("/", $year->name);
         $sessionCode = substr($year_code[0], -2);
         $staff_no = "{$schoolCode}/STAFF/{$sessionCode}/{$number}";
-        $passportName = str_replace('/','',$staff_no).".{$request->file('staff_passport')->getClientOriginalExtension()}";
-        $fullName = "{$request->surname} {$request->firstname} {$request->middlename}";        
+        $passportName = str_replace('/', '', $staff_no) . ".{$request->file('staff_passport')->getClientOriginalExtension()}";
+        $fullName = "{$request->surname} {$request->firstname} {$request->middlename}";
 
         try {
             DB::beginTransaction();
@@ -91,7 +91,7 @@ class StaffController extends Controller
                 $Staff_User->usertype = 3;
                 $Staff_User->name = strtoupper($fullName);
                 $Staff_User->username = $staff_no;
-                $Staff_User->email = strtolower(str_replace(' ', '',$fullName))."{$number}@gospelschools.sch.ng";
+                $Staff_User->email = strtolower(str_replace(' ', '', $fullName)) . "{$number}@gospelschools.sch.ng";
                 $Staff_User->password = bcrypt(strtolower($request->surname));
                 $Staff_User->save();
                 $Staff_User->toArray();
@@ -262,77 +262,6 @@ class StaffController extends Controller
         $staff->update($validated);
 
         return redirect()->back()->with('success', 'Staff updated successfully.');
-    }
-
-    // Staff Subject Assignment
-    public function staffSubjectAssignment()
-    {
-        $data['staff'] = Staff::all();
-        $data['subjects'] = SchoolSubjects::all();
-        $data['staffSubjects'] = Staff::whereHas('subjects')->with('subjects')->get();
-        
-        return view('backend.Staff.staff_subjects', $data);
-    }
-
-    public function storeStaffSubjectAssignments(Request $request)
-    {
-        // Validate the request
-        $validated = $request->validate([
-            'staff_id' => 'required|exists:staff,id',
-            'subject_id' => 'required|array',
-            'subject_id.*' => 'exists:school_subjects,id',
-        ]);
-        // Check if the staff already has the subject assigned
-        $staff = Staff::find($request->staff_id);
-        if (!$staff) {
-            return redirect()->back()->with([
-                'message' => 'Staff not found.',
-                'alert-type' => 'error'                
-            ]);
-        }
-
-        $staff->subjects()->sync($request->subject_id);
-
-        return redirect()->back()->with([
-            'message' => 'Subjects assigned successfully.',
-            'alert-type' => 'success'
-        ]);
-    }
-
-    // Staff Class Assignment
-    public function StaffClassAssignment()
-    {
-        $data['staff'] = Staff::all();
-        $data['classes'] = SchoolClass::all();
-        $data['arms'] = SchoolArms::all();
-        $data['departments'] = Departments::all();
-        $data['schoolSessions'] = SchoolSessions::all();
-        $data['classTeachers'] = ClassTeachers::with(['class', 'arm', 'academicSession', 'department','teacher'])->get();
-
-        return view('backend.Staff.staff_classes', $data);
-    }
-
-    public function storeStaffClassAssignments(Request $request)
-    {
-        $validated = $request->validate([
-            'staff_id' => 'required|exists:staff,id',
-            'class_id' => 'required|exists:school_classes,id',
-        ]);
-
-        $staff = Staff::find($request->staff_id);
-        if (!$staff) {
-            return redirect()->back()->with([
-                'message' => 'Staff not found.',
-                'alert-type' => 'error'
-            ]);
-        }
-
-        $staff->classGroup()->sync($request->class_id);
-
-        return redirect()->back()->with([
-            'message' => 'Classes assigned successfully.',
-            'alert-type' => 'success'
-        ]);
     }
 
     public function employmentLetter()

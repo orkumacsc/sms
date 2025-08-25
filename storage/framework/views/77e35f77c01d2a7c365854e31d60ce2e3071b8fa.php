@@ -73,14 +73,14 @@ $route = Route::current()->getName();
           </a>
           <ul class="treeview-menu">
             <li><a href="<?php echo e(route('staff')); ?>"><i class="ti-more"></i>List of Staff</a></li>
-            <li><a href="<?php echo e(route('staff.subjects')); ?>"><i class="ti-more"></i>Subject Teachers</a></li>
+            <li><a href="<?php echo e(route('staff.subjects')); ?>"><i class="ti-more"></i>Teaching Assignments</a></li>
             <li><a href="<?php echo e(route('staff.classes')); ?>"><i class="ti-more"></i>Form Masters</a></li>
             <li><a href="<?php echo e(route('staff.routines')); ?>"><i class="ti-more"></i>Teachers Routines</a></li>
           </ul>
         </li>
 
         
-        <li class="treeview <?php echo e(($prefix == 'admin/academics')? 'active' : ''); ?>">
+        <li class="treeview <?php echo e(($prefix == 'admin_academics')? 'active' : ''); ?>">
           <a href="javascript:void(0)">
             <i data-feather="book-open"></i>
             <span>Academics</span>

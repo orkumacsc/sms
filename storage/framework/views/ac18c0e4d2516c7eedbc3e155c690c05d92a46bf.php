@@ -40,7 +40,9 @@
         <div class="row">
             <div class="col-sm-12 d-flex align-items-end">
                 <div class="form-group mb-0">
-                    <button type="submit" class="btn btn-info">Submit</button>
+                    <button type="submit" class="btn btn-info">
+                       <i class="fa fa-check"></i> Assign
+                    </button>
                 </div>
             </div>
         </div>

@@ -25,5 +25,19 @@ class SchoolArms extends Model
         return $this->belongsToMany(Departments::class, 'discipline_arms', 'school_arms_id', 'departments_id');
     }
 
+    public function students()
+    {
+        return $this->belongsToMany(Students::class, 'students_arms', 'school_arms_id', 'students_id');
+    }
+
+    public function getArms()
+    {
+        return SchoolArms::where('parent_id', null)->get();
+    }
+
+    public function getSubArms()
+    {
+        return SchoolArms::where('parent_id', $this->id)->get();
+    }
 
 }

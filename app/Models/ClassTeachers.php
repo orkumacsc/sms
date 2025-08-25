@@ -15,6 +15,8 @@ class ClassTeachers extends Model
         'academic_sessions_id',
         'departments_id',
         'teacher_id',
+        'assigned_by',
+        'updated_by',
         'active_status'
     ];
 

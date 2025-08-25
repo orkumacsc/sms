@@ -28,7 +28,7 @@
 	  </div>
 
 	  <div>
-	  		<h5> <?php echo e(Active_Term()->term_name); ?> - <?php echo e(Active_Session()->name); ?></h5>
+	  		<h5> <?php echo e(currentTerm()->term_name); ?> - <?php echo e(currentAcademicSession()->name); ?></h5>
 	  </div>
 		
       <div class="navbar-custom-menu r-side">

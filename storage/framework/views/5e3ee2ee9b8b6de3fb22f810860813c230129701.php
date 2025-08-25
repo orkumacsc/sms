@@ -319,7 +319,7 @@
 											<hr />
 											
 											<?php $__currentLoopData = $academic_seasons; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $academic_sessions => $academic_season): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-											<h4 class="text-muted"><?php echo e(Active_Session()->name == $academic_sessions ? 'Current Academic Session' : ''); ?></h4>	
+											<h4 class="text-muted"><?php echo e(currentAcademicSession()->name == $academic_sessions ? 'Current Academic Session' : ''); ?></h4>	
 											<h5><?php echo e($academic_sessions); ?> Academic Session</h5>
 												<div class="table-responsive">
 													<table class="table table-bordered table-striped">

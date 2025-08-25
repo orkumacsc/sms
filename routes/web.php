@@ -30,6 +30,9 @@ use App\Http\Controllers\StudentPromteController;
 use App\Http\Controllers\StudentsClassController;
 use App\Http\Controllers\backend\Setup\AcademicSessionController;
 use App\Http\Controllers\backend\Setup\SchoolArmsController;
+use App\Http\Controllers\admin\Staff\StaffSubjectAssignmentController;
+use App\Http\Controllers\admin\Academics\FormMastersAssignmentController;
+use App\Http\Controllers\admin\Academics\TeachingAssignmentsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,15 +66,18 @@ Route::middleware(['admin'])->group(function () {
     // Staff Management
     Route::prefix('admin/staff')->group(function () {
         // Staff Subject Assignment
-        Route::get('/subjects', [StaffController::class, 'StaffSubjectAssignment'])->name('staff.subjects');
-        Route::post('/subjects', [StaffController::class, 'storeStaffSubjectAssignments'])->name('staff.subjects.store');
-        Route::put('/subjects/{id}', [StaffController::class, 'updateStaffSubjectAssignments'])->name('staff.subjects.update');
+        Route::get('/teaching-assignments', [StaffSubjectAssignmentController::class, 'index'])->name('staff.subjects');
+        Route::post('/teaching-assignments', [StaffSubjectAssignmentController::class, 'store'])->name('staff.subjects.store');
+        Route::put('/teaching-assignments/{id}', [StaffSubjectAssignmentController::class, 'update'])->name('subjects.assignment.update');
+        Route::delete('/teaching-assignments/{id}', [StaffSubjectAssignmentController::class, 'destroy'])->name('staff.subjects.destroy');
+        Route::post('/teaching-assignments/store', [TeachingAssignmentsController::class, 'store'])->name('staff.teaching.assign');
+        Route::put('/teaching-assignments/{id}', [TeachingAssignmentsController::class, 'update'])->name('teaching.assignments.update');
 
         // Staff Class Assignment
-        Route::get('/classes', [StaffController::class, 'StaffClassAssignment'])->name('staff.classes');
-        Route::post('/classes', [StaffController::class, 'storeStaffClassAssignments'])->name('staff.classes.store');
-        Route::put('/classes/{id}', [StaffController::class, 'updateStaffClassAssignments'])->name('staff.classes.update');
-        Route::delete('/classes/{id}', [StaffController::class, 'destroyStaffClassAssignments'])->name('staff.classes.delete');
+        Route::get('/form-masters', [FormMastersAssignmentController::class, 'index'])->name('staff.classes');
+        Route::post('/form-masters', [FormMastersAssignmentController::class, 'store'])->name('staff.classes.store');
+        Route::put('/form-masters/{id}', [FormMastersAssignmentController::class, 'update'])->name('staff.classes.update');
+        Route::delete('/form-masters/{id}', [FormMastersAssignmentController::class, 'destroy'])->name('staff.classes.delete');
 
         // Staff Routine Assignment
         Route::get('/routines', [StaffController::class, 'StaffRoutinesAssignment'])->name('staff.routines');
@@ -113,7 +119,7 @@ Route::middleware(['admin'])->group(function () {
     });
 
     // Academic Management
-    Route::prefix('admin/academics')->group(function () {
+    Route::prefix('admin_academics')->group(function () {
         // School Classes routes        
         Route::post('school-classes', [SchoolClassController::class, 'storeSchoolClass'])->name('save_school_class');
         Route::get('class-profile/{class_id}', [SchoolClassController::class, 'classProfile'])->name('class_profile');
@@ -148,7 +154,7 @@ Route::middleware(['admin'])->group(function () {
 // Staff Routes
 Route::middleware(['staff'])->group(function () {
     // Dashboard Route
-    Route::get('/staff/dashboard', fn() => view('Teachers.dashboard'))->name('staff.dashboard');
+    Route::get('/staff/dashboard', [TeachersController::class, 'dashboard'])->name('staff.dashboard');
 
     // Form Teacher Routes
     Route::middleware(['isClassTeacher'])->group(function () {

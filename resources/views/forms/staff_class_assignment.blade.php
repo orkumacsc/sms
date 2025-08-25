@@ -43,10 +43,7 @@
                 <div class="form-group">
                     <label for="departments_id">Discipline <span class="text-danger">*</span></label>
                     <select name="departments_id" id="departments_id" class="form-control" data-validation-required-message="Please select a discipline">
-                        <option value="">Select Discipline</option>
-                        @foreach($departments as $department)
-                            <option value="{{ $department->id }}">{{ $department->name }}</option>
-                        @endforeach
+                        
                     </select>                    
                 </div>
             </div>
@@ -57,10 +54,7 @@
                 <div class="form-group">
                     <label for="school_arms_id">Arm <span class="text-danger">*</span></label>
                     <select name="school_arms_id" id="school_arms_id" class="form-control" data-validation-required-message="Please select an arm">
-                        <option value="">Select Arm</option>
-                        @foreach($arms as $arm)
-                            <option value="{{ $arm->id }}">{{ $arm->arm_name }}</option>
-                        @endforeach
+                        
                     </select>                    
                 </div>
             </div>
@@ -70,12 +64,8 @@
             <div class="col-sm-12">
                 <div class="form-group">
                     <label for="academic_sessions_id">Academic Session <span class="text-danger">*</span></label>
-                    <select name="academic_sessions_id" id="academic_sessions_id" class="form-control" data-validation-required-message="Please select an academic session">
-                        <option value="">Select Academic Session</option>
-                        @foreach($schoolSessions as $session)
-                            <option value="{{ $session->id }}">{{ $session->name }}</option>
-                        @endforeach
-                    </select>                    
+                    <input type="text" name="academic_sessions_id" id="academic_sessions_id" class="form-control" value="{{ currentAcademicSession()->name }}" readonly> 
+                    <input type="hidden" name="academic_sessions_id" value="{{ currentAcademicSession()->id }}">            
                 </div>
             </div>
         </div>
@@ -89,8 +79,9 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="close"><i
-                class="ti-arrow-left"> Cancel</i></button>        
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="close">
+            <i class="ti-cross-left"></i> Cancel
+        </button>        
     </div>
 </form>
 

@@ -48,7 +48,7 @@
                 <li class="d-flex align-items-center nav-item" style="justify-content: flex-end;">
                     <div>
                         <h6 class="mb-0" style="text-align: left;">
-                            {{ active_term()->term_name ?? '' }} | {{ active_session()->name ?? '' }}
+                            {{ currentTerm()->term_name ?? '' }} | {{ currentAcademicSession()->name ?? '' }}
                         </h6>
                     </div>
                 </li>

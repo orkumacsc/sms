@@ -28,7 +28,7 @@
 	  </div>
 
 	  <div>
-	  		<h5> {{ Active_Term()->term_name }} - {{ Active_Session()->name }}</h5>
+	  		<h5> {{ currentTerm()->term_name }} - {{ currentAcademicSession()->name }}</h5>
 	  </div>
 		
       <div class="navbar-custom-menu r-side">

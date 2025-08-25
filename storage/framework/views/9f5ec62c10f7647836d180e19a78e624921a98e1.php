@@ -1,7 +1,7 @@
-<form method="post" action="<?php echo e(route('staff.classes.store')); ?>" enctype="multipart/form-data">
+<form method="post" action="<?php echo e(route('staff.teaching.assign')); ?>" enctype="multipart/form-data">
     <?php echo csrf_field(); ?>
     <div class="modal-header">
-        <h5 class="modal-title" id="StaffEnrolmentModal">Form Master Appointment</h5>
+        <h5 class="modal-title" id="StaffEnrolmentModal">Teacher-Class-Subject Allocation</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="close">
             <span aria-hidden="true">&times;</span>
         </button>
@@ -11,18 +11,29 @@
             <div class="col-sm-12">
                 <div class="form-group">
                     <label for="staff_id">Staff <span class="text-danger">*</span></label>
-                    <select name="staff_id" id="staff_id" class="form-control" data-validation-required-message="Please select a staff member">
+                    <select name="staff_id" id="_staff_id" required class="form-control">
                         <option value="">Select Staff</option>
                         <?php $__currentLoopData = $staff; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $_staff): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <option value="<?php echo e($_staff->id); ?>">
-                                <?php echo e($_staff->surname); ?>,
-                                <?php echo e($_staff->firstname); ?><?php echo e($_staff->middlename ? " {$_staff->middlename}" : ''); ?>
+                                <?php echo e($_staff->surname); ?>, <?php echo e($_staff->firstname); ?><?php echo e($_staff->middlename ? " {$_staff->middlename}" : ''); ?>
 
                             </option>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </select>                    
+                    </select>
                 </div>
-            </div>                     
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label for="subjects_id">Subjects <span class="text-danger">*</span></label>
+                    <select name="subject_id[]" id="subjects_id" required multiple class="form-control">
+                        
+                    </select>
+                    <small class="text-muted">Hold Ctrl (Windows) or Command (Mac) to select multiple subjects.</small>
+                </div>
+            </div>            
         </div>
 
         <div class="row">
@@ -59,36 +70,59 @@
                     </select>                    
                 </div>
             </div>
-        </div>
+        </div> 
 
         <div class="row">
             <div class="col-sm-12">
                 <div class="form-group">
                     <label for="academic_sessions_id">Academic Session <span class="text-danger">*</span></label>
-                    <input type="text" name="academic_sessions_id" id="academic_sessions_id" class="form-control" value="<?php echo e(currentAcademicSession()->name); ?>" readonly> 
-                    <input type="hidden" name="academic_sessions_id" value="<?php echo e(currentAcademicSession()->id); ?>">            
+                    <select name="academic_sessions_id" id="academic_sessions_id" class="form-control" disabled>
+                        <option value="">Select Academic Session</option>
+                        <?php $__currentLoopData = $schoolSessions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $session): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($session->id); ?>" <?php echo e($session->id == currentAcademicSession()->id ? 'selected' : ''); ?>><?php echo e($session->name); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </select>                    
                 </div>
             </div>
         </div>
 
         <div class="row">
-             <div class="col-sm-12">
-                <div class="form-group">
-                    <input type="submit" value="Appoint" class="btn btn-info">
+            <div class="col-sm-12 d-flex align-items-end">
+                <div class="form-group mb-0">
+                    <button type="submit" class="btn btn-info">
+                        <i class="fa fa-check"></i> Assign
+                    </button>
                 </div>
             </div>
         </div>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="close">
-            <i class="ti-cross-left"></i> Cancel
-        </button>        
+        <button type="button" class="btn btn-outline-danger" data-dismiss="modal" aria-label="close"><i
+                class="ti-arrow-left"> Cancel</i></button>
     </div>
 </form>
+
 
 <script>   
     $school_classes_id = document.getElementById('school_classes_id');   
     $departments_id = document.getElementById('departments_id');    
+    $staff_id = document.getElementById('_staff_id');
+
+    $staff_id.addEventListener('change', function() {
+       fetch(`/api/staff/${this.value}/subjects`)
+            .then(response => response.json())
+            .then(data => {
+                const subjectSelect = document.getElementById('subjects_id');
+                subjectSelect.innerHTML = '<option value="">Select Subjects</option>';
+                data.forEach(subjectItem => {
+                    const option = document.createElement('option');
+                    option.value = subjectItem.id;
+                    option.textContent = subjectItem.subject_name;
+                    subjectSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching subjects:', error));
+    });
 
     $school_classes_id.addEventListener('change', function() {
        fetch(`/api/classes/${this.value}/disciplines`)
@@ -121,4 +155,4 @@
             })
             .catch(error => console.error('Error fetching arms:', error));
     });   
-</script><?php /**PATH C:\xampp\htdocs\gospelcollege\portal.gospelschools.sch.ng\resources\views/forms/staff_class_assignment.blade.php ENDPATH**/ ?>
+</script><?php /**PATH C:\xampp\htdocs\gospelcollege\portal.gospelschools.sch.ng\resources\views/forms/teaching_classes.blade.php ENDPATH**/ ?>

@@ -15,8 +15,7 @@ use App\Models\FeesGroup;
 use App\Models\FeesType;
 use App\Models\SchoolSetup;
 
-// Helers function for school_details
-
+// Helper function for school_details
 if (!function_exists('SchoolDetails')) {
     function SchoolDetails()
     {
@@ -25,8 +24,8 @@ if (!function_exists('SchoolDetails')) {
 }
 
 
-if (!function_exists('CurrentAcademicId')) {
-    function CurrentAcademicId()
+if (!function_exists('currentAcademicId')) {
+    function currentAcademicId()
     {
         $currentAcadSeason = CurrentAcademicSeason::select('session_id as currentSession', 'term_id as currentTerm')
             ->where('active_status', 1)->get();
@@ -34,8 +33,8 @@ if (!function_exists('CurrentAcademicId')) {
     }
 }
 
-if (!function_exists('active_term')) {
-    function Active_Term()
+if (!function_exists('currentTerm')) {
+    function currentTerm()
     {
         return DB::table('current_academic_seasons')
             ->join('school_terms', 'school_terms.id', 'current_academic_seasons.term_id')
@@ -49,23 +48,27 @@ if (!function_exists('active_term')) {
     }
 }
 
-if (!function_exists('active_session')) {
-    function Active_Session()
+if (!function_exists('currentAcademicSession')) {
+    function currentAcademicSession()
     {
         return SchoolSessions::where('active_status', 1)->get()->first();
     }
 }
 
-function FeestoWords($amount)
-{
-    $toWords = new NumberFormatter("EN", NumberFormatter::SPELLOUT);
-    echo ucwords($toWords->format($amount));
+if (!function_exists('feesToWords')) {
+    function feesToWords($amount)
+    {
+        $toWords = new NumberFormatter("en", NumberFormatter::SPELLOUT);
+        return ucwords($toWords->format($amount));
+    }
 }
 
-function formatCurrency($camount)
-{
-    $toCurrency = new NumberFormatter("EN", NumberFormatter::DECIMAL);
-    echo $toCurrency->format($camount);
+if (!function_exists('formatCurrency')) {
+    function formatCurrency($camount)
+    {
+        $toCurrency = new NumberFormatter("en", NumberFormatter::CURRENCY);
+        return $toCurrency->formatCurrency($camount, 'NGN');
+    }
 }
 
 if (!function_exists('isFound')) {
@@ -81,15 +84,15 @@ if (!function_exists('isScoresUploaded')) {
         $CASS_Scores = CassScores::select('student_id', 'cass_type', 'scores')
             ->where('class_id', '=', $class_id)
             ->where('class_arm_id', $class_arm_id)
-            ->where('academic_session_id', Active_Session()->id)
-            ->where('term_id', Active_Term()->term_id)
+            ->where('academic_session_id', currentAcademicSession()->id)
+            ->where('term_id', currentTerm()->term_id)
             ->where('subject_id', $subject_id)
             ->get()->groupBy('cass_type');
 
         $Marks_Registers = MarksRegisters::where('class_id', '=', $class_id)
             ->where('class_arm_id', $class_arm_id)
-            ->where('academic_session_id', Active_Session()->id)
-            ->where('term_id', Active_Term()->term_id)
+            ->where('academic_session_id', currentAcademicSession()->id)
+            ->where('term_id', currentTerm()->term_id)
             ->where('subject_id', $subject_id)
             ->get()->all();
         return (count($CASS_Scores) && $Marks_Registers) ? true : false;
@@ -348,9 +351,6 @@ if (!function_exists('calculateSubjectHighLow')) {
         return $results;
     }
 }
-
-
-
 
 if (!function_exists('computeResults')) {
     function computeResults($result_summary, $student_obtained_marks, $positions, $no_subjects_offered, $result_type = null)

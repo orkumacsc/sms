@@ -112,7 +112,7 @@ class SchoolArmsController extends Controller
 
         // Create the school arm or get existing one if name already exists
         SchoolArms::firstOrCreate([
-            'name' => strtoupper($request->name),
+            'arm_name' => strtoupper($request->arm_name),
         ]);
 
         // Flash a success message
@@ -130,7 +130,8 @@ class SchoolArmsController extends Controller
     protected function schoolArmValidationRules()
     {
         return [
-            'arm_name' => 'required|string|max:255',
+            'arm_name' => 'required|string|max:255',            
+            'parent_id' => 'required|exists:school_arms,id'
         ];
     }
 

@@ -70,6 +70,7 @@ class LoginController extends Controller
                     $staff_profile['gender'] = $profile->gender_id;
 
                     session(['staff_profile' => $staff_profile]);
+                    session(['current_academic_session_id' => 7]); // Assuming 7 is the current academic session ID
 
                     return redirect()->intended('staff/dashboard');
                 }

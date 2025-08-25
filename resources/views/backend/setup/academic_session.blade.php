@@ -319,7 +319,7 @@
 											<hr />
 											
 											@foreach($academic_seasons as $academic_sessions => $academic_season)
-											<h4 class="text-muted">{{ Active_Session()->name == $academic_sessions ? 'Current Academic Session' : ''}}</h4>	
+											<h4 class="text-muted">{{ currentAcademicSession()->name == $academic_sessions ? 'Current Academic Session' : ''}}</h4>	
 											<h5>{{ $academic_sessions }} Academic Session</h5>
 												<div class="table-responsive">
 													<table class="table table-bordered table-striped">
